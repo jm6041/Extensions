@@ -1,13 +1,14 @@
 <Project>
-  <Import Project="version.props" />
-
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)build\Key.snk</AssemblyOriginatorKeyFile>
     <Authors>jiangming</Authors>
     <Company>Jimlicat</Company>
     <Copyright>Copyright @ Jimlicat</Copyright>
-    <PackageProjectUrl>https://github.com/jm6041/Auth</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/jm6041/Auth.git</RepositoryUrl>    
+    <Product>JimlicatExtensions</Product>
+    <Description>Jimlicat .net useful extensions</Description>
+    <PackageTags>Jimlicat</PackageTags>
+    <PackageProjectUrl>https://github.com/jm6041/Extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/jm6041/Extensions.git</RepositoryUrl>    
     <PublicSign Condition="'$(OS)' != 'Windows_NT'">True</PublicSign>
     <RepositoryType>git</RepositoryType>
     <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
@@ -17,5 +18,7 @@
     <!--<NoWarn>$(NoWarn);CA1032;CA1034;CA1063;CA1815;CA1819</NoWarn>-->
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 </Project>

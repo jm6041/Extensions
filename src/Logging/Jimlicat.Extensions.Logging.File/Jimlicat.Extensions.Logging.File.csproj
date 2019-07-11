@@ -8,7 +8,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DocumentationFile>obj\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
     <PackageReleaseNotes>日志批量写入文件</PackageReleaseNotes>
     <PackageTags>Jimlicat,Logging;logger;Jimlicat.Extensions.Logging.File;FileLogger</PackageTags>
   </PropertyGroup>

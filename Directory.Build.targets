@@ -1,7 +1,12 @@
-﻿<Project>
+<Project>
   <PropertyGroup>
     <!-- Assign these values at the end of the project after TargetFramework has been assigned. TargetFramework is not assigned yet in Directory.Build.props. -->
     <RuntimeFrameworkVersion Condition=" '$(TargetFramework)' == 'netcoreapp2.1' ">$(MicrosoftNETCoreApp21PackageVersion)</RuntimeFrameworkVersion>
-    <NETStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(NETStandardLibrary20PackageVersion)</NETStandardImplicitPackageVersion>
+    <NETStandardImplicitPackageVersion Condition=" '$(TargetFramework)' == 'netstandard2.0' ">$(NETStandardLibrary20PackageVersion)</NETStandardImplicitPackageVersion>    
   </PropertyGroup>
+
+  <Target Name="CopyPackage" AfterTargets="Pack">
+    <Copy SourceFiles="$(BaseOutputPath)\$(Configuration)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(SolutionDir)\nupkgs\" ContinueOnError="false" />
+  </Target>
+  
 </Project>
