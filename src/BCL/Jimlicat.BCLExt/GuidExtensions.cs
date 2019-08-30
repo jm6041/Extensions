@@ -8,13 +8,13 @@ namespace System
     public static class GuidExtensions
     {
         /// <summary>
-        /// Guid转换为Base64，去除末尾'=='
+        /// Guid转换为url友好的Base64
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public static string ToBase64(this Guid guid)
+        public static string ToBase64Url(this Guid guid)
         {
-            return GuidHelper.ToBase64(guid);
+            return GuidHelper.ToBase64Url(guid);
         }
 
         /// <summary>

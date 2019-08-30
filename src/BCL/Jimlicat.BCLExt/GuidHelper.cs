@@ -10,13 +10,13 @@ namespace System
     public class GuidHelper
     {
         /// <summary>
-        /// Guid转换为Base64，去除末尾'=='
+        /// Guid转换为url友好的Base64
         /// </summary>
         /// <param name="guid"></param>
         /// <returns></returns>
-        public static string ToBase64(Guid guid)
+        public static string ToBase64Url(Guid guid)
         {
-            return Convert.ToBase64String(guid.ToByteArray()).TrimEnd('=');
+            return Base64UrlEncoder.Encode(guid.ToByteArray());
         }
 
         /// <summary>
@@ -40,8 +40,7 @@ namespace System
             guid = Guid.Empty;
             try
             {
-                string gs = str.PadRight(24, '=');
-                byte[] gb = Convert.FromBase64String(gs);
+                byte[] gb = Base64UrlEncoder.DecodeBytes(str);
                 guid = new Guid(gb);
                 return true;
             }

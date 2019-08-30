@@ -10,10 +10,18 @@ namespace BCLConsoleApp
             Console.WriteLine(guidb32);
             Console.WriteLine(guidb32.Length);
 
-            string guidb64 = Guid.NewGuid().ToBase64();
-            Console.WriteLine(guidb64);
-            Console.WriteLine(guidb64.Length);
+            for (int i = 0; i <= 10; i++)
+            {
+                Guid nid = Guid.NewGuid();
+                Console.WriteLine(nid);
+                string guidb64 = nid.ToBase64Url();
+                Console.WriteLine(guidb64);
+                Console.WriteLine(guidb64.Length);
 
+                GuidHelper.TryFromBase64(guidb64, out Guid gid);
+                Console.WriteLine(gid);
+                Console.WriteLine("-------------------------------");
+            }
             Console.WriteLine("Hello World!");
         }
     }
