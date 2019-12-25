@@ -1,0 +1,106 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta name="renderer" content="webkit">
+    <meta name="referrer" content="always">
+    <title>SignalR测试</title>
+    <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<body>
+    <h2>SignalR测试</h2>
+    <div class="container body-content" style="height:900px;">
+        <div class="col-md-4">
+            <label for="Content">内容</label>
+            <input type="text" id="Content" name="Content" class="form-control" />
+            <input id="btnSend" type="button" value="发送" />
+            <hr />
+            <div>
+                <label for="textProgress">接受内容</label>
+                <textarea id="textProgress" class="form-control"></textarea>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div>
+                <label for="textData">数据</label>
+                <textarea id="textData" class="form-control" style="height:400px;"></textarea>
+            </div>
+            <div>
+                <label for="textConnect">连接信息</label>
+                <textarea id="textConnect" class="form-control" style="height:200px;"></textarea>
+            </div>
+        </div>
+        <footer>
+            <textarea id="textBrowser" class="form-control" style="height:100px;"></textarea>
+        </footer>
+    </div>
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
+    <script src="/lib/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="lib/signalr/signalr.js"></script>
+    <script>
+        var txt = "";
+        txt += "<p>浏览器代号: " + navigator.appCodeName + "</p>";
+        txt += "<p>浏览器名称: " + navigator.appName + "</p>";
+        txt += "<p>浏览器版本: " + navigator.appVersion + "</p>";
+        txt += "<p>启用Cookies: " + navigator.cookieEnabled + "</p>";
+        txt += "<p>硬件平台: " + navigator.platform + "</p>";
+        txt += "<p>用户代理: " + navigator.userAgent + "</p>";
+        txt += "<p>用户代理语言: " + navigator.systemLanguage + "</p>";
+        document.getElementById("textBrowser").value = txt;
+
+        // LogLevel:Error,Warning,Information,Debug,Trace
+        // HttpTransportType:WebSockets,ServerSentEvents,LongPolling
+        var urlPrefix = location.protocol + "//" + location.host;
+        var connection = new signalR.HubConnectionBuilder()
+            .configureLogging(signalR.LogLevel.Trace)
+            .withUrl("/test", signalR.HttpTransportType.WebSockets)
+            .withAutomaticReconnect()
+            .build();
+        $("#btnSend").click(function () {
+            var v = $("#Content").val();
+            if (v) {
+                // 发送
+                connection.invoke('Send', v).catch(function (err) {
+                    addConnectInfo("发送数据异常：" + err);
+                });
+            }
+        });
+
+        // 接受处理
+        connection.on('Received', function (p) {
+            var v = $("#textProgress").val();
+            v = v + "\n" + JSON.stringify(p);
+            $("#textProgress").val(v);
+        });
+
+        // 接受处理
+        connection.on('DataReceived', function (p) {
+            var v = $("#textData").val();
+            v = v + "\n" + JSON.stringify(p);
+            $("#textData").val(v);
+        });
+
+        connection.on('Connected', function (cid) {
+            addConnectInfo("已经连接，连接Id：" + cid);
+        });
+
+        connection.start().catch(function (err) {
+            addConnectInfo("建立连接异常：" + JSON.stringify(err));
+        });
+
+        connection.onreconnected(function (cid) {
+            addConnectInfo("重新连接，连接Id：" + cid);
+        });
+
+        // 添加连接信息
+        function addConnectInfo(msg) {
+            var v = $("#textConnect").val();
+            v = v + "\n" + msg;
+            $("#textConnect").val(v);
+        }
+    </script>
+</body>
+</html>

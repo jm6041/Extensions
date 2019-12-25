@@ -1,0 +1,7 @@
+localdev.pfx
+Dns: localhost
+УмТыЃКAa1qaz2wsx
+
+my.pfx
+Dns: localhost
+УмТыЃКAa1qaz2wsx

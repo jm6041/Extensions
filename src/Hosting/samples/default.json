@@ -1,0 +1,35 @@
+{
+  "Serilog": {
+    "MinimumLevel": {
+      "Default": "Information",
+      "Override": {
+        "Microsoft": "Warning",
+        "System": "Warning"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "File",
+        "Args": {
+          "path": "logs/log.log",
+          "restrictedToMinimumLevel": "Information",
+          //"outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}",
+          // 文件大小限制为20mb
+          "fileSizeLimitBytes": 20971520,
+          // 是否启用缓存
+          //"buffered": false,
+          // 是否进程间共享
+          //"shared": false,
+          // 写入磁盘间隔，默认为 null
+          //"flushToDiskInterval": "00:00:02"
+          // 滚动文件间隔,Infinite,Year,Month,Day,Hour,Minute
+          "rollingInterval": "Day",
+          // 启用文件大小限制滚动，默认为false
+          "rollOnFileSizeLimit": true,
+          // 保留文件数量
+          "retainedFileCountLimit": 4
+        }
+      }
+    ]
+  }
+}

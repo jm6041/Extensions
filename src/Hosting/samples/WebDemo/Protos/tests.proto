@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+
+
+package Tests;
+
+option csharp_namespace = "Tests";
+option java_package = "com.example.tests";
+
+import "google/protobuf/Empty.proto";
+import "google/protobuf/wrappers.proto";
+
+// Tests 服务
+service MyTests {
+   // 测试数据
+   rpc PutTest (InputDto) returns (TestResult);
+   // 获取请求数据
+   rpc GetRequestResult (google.protobuf.Empty) returns (RequestResult);
+}
+// 输入数据
+message InputDto{
+  // 数字
+  double val = 10;
+  // 文本
+  google.protobuf.StringValue text = 20;
+  // 字符串集合
+  repeated string items = 30;
+}
+// 返回结果
+message TestResult{
+  int64 timestamp = 30;
+  string date = 40;
+  string gid = 50;
+  string base64 = 60;
+  string myid = 70;
+  // 输入数据
+  InputDto input = 80;
+}
+// 请求结果
+message RequestResult{
+  // 应用名
+  string app_name = 10;
+  string host = 20;
+  map<string, string> headers = 30;
+}
