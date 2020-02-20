@@ -28,6 +28,37 @@ namespace System.Linq
     public static class PagingExtensions
     {
         /// <summary>
+        /// 执行多重排序
+        /// </summary>
+        /// <typeparam name="T">数据源类型</typeparam>
+        /// <param name="query">数据源</param>
+        /// <param name="orders">排序信息</param>
+        /// <returns>排序结果</returns>
+        private static IOrderedQueryable<T> OrderAndThenBy<T>(this IQueryable<T> query, IEnumerable<Ordering> orders)
+        {
+            if (query == null)
+            {
+                throw new ArgumentNullException(nameof(query));
+            }
+            if (orders == null)
+            {
+                throw new ArgumentNullException(nameof(orders));
+            }
+            List<Ordering> orderList = new List<Ordering>(orders);
+            if (!orderList.Any())
+            {
+                throw new ArgumentException(nameof(orders) + ": is empty.");
+            }
+            var orderedQuery = query.OrderBy(orderList[0]);
+            int count = orderList.Count;
+            for (int i = 1; i < count; i++)
+            {
+                orderedQuery = orderedQuery.ThenBy(orderList[i]);
+            }
+            return orderedQuery;
+        }
+
+        /// <summary>
         /// 执行分页, 自动排序，分页
         /// </summary>
         /// <typeparam name="T">数据源类型</typeparam>

@@ -93,37 +93,6 @@ namespace System.Linq
         }
 
         /// <summary>
-        /// 执行多重排序
-        /// </summary>
-        /// <typeparam name="T">数据源类型</typeparam>
-        /// <param name="query">数据源</param>
-        /// <param name="orders">排序信息</param>
-        /// <returns>排序结果</returns>
-        public static IOrderedQueryable<T> OrderAndThenBy<T>(this IQueryable<T> query, IEnumerable<Ordering> orders)
-        {
-            if (query == null)
-            {
-                throw new ArgumentNullException(nameof(query));
-            }
-            if (orders == null)
-            {
-                throw new ArgumentNullException(nameof(orders));
-            }
-            List<Ordering> orderList = new List<Ordering>(orders);
-            if (!orderList.Any())
-            {
-                throw new ArgumentException(nameof(orders) + ": is empty.");
-            }
-            var orderedQuery = OrderBy(query, orderList[0]);
-            int count = orderList.Count;
-            for (int i = 1; i < count; i++)
-            {
-                orderedQuery = ThenBy(orderedQuery, orderList[i]);
-            }
-            return orderedQuery;
-        }
-
-        /// <summary>
         /// 
         /// 调用排序查询，在(Entity Framework, Linq to Sql)中，不应该使用比较器
         /// </summary>
