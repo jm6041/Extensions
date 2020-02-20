@@ -32,7 +32,7 @@ namespace ConsoleApp
             Console.WriteLine("原始值");
             Print(datas);
 
-            Ordering ordering0 = new Ordering { Name = "Id", Direction = OrderingDirection.Desc };
+            Ordering ordering0 = new Ordering { Name = "Id", Direction = Direction.Desc };
             var descDatas = datas.OrderBy(ordering0);
             Console.WriteLine("倒序后的值");
             Print(descDatas);

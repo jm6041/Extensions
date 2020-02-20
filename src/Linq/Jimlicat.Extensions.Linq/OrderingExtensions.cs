@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -11,14 +11,14 @@ namespace System.Linq
     public static class OrderingExtensions
     {
         // 名字对应成员缓存表达式
-        private static ImmutableDictionary<(Type Type, string Name, OrderingDirection Direction), LambdaExpression> _nameMemberExpressionCache
-            = ImmutableDictionary<(Type Type, string Name, OrderingDirection Direction), LambdaExpression>.Empty;
+        private static ImmutableDictionary<(Type Type, string Name, Direction Direction), LambdaExpression> _nameMemberExpressionCache
+            = ImmutableDictionary<(Type Type, string Name, Direction Direction), LambdaExpression>.Empty;
         // OrderBy委托缓存
-        private static ImmutableDictionary<(Type Type, string Name, OrderingDirection Direction), Delegate> _orderByActionCache
-            = ImmutableDictionary<(Type Type, string Name, OrderingDirection Direction), Delegate>.Empty;
+        private static ImmutableDictionary<(Type Type, string Name, Direction Direction), Delegate> _orderByActionCache
+            = ImmutableDictionary<(Type Type, string Name, Direction Direction), Delegate>.Empty;
         // ThenBy委托缓存
-        private static ImmutableDictionary<(Type Type, string Name, OrderingDirection Direction), Delegate> _thenByActionCache
-            = ImmutableDictionary<(Type Type, string Name, OrderingDirection Direction), Delegate>.Empty;
+        private static ImmutableDictionary<(Type Type, string Name, Direction Direction), Delegate> _thenByActionCache
+            = ImmutableDictionary<(Type Type, string Name, Direction Direction), Delegate>.Empty;
 
         /// <summary>
         /// 创建Lambda表达式"_ => _.Name"
@@ -54,7 +54,7 @@ namespace System.Linq
         private static LambdaExpression CreateFuncExpression<T>(Type memberType, Ordering order, string orderMethod)
         {
             string funName = orderMethod;
-            if (order.Direction == OrderingDirection.Desc)
+            if (order.Direction == Direction.Desc)
             {
                 funName += "Descending";
             }
@@ -115,7 +115,7 @@ namespace System.Linq
             {
                 throw new ArgumentNullException(nameof(order));
             }
-            (Type Type, string Name, OrderingDirection Direction) key = (typeof(T), order.Name.ToUpper(), order.Direction);
+            (Type Type, string Name, Direction Direction) key = (typeof(T), order.Name.ToUpper(), order.Direction);
             // 尝试从缓存中加载，不存在时创建
             if (!_nameMemberExpressionCache.TryGetValue(key, out LambdaExpression expression))
             {
@@ -148,7 +148,7 @@ namespace System.Linq
             {
                 throw new ArgumentNullException(nameof(order));
             }
-            (Type Type, string Name, OrderingDirection Direction) key = (typeof(T), order.Name.ToUpper(), order.Direction);
+            (Type Type, string Name, Direction Direction) key = (typeof(T), order.Name.ToUpper(), order.Direction);
             // 尝试从缓存中加载，不存在时创建
             if (!_nameMemberExpressionCache.TryGetValue(key, out LambdaExpression expression))
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace System.Linq
 {
@@ -6,7 +6,7 @@ namespace System.Linq
     /// 排序顺序
     /// </summary>
     [Serializable]
-    public enum OrderingDirection
+    public enum Direction
     {
         /// <summary>
         /// 升序

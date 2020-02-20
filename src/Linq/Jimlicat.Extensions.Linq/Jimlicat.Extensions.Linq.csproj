@@ -1,20 +1,19 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>System.Linq</RootNamespace>
     <Description>添加按字段名排序分页</Description>
-    <PackageTags>Eson,Linq,Page</PackageTags>
+    <PackageTags>Jimlicat,Linq,Page</PackageTags>
     <PackageReleaseNotes>扩展System.Linq，添加分页排序</PackageReleaseNotes>
   </PropertyGroup>
 
   <PropertyGroup>
-    <DocumentationFile>obj\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-    <Product>Eson Linq 排序分页扩展</Product>
+    <Product>Jimlicat Linq 排序分页扩展</Product>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" Version="1.5.0" />
+    <PackageReference Include="System.Collections.Immutable" />
   </ItemGroup>
 
 </Project>
