@@ -17,7 +17,7 @@ namespace System.Linq
         {
             int count = await source.CountAsync();
             var result = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
-            return await Task.FromResult(new PagedResult<T>() { ToltalCount = count, Result = result });
+            return await Task.FromResult(new PagedResult<T>() { Toltal = count, Result = result });
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace System.Linq
             {
                 if (page.PageSize <= 0)
                 {
-                    return new PagedResult<T>() { ToltalCount = count, Result = Enumerable.Empty<T>().ToList(), };
+                    return new PagedResult<T>() { Toltal = count, Result = Enumerable.Empty<T>().ToList(), };
                 }
                 if (page.PageIndex < 0)
                 {
@@ -46,7 +46,7 @@ namespace System.Linq
                 }
                 result = await source.Page(page).ToListAsync();
             }
-            return new PagedResult<T>() { ToltalCount = count, Result = result, };
+            return new PagedResult<T>() { Toltal = count, Result = result, };
         }
     }
 }

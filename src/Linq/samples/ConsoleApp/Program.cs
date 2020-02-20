@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,7 +31,8 @@ namespace ConsoleApp
             IQueryable<UserInfo> datas = UserInfo.GetSource();
             Console.WriteLine("原始值");
             Print(datas);
-
+            var list = datas.ToList();
+            list.OrderBy(x => x.Name);
             Ordering ordering0 = new Ordering { Name = "Id", Direction = Direction.Desc };
             var descDatas = datas.OrderBy(ordering0);
             Console.WriteLine("倒序后的值");
@@ -44,7 +45,7 @@ namespace ConsoleApp
             Print(pageDatas);
 
             var pagedResult = datas.ToPagedResult(pageParameter);
-            Console.WriteLine($"分页结果 ToltalCount:{pagedResult.ToltalCount}");
+            Console.WriteLine($"分页结果 Toltal:{pagedResult.Toltal}");
             Print(pagedResult.Result);
 
             Console.ReadLine();

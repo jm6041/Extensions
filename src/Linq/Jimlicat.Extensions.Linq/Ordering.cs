@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 namespace System.Linq
 {
     /// <summary>
-    /// 分页排序
+    /// 排序字段名和方向
     /// </summary>
     [Serializable]
     [DataContract]

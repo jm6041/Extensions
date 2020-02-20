@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -19,7 +19,7 @@ namespace System.Linq
         /// 数据总量
         /// </summary>
 
-        public int ToltalCount { get; set; }
+        public int Toltal { get; set; }
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ namespace System.Linq
             {
                 result = source.Page(page).ToList();
             }
-            return new PagedResult<T>() { ToltalCount = count, Result = result, };
+            return new PagedResult<T>() { Toltal = count, Result = result, };
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace System.Linq
         {
             int count = source.Count();
             var result = source.Skip(pageIndex * pageSize).Take(pageSize).ToArray();
-            return new PagedResult<T>() { ToltalCount = count, Result = result };
+            return new PagedResult<T>() { Toltal = count, Result = result };
         }
     }
 }
