@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Design;
+using System;
 
 namespace Microsoft.EntityFrameworkCore
 {
@@ -15,11 +14,6 @@ namespace Microsoft.EntityFrameworkCore
         public TContext CreateDbContext()
         {
             return (TContext)Activator.CreateInstance(typeof(TContext), _options);
-        }
-
-        TContext IDesignTimeDbContextFactory<TContext>.CreateDbContext(string[] args)
-        {
-            return CreateDbContext();
         }
     }
 }

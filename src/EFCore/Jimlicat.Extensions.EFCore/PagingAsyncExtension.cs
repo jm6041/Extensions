@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 
-namespace System.Linq
+namespace Microsoft.EntityFrameworkCore
 {
+    /// <summary>
+    /// 分页异步扩展
+    /// </summary>
     static class PagingAsyncExtension
     {
         /// <summary>
@@ -17,7 +21,7 @@ namespace System.Linq
         {
             int count = await source.CountAsync();
             var result = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
-            return await Task.FromResult(new PagedResult<T>() { Toltal = count, Result = result });
+            return new PagedResult<T>() { Toltal = count, Result = result };
         }
 
         /// <summary>
@@ -29,7 +33,7 @@ namespace System.Linq
         public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> source, PageParameter page)
         {
             int count = await source.CountAsync();
-            IList<T> result = null;
+            IList<T> result;
             if (page == null)
             {
                 result = await source.ToListAsync();
@@ -39,10 +43,6 @@ namespace System.Linq
                 if (page.PageSize <= 0)
                 {
                     return new PagedResult<T>() { Toltal = count, Result = Enumerable.Empty<T>().ToList(), };
-                }
-                if (page.PageIndex < 0)
-                {
-                    page.PageIndex = 0;
                 }
                 result = await source.Page(page).ToListAsync();
             }

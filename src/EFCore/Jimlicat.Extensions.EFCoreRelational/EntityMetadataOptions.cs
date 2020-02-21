@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -131,7 +131,7 @@ namespace Microsoft.EntityFrameworkCore
     {
         private NameType _defaultTableNameType { get; set; }
         private NameType _detaultColumnNameType { get; set; }
-        private int?  _detaultStringLength { get; set; } = 2000;
+        private int? _detaultStringLength { get; set; } = 2000;
 
         public void ApplyServices(IServiceCollection services)
         {
@@ -154,7 +154,7 @@ namespace Microsoft.EntityFrameworkCore
 
         public EntityMetadataExtension WithDetaultStringLength(int? length)
         {
-            if (length.HasValue                 && length <= 0)
+            if (length.HasValue && length <= 0)
             {
                 throw new InvalidOperationException("长度必须大于等于0");
             }
@@ -202,7 +202,17 @@ namespace Microsoft.EntityFrameworkCore
 
         private DbContextOptionsExtensionInfo _info;
 
-        public DbContextOptionsExtensionInfo Info => _info ??= new ExtensionInfo(this);
+        public DbContextOptionsExtensionInfo Info
+        {
+            get
+            {
+                if (_info == null)
+                {
+                    _info = new ExtensionInfo(this);
+                }
+                return _info;
+            }
+        }
     }
 
     public class ExtensionInfo : DbContextOptionsExtensionInfo

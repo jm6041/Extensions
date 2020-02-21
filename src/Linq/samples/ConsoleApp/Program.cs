@@ -39,7 +39,7 @@ namespace ConsoleApp
             Print(descDatas);
 
             List<Ordering> orderings = new List<Ordering>() { ordering0 };
-            PageParameter pageParameter = new PageParameter() { PageIndex = 1, PageSize = 3, Orderings = orderings };
+            PageParameter pageParameter = new PageParameter() { PageIndex = -1, PageSize = 3, Orderings = orderings };
             var pageDatas = datas.Page(pageParameter);
             Console.WriteLine($"分页后的值 PageIndex:{pageParameter.PageIndex}   PageSize:{pageParameter.PageSize}");
             Print(pageDatas);

@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Microsoft.EntityFrameworkCore
 {
@@ -6,7 +6,7 @@ namespace Microsoft.EntityFrameworkCore
     /// <see cref="DbContext"/> Factory 接口定义
     /// </summary>
     /// <typeparam name="TContext"></typeparam>
-    public interface IDbContextFactory<out TContext> : IDesignTimeDbContextFactory<TContext>
+    public interface IDbContextFactory<out TContext>
         where TContext : DbContext
     {
         /// <summary>

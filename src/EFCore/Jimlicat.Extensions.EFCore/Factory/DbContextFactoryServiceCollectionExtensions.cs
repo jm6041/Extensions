@@ -1,10 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -28,8 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             DbContextOptions<TContext> options = DbContextOptionsFactory<TContext>(optionsAction);
             DbContextFactory<TContext> factory = new DbContextFactory<TContext>(options);
             serviceCollection.AddSingleton(factory);
-            serviceCollection.AddSingleton<EntityFrameworkCore.IDbContextFactory<TContext>>((sp) => sp.GetRequiredService<DbContextFactory<TContext>>());
-            serviceCollection.AddSingleton<IDesignTimeDbContextFactory<TContext>>((sp) => sp.GetRequiredService<DbContextFactory<TContext>>());
+            serviceCollection.AddSingleton<IDbContextFactory<TContext>>((sp) => sp.GetRequiredService<DbContextFactory<TContext>>());
             return serviceCollection;
         }
 

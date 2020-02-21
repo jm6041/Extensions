@@ -98,7 +98,7 @@ namespace System.Linq
         public static PagedResult<T> ToPagedResult<T>(this IQueryable<T> source, PageParameter page)
         {
             int count = source.Count();
-            IList<T> result = null;
+            IList<T> result;
             if (page == null)
             {
                 result = source.ToList();
