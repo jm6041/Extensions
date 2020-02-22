@@ -25,7 +25,7 @@ namespace Microsoft.Extensions.DependencyInjection
             DbContextOptions<TContext> options = DbContextOptionsFactory<TContext>(optionsAction);
             DbContextFactory<TContext> factory = new DbContextFactory<TContext>(options);
             serviceCollection.AddSingleton(factory);
-            serviceCollection.AddSingleton<IDbContextFactory<TContext>>((sp) => sp.GetRequiredService<DbContextFactory<TContext>>());
+            serviceCollection.AddSingleton<EntityFrameworkCore.IDbContextFactory<TContext>>((sp) => sp.GetRequiredService<DbContextFactory<TContext>>());
             return serviceCollection;
         }
 
