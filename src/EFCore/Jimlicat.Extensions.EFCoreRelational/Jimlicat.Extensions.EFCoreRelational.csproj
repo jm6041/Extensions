@@ -5,6 +5,11 @@
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Product>Jimlicat EntityFrameworkCore 扩展</Product>
+    <PackageReleaseNotes>Jimlicat EntityFrameworkCore 扩展，新增实体元数据配置</PackageReleaseNotes>
+  </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.0" />
   </ItemGroup>
