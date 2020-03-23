@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Lib.Log;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -40,26 +39,6 @@ namespace Microsoft.AspNetCore.Hosting
         /// </summary>
         private static readonly string ENVIRONMENT;
         /// <summary>
-        /// CTC_CLUSTER
-        /// </summary>
-        private static readonly string CTC_CLUSTER;
-        /// <summary>
-        /// CTC_CONSUL_HOST
-        /// </summary>
-        private static readonly string CTC_CONSUL_HOST = "localhost";
-        /// <summary>
-        /// CTC_CONSUL_PORT
-        /// </summary>
-        private static readonly string CTC_CONSUL_PORT = "80";
-        /// <summary>
-        /// Consule Uri
-        /// </summary>
-        private static readonly string CONSUL_URI = "";
-        /// <summary>
-        /// 是否为K8S环境，如果K8S环境，从CONSUL读取配置
-        /// </summary>
-        public static readonly bool IS_K8S;
-        /// <summary>
         /// 启动 ConfigurationBuilder，读取
         /// appsettings.json
         /// appsettings.{EnvironmentName}.json
@@ -76,11 +55,6 @@ namespace Microsoft.AspNetCore.Hosting
             CONTENT_ROOT = GetContentRootInner(IS_WINDOWS_SERVICE);
             CUSTOM_CONFIG_JSONFILE = GetCustomConfigJsonFile(CONTENT_ROOT);
             ENVIRONMENT = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-            CTC_CLUSTER = Environment.GetEnvironmentVariable("CTC_CLUSTER");
-            CTC_CONSUL_HOST = Environment.GetEnvironmentVariable("CTC_CONSUL_HOST");
-            CTC_CONSUL_PORT = Environment.GetEnvironmentVariable("CTC_CONSUL_PORT");
-            CONSUL_URI = $"http://{CTC_CONSUL_HOST}:{CTC_CONSUL_PORT}";
-            IS_K8S = CTC_CLUSTER != null && CTC_CLUSTER.Equals("k8s", StringComparison.OrdinalIgnoreCase);
             M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = CUSTOM_CONFIG_JSONFILE;
             StartupConfigurationBuilder = CreateBuilder(CONTENT_ROOT, ENVIRONMENT, CUSTOM_CONFIG_JSONFILE);
         }
@@ -183,51 +157,13 @@ namespace Microsoft.AspNetCore.Hosting
             hostBuilder.UseContentRoot(contentRoot)
                 .ConfigureAppConfiguration((context, builder) =>
                 {
-                    if (IS_K8S)
-                    {
-                        builder.AddConsulConfiguration(CONSUL_URI, sharedKey, specialKey, args);
-                    }
-                    else
-                    {
-                        var env = context.HostingEnvironment;
-                        builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, CUSTOM_CONFIG_JSONFILE, args, argsConfigJsonFile);
-                    }
+                    var env = context.HostingEnvironment;
+                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, CUSTOM_CONFIG_JSONFILE, args, argsConfigJsonFile);
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
-                    if (IS_K8S)
-                    {
-                        builder.ClearProviders();
-                        NLogOptions nLogOptions = null;
-                        KafkaOptions kafkaOptions = null;
-                        if (hostContext.Configuration.GetSection("Logging:Local:Enable").Get<bool>())
-                        {
-                            Console.WriteLine("Enable local logging");
-                            nLogOptions = new NLogOptions
-                            {
-                                NLogSavePath = "log"
-                            };
-                        }
-                        if (hostContext.Configuration.GetSection("Logging:Mixed:Enable").Get<bool>())
-                        {
-                            Console.WriteLine("Enable Kafka logging");
-                            kafkaOptions = new KafkaOptions
-                            {
-                                BrokerList = hostContext.Configuration["Logging:Mixed:BrokerList"],
-                                TopicName = hostContext.Configuration["Logging:Mixed:TopicName"],
-                                Project = hostContext.Configuration["Logging:Mixed:Project"],
-                                Environment = hostContext.Configuration["Logging:Mixed:Environment"],
-                                ClientTag = hostContext.Configuration["Logging:Mixed:ClientTag"]
-                            };
-                        }
-                        builder.Services.AddSingleton<ITraceContext, TraceContext>();
-                        builder.AddMix(kafkaOptions, nLogOptions, hostContext.HostingEnvironment.IsDevelopment());
-                    }
-                    else
-                    {
-                        var logger = CreateLogger(hostContext.Configuration);
-                        builder.AddSerilog(logger);
-                    }
+                    var logger = CreateLogger(hostContext.Configuration);
+                    builder.AddSerilog(logger);
                 });
             return hostBuilder;
         }
@@ -254,51 +190,13 @@ namespace Microsoft.AspNetCore.Hosting
                 .UseSystemd()
                 .ConfigureAppConfiguration((context, builder) =>
                 {
-                    if (IS_K8S)
-                    {
-                        builder.AddConsulConfiguration(sharedKey, specialKey, CONSUL_URI, args);
-                    }
-                    else
-                    {
-                        var env = context.HostingEnvironment;
-                        builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, CUSTOM_CONFIG_JSONFILE, args, argsConfigJsonFile);
-                    }
+                    var env = context.HostingEnvironment;
+                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, CUSTOM_CONFIG_JSONFILE, args, argsConfigJsonFile);
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
-                    if (IS_K8S)
-                    {
-                        builder.ClearProviders();
-                        NLogOptions nLogOptions = null;
-                        KafkaOptions kafkaOptions = null;
-                        if (hostContext.Configuration.GetSection("Logging:Local:Enable").Get<bool>())
-                        {
-                            Console.WriteLine("Enable local logging");
-                            nLogOptions = new NLogOptions
-                            {
-                                NLogSavePath = "log"
-                            };
-                        }
-                        if (hostContext.Configuration.GetSection("Logging:Mixed:Enable").Get<bool>())
-                        {
-                            Console.WriteLine("Enable Kafka logging");
-                            kafkaOptions = new KafkaOptions
-                            {
-                                BrokerList = hostContext.Configuration["Logging:Mixed:BrokerList"],
-                                TopicName = hostContext.Configuration["Logging:Mixed:TopicName"],
-                                Project = hostContext.Configuration["Logging:Mixed:Project"],
-                                Environment = hostContext.Configuration["Logging:Mixed:Environment"],
-                                ClientTag = hostContext.Configuration["Logging:Mixed:ClientTag"]
-                            };
-                        }
-                        builder.Services.AddSingleton<ITraceContext, TraceContext>();
-                        builder.AddMix(kafkaOptions, nLogOptions, hostContext.HostingEnvironment.IsDevelopment());
-                    }
-                    else
-                    {
-                        var logger = CreateLogger(hostContext.Configuration);
-                        builder.AddSerilog(logger);
-                    }
+                    var logger = CreateLogger(hostContext.Configuration);
+                    builder.AddSerilog(logger);
                 });
             return hostBuilder;
         }
@@ -382,26 +280,9 @@ namespace Microsoft.AspNetCore.Hosting
             sb.AppendFormat($"ContentRoot: \"{contentRoot}\"");
             sb.AppendLine();
             sb.AppendLine();
-            if (IS_K8S)
-            {
-                sb.Append($"CTC_CLUSTER:{CTC_CLUSTER}");
-                sb.AppendLine();
-                sb.Append($"  CTC_CONSUL_HOST:{CTC_CONSUL_HOST}");
-                sb.AppendLine();
-                sb.Append($"  CTC_CONSUL_PORT:{CTC_CONSUL_PORT}");
-                sb.AppendLine();
-                sb.Append($"  CONSUL_URI:{CONSUL_URI}");
-                sb.AppendLine();
-                sb.Append($"    {sharedKey}");
-                sb.AppendLine();
-                sb.Append($"    {specialKey}");
-                sb.AppendLine();
-            }
-            else
-            {
-                sb.Append("=============================== 配置说明 ===============================");
-                sb.AppendLine();
-                string localConfigInfo = @"所有的配置都是键值对，在环境变量中使用双下划线'__'代替英文冒号':'，在参数中格式为'--Key=Value'
+            sb.Append("=============================== 配置说明 ===============================");
+            sb.AppendLine();
+            string localConfigInfo = @"所有的配置都是键值对，在环境变量中使用双下划线'__'代替英文冒号':'，在参数中格式为'--Key=Value'
 键值对的值安配置加载顺序，后面的覆盖前面的值
 配置加载顺序
   默认配置(详情见 https://docs.microsoft.com/zh-cn/aspnet/)
@@ -427,40 +308,40 @@ namespace Microsoft.AspNetCore.Hosting
     *config.json
   指定配置文件 ( 必须是Json配置文件，由命令行参数指定 )
   命令行参数";
-                sb.Append(localConfigInfo);
+            sb.Append(localConfigInfo);
+            sb.AppendLine();
+            sb.Append("=========================================================================");
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.Append("参数信息，建议 ContentRoot 目录添加 help.info 文件，用于参数说明").AppendLine();
+            sb.Append($"  {M.cf_arg} | {M.ConfigFile_Arg}  <path>  指定配置文件").AppendLine();
+
+
+            string helpFile = Path.Combine(contentRoot, "help.info");
+            if (File.Exists(helpFile))
+            {
+                string help = File.ReadAllText(helpFile, Encoding.UTF8);
+                sb.Append("=============================== Help File ===============================");
+                sb.AppendLine();
+                sb.Append(help);
                 sb.AppendLine();
                 sb.Append("=========================================================================");
-                sb.AppendLine();
-                sb.AppendLine();
-                sb.Append("参数信息，建议 ContentRoot 目录添加 help.info 文件，用于参数说明").AppendLine();
-                sb.Append($"  {M.cf_arg} | {M.ConfigFile_Arg}  <path>  指定配置文件").AppendLine();
-
-
-                string helpFile = Path.Combine(contentRoot, "help.info");
-                if (File.Exists(helpFile))
-                {
-                    string help = File.ReadAllText(helpFile, Encoding.UTF8);
-                    sb.Append("=============================== Help File ===============================");
-                    sb.AppendLine();
-                    sb.Append(help);
-                    sb.AppendLine();
-                    sb.Append("=========================================================================");
-                }
-
-                sb.AppendLine();
-                sb.AppendLine();
-                sb.AppendFormat("input args: {0}", string.Join(" ", args));
-                sb.AppendLine();
-                sb.AppendLine();
-                sb.AppendFormat($"{M.DefaultConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.DefaultConfigFileKey]}\"");
-                sb.AppendLine();
-                sb.AppendFormat($"{M.DefaultEnvConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.DefaultEnvConfigFileKey]}\"");
-                sb.AppendLine();
-                sb.AppendFormat($"{M.CustomConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.CustomConfigFileKey]}\"");
-                sb.AppendLine();
-                sb.AppendFormat($"{M.ArgsConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey]}\"");
-                sb.AppendLine();
             }
+
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendFormat("input args: {0}", string.Join(" ", args));
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendFormat($"{M.DefaultConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.DefaultConfigFileKey]}\"");
+            sb.AppendLine();
+            sb.AppendFormat($"{M.DefaultEnvConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.DefaultEnvConfigFileKey]}\"");
+            sb.AppendLine();
+            sb.AppendFormat($"{M.CustomConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.CustomConfigFileKey]}\"");
+            sb.AppendLine();
+            sb.AppendFormat($"{M.ArgsConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey]}\"");
+            sb.AppendLine();
+
             string msg = sb.ToString();
             using (var streamWriter = File.AppendText(file))
             {
