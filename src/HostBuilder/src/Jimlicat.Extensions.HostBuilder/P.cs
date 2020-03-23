@@ -66,7 +66,7 @@ namespace Microsoft.AspNetCore.Hosting
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
-            .AddextendedConfiguration(contentRoot, environmentName, customConfigJsonFile);
+            .AddExtendedConfiguration(contentRoot, environmentName, customConfigJsonFile);
             return builder;
         }
 

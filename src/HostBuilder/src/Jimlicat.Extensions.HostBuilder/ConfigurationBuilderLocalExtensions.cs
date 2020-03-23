@@ -80,7 +80,7 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="argsConfigJsonFile">参数指定配置目录</param>
         public static IConfigurationBuilder AddLocalConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile, string[] args, string argsConfigJsonFile)
         {
-            builder.AddextendedConfiguration(contentRoot, environmentName, customConfigJsonFile);
+            builder.AddExtendedConfiguration(contentRoot, environmentName, customConfigJsonFile);
             if (args != null)
             {
                 // 参数指定配置文件
@@ -100,7 +100,7 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="contentRoot"></param>
         /// <param name="environmentName"></param>
         /// <param name="customConfigJsonFile">自定义配置目录</param>
-        internal static IConfigurationBuilder AddextendedConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile)
+        internal static IConfigurationBuilder AddExtendedConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile)
         {
             // 默认配置文件
             builder.AddDefaultConfigFile(contentRoot, environmentName);
