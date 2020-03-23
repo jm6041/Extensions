@@ -5,11 +5,11 @@ VisualStudioVersion = 16.0.28803.352
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CA8DADC9-4088-42C4-8C71-E7B30963B115}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.HostBuilder", "src\Jimlicat.Extensions.HostBuilder\Extensions.HostBuilder.csproj", "{2F0E1E15-0122-4CCB-95F5-8647DF3B5C41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.HostBuilder", "src\Jimlicat.Extensions.HostBuilder\Jimlicat.Extensions.HostBuilder.csproj", "{2F0E1E15-0122-4CCB-95F5-8647DF3B5C41}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{90854655-3284-485A-AAA4-11955B491167}"
 	ProjectSection(SolutionItems) = preProject
-		samples\dconfig.json = samples\dconfig.json
+		samples\default.json = samples\default.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebDemo", "samples\WebDemo\WebDemo.csproj", "{CB8C5F6F-C8C1-4C76-9818-918C40130F2A}"

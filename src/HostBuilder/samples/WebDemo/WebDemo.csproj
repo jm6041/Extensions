@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Extensions.HostBuilder\Extensions.HostBuilder.csproj" />
+    <ProjectReference Include="..\..\src\Jimlicat.Extensions.HostBuilder\Jimlicat.Extensions.HostBuilder.csproj" />
     <ProjectReference Include="..\WebCommon\WebCommon.csproj" />
   </ItemGroup>
 
