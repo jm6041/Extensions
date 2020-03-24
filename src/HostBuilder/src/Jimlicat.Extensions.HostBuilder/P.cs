@@ -24,7 +24,7 @@ namespace Microsoft.AspNetCore.Hosting
         /// <summary>
         /// 是否Windows服务托管
         /// </summary>
-        private static readonly bool s_IsWindowsService;
+        private static readonly bool s_IsWindowsService = WindowsServiceHelpers.IsWindowsService();
         /// <summary>
         /// ContentRoot
         /// </summary>
@@ -33,13 +33,6 @@ namespace Microsoft.AspNetCore.Hosting
         /// 入口程序集名
         /// </summary>
         private static volatile string s_EntryAssemblyName;
-        /// <summary>
-        /// 静态构造函数
-        /// </summary>
-        static P()
-        {
-            s_IsWindowsService = WindowsServiceHelpers.IsWindowsService();
-        }
         /// <summary>
         /// 创建 <see cref="ConfigurationBuilder"/>
         /// </summary>
@@ -85,7 +78,8 @@ namespace Microsoft.AspNetCore.Hosting
             }
             // 内容根目录，默认当前程序真实目录
             string contentRoot = AppContext.BaseDirectory;
-            if (WindowsServiceHelpers.IsWindowsService())
+            bool isws = IsWindowsService();
+            if (isws)
             {
                 Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
                 return s_ContentRoot;
