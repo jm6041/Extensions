@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using WebCommon.Hubs;
 using WebCommon.Works;
 
@@ -104,7 +105,8 @@ namespace WebNet461
                 });
             });
 
-            S.WriteConfiguration(env, Configuration);
+            var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
+            S.WriteAndLogConfiguration(logger, env, Configuration);
         }
     }
 }

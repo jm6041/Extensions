@@ -24,8 +24,7 @@ namespace WebNet461
         {
             string contentRoot = P.GetContentRoot(args);
             // 日志目录
-            string logsDir = Path.Combine(contentRoot, "logs");
-            Directory.CreateDirectory(logsDir);
+            string logsDir = P.GetDefaultLogDirectory(contentRoot);
             // 状态文件
             string statusFileName = P.GetFileName(logsDir, "status");
             // 系统崩溃错误文件

@@ -6,6 +6,7 @@ using System.Text;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Builder
 {
@@ -113,7 +114,7 @@ namespace Microsoft.AspNetCore.Builder
         }
 
         /// <summary>
-        /// 写入系统信息
+        /// 写入配置信息
         /// </summary>
         /// <param name="env"></param>
         /// <param name="configuration"></param>
@@ -121,14 +122,84 @@ namespace Microsoft.AspNetCore.Builder
 #if NETCOREAPP2_1 || NET461
         public static void WriteConfiguration(IHostingEnvironment env, IConfiguration configuration)
         {
-            var config = GetConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
             WriteConfigurationInner(configuration, config);
         }
 #else
         public static void WriteConfiguration(IWebHostEnvironment env, IConfiguration configuration)
         {
-            var config = GetConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
             WriteConfigurationInner(configuration, config);
+        }
+#endif
+        /// <summary>
+        /// Configuration EventId
+        /// </summary>
+        public static readonly EventId ConfigurationEventId = new EventId(19, "Configuration");
+        /// <summary>
+        /// 日志记录配置信息
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="env"></param>
+        /// <param name="configuration"></param>
+        /// <param name="logLevel"></param>
+#if NETCOREAPP2_1 || NET461
+        public static void LogConfiguration(ILogger logger, IHostingEnvironment env, IConfiguration configuration, LogLevel logLevel = LogLevel.Information)
+        {
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            LogConfigurationInner(logger, config, logLevel);
+        }
+#else
+        public static void LogConfiguration(ILogger logger, IWebHostEnvironment env, IConfiguration configuration, LogLevel logLevel = LogLevel.Information)
+        {
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            LogConfigurationInner(logger, config, logLevel);
+        }
+#endif
+        private static void LogConfigurationInner(ILogger logger,  string config, LogLevel logLevel)
+        {
+            logger.Log(logLevel, ConfigurationEventId, config);
+        }
+
+        /// <summary>
+        /// 写入并且日志记录配置信息
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="env"></param>
+        /// <param name="configuration"></param>
+        /// <param name="logLevel"></param>
+#if NETCOREAPP2_1 || NET461
+        public static void WriteAndLogConfiguration(ILogger logger, IHostingEnvironment env, IConfiguration configuration, LogLevel logLevel = LogLevel.Information)
+        {
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            WriteConfigurationInner(configuration, config);
+            LogConfigurationInner(logger, config, logLevel);
+        }
+#else
+        public static void WriteAndLogConfiguration(ILogger logger, IWebHostEnvironment env, IConfiguration configuration, LogLevel logLevel = LogLevel.Information)
+        {
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            WriteConfigurationInner(configuration, config);
+            LogConfigurationInner(logger, config, logLevel);
+        }
+#endif
+        /// <summary>
+        /// 获得配置信息
+        /// </summary>
+        /// <param name="env"></param>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+#if NETCOREAPP2_1 || NET461
+        public static string GetConfiguration(IHostingEnvironment env, IConfiguration configuration)
+        {
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            return config;
+        }
+#else
+        public static string GetConfiguration(IWebHostEnvironment env, IConfiguration configuration)
+        {
+            var config = GetConfigurationInner(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            return config;
         }
 #endif
         private static void WriteConfigurationInner(IConfiguration configuration, string config)
@@ -152,7 +223,7 @@ namespace Microsoft.AspNetCore.Builder
         /// <param name="environmentName"></param>
         /// <param name="contentRootPath"></param>
         /// <param name="webRootPath"></param>
-        private static string GetConfiguration(IConfiguration configuration, string appName, string environmentName, string contentRootPath, string webRootPath)
+        private static string GetConfigurationInner(IConfiguration configuration, string appName, string environmentName, string contentRootPath, string webRootPath)
         {
             StringBuilder b = new StringBuilder();
             b.Append(appName).AppendLine();

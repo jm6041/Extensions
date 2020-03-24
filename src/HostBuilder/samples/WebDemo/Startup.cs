@@ -14,6 +14,7 @@ using WebDemo.Managers;
 using WebDemo.Services;
 using WebCommon.Hubs;
 using WebCommon.Works;
+using Microsoft.Extensions.Logging;
 
 namespace WebDemo
 {
@@ -83,7 +84,8 @@ namespace WebDemo
                 });
             });
 
-            S.WriteConfiguration(env, Configuration);
+            var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
+            S.WriteAndLogConfiguration(logger, env, Configuration);
         }
     }
 }

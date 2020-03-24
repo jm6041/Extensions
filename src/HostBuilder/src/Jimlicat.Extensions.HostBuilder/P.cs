@@ -6,11 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Hosting.WindowsServices;
-using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 
 #if NETCOREAPP3_1
 namespace Microsoft.Extensions.Hosting
@@ -31,6 +29,10 @@ namespace Microsoft.AspNetCore.Hosting
         /// ContentRoot
         /// </summary>
         private static volatile string s_ContentRoot;
+        /// <summary>
+        /// 入口程序集名
+        /// </summary>
+        private static volatile string s_EntryAssemblyName;
         /// <summary>
         /// 静态构造函数
         /// </summary>
@@ -106,6 +108,18 @@ namespace Microsoft.AspNetCore.Hosting
             }
             Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
             return s_ContentRoot;
+        }
+        /// <summary>
+        /// 默认日志目录, {contentRoot}/logs/
+        /// </summary>
+        /// <param name="contentRoot"></param>
+        /// <returns></returns>
+        public static string GetDefaultLogDirectory(string contentRoot)
+        {
+            // 日志目录
+            string logsDir = Path.Combine(contentRoot, "logs");
+            Directory.CreateDirectory(logsDir);
+            return logsDir;
         }
 
         /// <summary>
@@ -188,7 +202,7 @@ namespace Microsoft.AspNetCore.Hosting
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
-                    var logger = CreateLogger(hostContext.Configuration);
+                    var logger = CreateLogger(contentRoot, hostContext.Configuration);
                     builder.AddSerilog(logger);
                 });
             return hostBuilder;
@@ -229,17 +243,45 @@ namespace Microsoft.AspNetCore.Hosting
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
-                    var logger = CreateLogger(hostContext.Configuration);
+                    var logger = CreateLogger(contentRoot, hostContext.Configuration);
                     builder.AddSerilog(logger);
                 });
             return hostBuilder;
         }
 #endif
-
-        private static Serilog.ILogger CreateLogger(IConfiguration configuration)
+        /// <summary>
+        /// 是否已经配置了Serilog写文件日志
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns></returns>
+        private static bool HasSerilogWriteToFile(IConfiguration configuration)
         {
-            return new LoggerConfiguration()
-                .ReadFrom.Configuration(configuration)
+            bool hasFile = configuration.GetSection("Serilog:WriteTo").GetChildren().Any(x => x.GetSection("Name").Value == "File");
+            return hasFile;
+        }
+
+        private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration)
+        {
+            var logConfig = new LoggerConfiguration();
+            if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认
+            {
+                string logDir = GetDefaultLogDirectory(contentRoot);
+                string entryName = GetEntryAssemblyName();
+                string logPath = Path.Combine(logDir, $"{entryName}-log.log");
+                logConfig.WriteTo.File(path: logPath,
+#if DEBUG
+            restrictedToMinimumLevel: LogEventLevel.Debug,
+#endif
+#if RELEASE
+            restrictedToMinimumLevel: LogEventLevel.Warning,
+#endif
+            fileSizeLimitBytes: 20 * 1024 * 1024,
+            flushToDiskInterval: TimeSpan.FromMinutes(1),
+            rollingInterval: RollingInterval.Day,
+            rollOnFileSizeLimit: true,
+            retainedFileCountLimit: 4);
+            }
+            return logConfig.ReadFrom.Configuration(configuration)
                 .CreateLogger();
         }
         /// <summary>
@@ -264,7 +306,21 @@ namespace Microsoft.AspNetCore.Hosting
             }
             return file;
         }
-
+        /// <summary>
+        /// 获得入口程序集名
+        /// </summary>
+        /// <returns></returns>
+        public static string GetEntryAssemblyName()
+        {
+            if (s_EntryAssemblyName != null)
+            {
+                return s_EntryAssemblyName;
+            }
+            // 入口程序集名
+            var en = Assembly.GetEntryAssembly().GetName().Name;
+            Interlocked.CompareExchange(ref s_EntryAssemblyName, en, null);
+            return s_EntryAssemblyName;
+        }
         /// <summary>
         /// 获得指定前缀的文件名
         /// </summary>
@@ -274,8 +330,7 @@ namespace Microsoft.AspNetCore.Hosting
         /// <returns></returns>
         public static string GetFileName(string dir, string prefix, int count = 3)
         {
-            // 入口程序集名
-            var entryName = Assembly.GetEntryAssembly().GetName().Name;
+            string entryName = GetEntryAssemblyName();
             var start = entryName + "-" + prefix;
             DirectoryInfo dirInfo = new DirectoryInfo(dir);
             // 删除早期的文件
@@ -285,7 +340,8 @@ namespace Microsoft.AspNetCore.Hosting
                 df.Delete();
             }
             DateTimeOffset now = DateTimeOffset.Now;
-            string n = string.Format("{0}-{1:yyyyMMdd}-{2}.log", start, now, now.Ticks);
+            //string n = string.Format("{0}-{1:yyyyMMdd}-{2}.log", start, now, now.Ticks);
+            string n = string.Format("{0}-{1:yyyyMMdd}.log", start, now);
             string fn = Path.Combine(dir, n);
             return fn;
         }
@@ -297,8 +353,10 @@ namespace Microsoft.AspNetCore.Hosting
         public static void WriteStartupLog(string[] args, string file)
         {
             StringBuilder sb = new StringBuilder();
+            sb.Append("=============================== Start ===============================");
+            sb.AppendLine();
             // 入口程序集名
-            var entryName = Assembly.GetEntryAssembly().GetName().Name;
+            var entryName = GetEntryAssemblyName();
             sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program {1} Starting", DateTimeOffset.Now, entryName);
             sb.AppendLine();
 #if DEBUG
@@ -310,8 +368,7 @@ namespace Microsoft.AspNetCore.Hosting
             string contentRoot = GetContentRoot(args);
             sb.AppendFormat($"ContentRoot: \"{contentRoot}\"");
             sb.AppendLine();
-            sb.AppendLine();
-            sb.Append("=============================== 配置说明 ===============================");
+            sb.Append("------------------- 配置说明 -------------------");
             sb.AppendLine();
             string localConfigInfo = @"所有的配置都是键值对，在环境变量中使用双下划线'__'代替英文冒号':'，在参数中推荐格式为'--Key Value','-key val'
 键值对的值安配置加载顺序，后面的覆盖前面的值
@@ -341,8 +398,7 @@ namespace Microsoft.AspNetCore.Hosting
   命令行参数";
             sb.Append(localConfigInfo);
             sb.AppendLine();
-            sb.Append("=========================================================================");
-            sb.AppendLine();
+            sb.Append("---------------------------------------------------");
             sb.AppendLine();
             sb.Append("参数信息，建议 ContentRoot 目录添加 help.info 文件，用于参数说明").AppendLine();
             sb.Append($"  {M.cr_arg} | {M.ContentRoot_Arg}  <dir>  指定内容根目录(ContentRoot)").AppendLine();
@@ -352,17 +408,15 @@ namespace Microsoft.AspNetCore.Hosting
             if (File.Exists(helpFile))
             {
                 string help = File.ReadAllText(helpFile, Encoding.UTF8);
-                sb.Append("=============================== Help File ===============================");
+                sb.Append("------------------ Help File ------------------");
                 sb.AppendLine();
                 sb.Append(help);
                 sb.AppendLine();
-                sb.Append("=========================================================================");
+                sb.Append("-----------------------------------------------");
             }
 
             sb.AppendLine();
-            sb.AppendLine();
             sb.AppendFormat("input args: {0}", string.Join(" ", args));
-            sb.AppendLine();
             sb.AppendLine();
             sb.AppendFormat($"{M.ContentRootKey}: \"{M.TEMP_CONFIG_DIC[M.ContentRootKey]}\"");
             sb.AppendLine();
@@ -389,7 +443,14 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="file"></param>
         public static void WriteErrorLog(Exception ex, string file)
         {
-            string msg = string.Format("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program Error: {1} ", DateTimeOffset.Now, ex);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("=============================== Error ===============================");
+            sb.AppendLine();
+            sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program Error. Details:", DateTimeOffset.Now);
+            sb.AppendLine();
+            sb.Append(ex.ToString());
+            sb.AppendLine();
+            string msg = sb.ToString();
             using (var streamWriter = File.AppendText(file))
             {
                 streamWriter.WriteLine(msg);
@@ -402,7 +463,10 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="file"></param>
         public static void WriteExitLog(string file)
         {
-            string msg = string.Format("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program Exited. ContentRoot: \"{1}\" ", DateTimeOffset.Now, s_ContentRoot);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program Exited.", DateTimeOffset.Now);
+            sb.AppendLine();
+            string msg = sb.ToString();
             using (var streamWriter = File.AppendText(file))
             {
                 streamWriter.WriteLine(msg);
