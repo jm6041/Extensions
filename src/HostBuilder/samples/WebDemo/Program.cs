@@ -12,21 +12,6 @@ using Microsoft.Extensions.Logging;
 namespace WebDemo
 {
     /// <summary>
-    /// Consul常量
-    /// </summary>
-    internal class ConsulConst
-    {
-        /// <summary>
-        /// 共享Key
-        /// </summary>
-        public const string SharedKey = "ctc/appsettings/shared";
-        /// <summary>
-        /// 特定Key
-        /// </summary>
-        public const string SpecialKey = "ctc/appsettings/IdentityServer";
-    }
-
-    /// <summary>
     /// 入口程序
     /// </summary>
     public class Program
@@ -37,7 +22,7 @@ namespace WebDemo
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            string contentRoot = P.GetContentRoot();
+            string contentRoot = P.GetContentRoot(args);
             // 日志目录
             string logsDir = Path.Combine(contentRoot, "logs");
             Directory.CreateDirectory(logsDir);
@@ -47,13 +32,13 @@ namespace WebDemo
             string errorFileName = P.GetFileName(logsDir, "error");
             try
             {
-                IHostBuilder hostBuilder = P.CreateHostBuilder(args, statusFileName, ConsulConst.SharedKey, ConsulConst.SpecialKey);
+                IHostBuilder hostBuilder = P.CreateHostBuilder(args, statusFileName);
                 hostBuilder.ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
                 var host = hostBuilder.Build();
-                P.WriteStartupLog(args, statusFileName, ConsulConst.SharedKey, ConsulConst.SpecialKey);
+                P.WriteStartupLog(args, statusFileName);
                 host.Run();
             }
             catch (Exception ex)

@@ -121,23 +121,38 @@ namespace Microsoft.AspNetCore.Builder
 #if NETCOREAPP2_1 || NET461
         public static void WriteConfiguration(IHostingEnvironment env, IConfiguration configuration)
         {
-           WriteConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            var config = GetConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            WriteConfigurationInner(configuration, config);
         }
 #else
         public static void WriteConfiguration(IWebHostEnvironment env, IConfiguration configuration)
         {
-            WriteConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            var config = GetConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath, env.WebRootPath);
+            WriteConfigurationInner(configuration, config);
         }
 #endif
+        private static void WriteConfigurationInner(IConfiguration configuration, string config)
+        {
+            string file = configuration.GetSection(M.StartupStatusFileKey)?.Value;
+            if (!string.IsNullOrEmpty(file))
+            {
+                using (var streamWriter = File.AppendText(file))
+                {
+                    streamWriter.WriteLine(config);
+                }
+            }
+            Console.WriteLine(config);
+        }
+
         /// <summary>
-        /// 写入系统信息
+        /// 获得配置信息
         /// </summary>
         /// <param name="configuration"></param>
         /// <param name="appName"></param>
         /// <param name="environmentName"></param>
         /// <param name="contentRootPath"></param>
         /// <param name="webRootPath"></param>
-        private static void WriteConfiguration(IConfiguration configuration, string appName, string environmentName, string contentRootPath, string webRootPath)
+        private static string GetConfiguration(IConfiguration configuration, string appName, string environmentName, string contentRootPath, string webRootPath)
         {
             StringBuilder b = new StringBuilder();
             b.Append(appName).AppendLine();
@@ -163,16 +178,8 @@ namespace Microsoft.AspNetCore.Builder
                 }
                 b.AppendLine();
             }
-
-            string file = configuration.GetSection(M.StartupStatusFileKey)?.Value;
-            if (!string.IsNullOrEmpty(file))
-            {
-                using (var streamWriter = File.AppendText(file))
-                {
-                    streamWriter.WriteLine(b.ToString());
-                }
-            }
-            Console.WriteLine(b.ToString());
+            b.AppendLine();
+            return b.ToString();
         }
     }
 }

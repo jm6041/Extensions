@@ -46,7 +46,7 @@ namespace Microsoft.Extensions.Configuration
         /// <returns></returns>
         public static Uri GetGrpcGateway(this IConfiguration configuration)
         {
-            // 获得连接字符串
+            // 获得 Grpc 网关
             string gw = configuration.GetSection("Grpc:Gateway").Value;
             if (string.IsNullOrEmpty(gw))
             {

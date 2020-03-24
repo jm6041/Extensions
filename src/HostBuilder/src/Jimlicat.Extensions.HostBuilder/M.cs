@@ -21,6 +21,18 @@ namespace System
         /// </summary>
         public const string ConfigFile_Arg = "--ConfigFile";
         /// <summary>
+        /// 指定 ContentRoot 参数，简写
+        /// </summary>
+        public const string cr_arg = "-cr";
+        /// <summary>
+        /// 指定 ContentRoot 参数
+        /// </summary>
+        public const string ContentRoot_Arg = "--ContentRoot";
+        /// <summary>
+        /// ContentRoot Key
+        /// </summary>
+        public const string ContentRootKey = "ContentRoot";
+        /// <summary>
         /// 默认配置文件Key
         /// </summary>
         public const string DefaultConfigFileKey = "DefaultConfigFile";
@@ -33,7 +45,7 @@ namespace System
         /// </summary>
         public const string CustomConfigFileKey = "CustomConfigFile";
         /// <summary>
-        /// 参数自定配置文件Key
+        /// 参数指定配置文件Key
         /// </summary>
         public const string ArgsConfigFileKey = "ArgsConfigFile";
         /// <summary>
@@ -41,6 +53,7 @@ namespace System
         /// </summary>
         public static readonly Dictionary<string, string> TEMP_CONFIG_DIC = new Dictionary<string, string>()
         {
+            {ContentRootKey, "" },
             {DefaultConfigFileKey, ""},
             {DefaultEnvConfigFileKey, ""},
             {CustomConfigFileKey, ""},

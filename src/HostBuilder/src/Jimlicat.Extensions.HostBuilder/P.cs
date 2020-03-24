@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,93 +26,113 @@ namespace Microsoft.AspNetCore.Hosting
         /// <summary>
         /// 是否Windows服务托管
         /// </summary>
-        private static readonly bool IS_WINDOWS_SERVICE;
+        private static readonly bool s_IsWindowsService;
         /// <summary>
         /// ContentRoot
         /// </summary>
-        private static readonly string CONTENT_ROOT;
-        /// <summary>
-        /// 自定义JSON配置文件
-        /// </summary>
-        private static readonly string CUSTOM_CONFIG_JSONFILE;        
-        /// <summary>
-        /// ASPNETCORE_ENVIRONMENT 指定的环境名
-        /// </summary>
-        private static readonly string ENVIRONMENT;
-        /// <summary>
-        /// 启动 ConfigurationBuilder，读取
-        /// appsettings.json
-        /// appsettings.{EnvironmentName}.json
-        /// 环境变量
-        /// 扩展的配置，扩展默认文件，config配置，secrets 目录配置文件，config 目录配置文件, 自定义配置文件
-        /// </summary>
-        public static ConfigurationBuilder StartupConfigurationBuilder { get; }
+        private static volatile string s_ContentRoot;
         /// <summary>
         /// 静态构造函数
         /// </summary>
         static P()
         {
-            IS_WINDOWS_SERVICE = WindowsServiceHelpers.IsWindowsService();
-            CONTENT_ROOT = GetContentRootInner(IS_WINDOWS_SERVICE);
-            CUSTOM_CONFIG_JSONFILE = GetCustomConfigJsonFile(CONTENT_ROOT);
-            ENVIRONMENT = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
-            M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = CUSTOM_CONFIG_JSONFILE;
-            StartupConfigurationBuilder = CreateBuilder(CONTENT_ROOT, ENVIRONMENT, CUSTOM_CONFIG_JSONFILE);
+            s_IsWindowsService = WindowsServiceHelpers.IsWindowsService();
         }
-
-        private static ConfigurationBuilder CreateBuilder(string contentRoot, string environmentName, string customConfigJsonFile)
+        /// <summary>
+        /// 创建 <see cref="ConfigurationBuilder"/>
+        /// </summary>
+        /// <param name="args">输入参数</param>
+        /// <param name="environmentName">环境名，如果为空，读取 "ASPNETCORE_ENVIRONMENT" 环境变量，如果环境变量为空，设为"Production"</param>
+        /// <remarks>
+        /// 读取 appsettings.json, appsettings.{EnvironmentName}.json, 环境变量
+        /// 扩展的配置，与HostBuilder的扩展配置一样
+        /// 默认文件，config配置，secrets 目录配置文件，config 目录配置文件，自定义配置文件，参数指定文件</remarks>
+        /// <returns><see cref="ConfigurationBuilder"/></returns>
+        public static ConfigurationBuilder CreateConfigurationBuilder(string[] args, string environmentName = null)
         {
+            if (string.IsNullOrEmpty(environmentName))
+            {
+                environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production";
+            }
+            // 内容根目录
+            string contentRoot = GetContentRoot(args);
+            // 自定义配置文件
+            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
+            // 参数指定配置文件
+            string argsConfigJsonFile = GetArgsConfigJsonFile(args);
+
             var builder = new ConfigurationBuilder();
             builder.SetBasePath(contentRoot)
             .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
             .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true)
             .AddEnvironmentVariables()
-            .AddExtendedConfiguration(contentRoot, environmentName, customConfigJsonFile);
+            .AddLocalConfiguration(contentRoot, environmentName, customConfigJsonFile, args, argsConfigJsonFile);
             return builder;
         }
 
         /// <summary>
-        /// 获得 ContentRoot
+        /// 初始化并且获得 ContentRoot，必须第一个调用，确定 ContentRoot
         /// </summary>
-        /// <param name="isws">是否Windows服务托管</param>
-        /// <returns></returns>
-        private static string GetContentRootInner(bool isws)
+        /// <param name="args">启动参数</param>
+        /// <returns>ContentRoot</returns>
+        public static string GetContentRoot(string[] args)
         {
+            if (s_ContentRoot != null)
+            {
+                return s_ContentRoot;
+            }
             // 内容根目录，默认当前程序真实目录
             string contentRoot = AppContext.BaseDirectory;
-            if (isws)
+            if (WindowsServiceHelpers.IsWindowsService())
             {
-                return contentRoot;
+                Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
+                return s_ContentRoot;
             }
 
             // 当前目录，
             string curDir = Directory.GetCurrentDirectory();
             // 当前目录信息
             DirectoryInfo curDirInfo = new DirectoryInfo(curDir);
-            // 当前目录包含项目文件，表示从项目启动，例如 dotnet run， 必须使用当前目录
+            // 当前目录包含项目文件，表示从项目启动，例如 dotnet run， 默认使用当前目录
             if (curDirInfo.EnumerateFiles("*.csproj").Any())
             {
                 contentRoot = curDir;
             }
-            return contentRoot;
+            // 如果启动参数指定目录，使用参数
+            var argContentRoot = GetContentRootArg(args);
+            if (!string.IsNullOrEmpty(argContentRoot))
+            {
+                contentRoot = argContentRoot;
+            }
+            Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
+            return s_ContentRoot;
         }
 
         /// <summary>
-        /// 前进程是否作为Windows服务托管
+        /// 进程是否作为Windows服务托管
         /// </summary>
         /// <returns></returns>
         public static bool IsWindowsService()
         {
-            return IS_WINDOWS_SERVICE;
+            return s_IsWindowsService;
         }
 
-        /// <summary>
-        /// 获得 ContentRoot
-        /// </summary>
-        /// <returns></returns>
-        public static string GetContentRoot()
+        private static string GetContentRootArg(string[] args)
         {
-            return CONTENT_ROOT;
+            string cr = "";
+            if (args != null)
+            {
+                int count = args.Length;
+                for (int i = 0; i < count - 1; i++)
+                {
+                    string arg = args[i];
+                    if (arg.Equals(M.cr_arg, StringComparison.OrdinalIgnoreCase) || arg.Equals(M.ContentRoot_Arg, StringComparison.OrdinalIgnoreCase))
+                    {
+                        cr = args[i + 1];
+                    }
+                }
+            }
+            return cr;
         }
         /// <summary>
         /// 获得自定义配置文件
@@ -133,13 +154,18 @@ namespace Microsoft.AspNetCore.Hosting
         /// </summary>
         /// <param name="args">参数</param>
         /// <param name="startupStatusFile">启动状态保存文件</param>
-        /// <param name="sharedKey">consul共享Key</param>
-        /// <param name="specialKey">consul特定Key</param>
         /// <returns></returns>
 #if NETCOREAPP2_1 || NET461
-        public static IWebHostBuilder CreateHostBuilder(string[] args, string startupStatusFile, string sharedKey = null, string specialKey = null)
+        public static IWebHostBuilder CreateHostBuilder(string[] args, string startupStatusFile)
         {
-            string contentRoot = CONTENT_ROOT;
+            // 内容根目录
+            string contentRoot = GetContentRoot(args);
+            M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
+
+            // 自定义配置文件
+            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
+            M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
+
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey] = argsConfigJsonFile;
@@ -158,7 +184,7 @@ namespace Microsoft.AspNetCore.Hosting
                 .ConfigureAppConfiguration((context, builder) =>
                 {
                     var env = context.HostingEnvironment;
-                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, CUSTOM_CONFIG_JSONFILE, args, argsConfigJsonFile);
+                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, customConfigJsonFile, args, argsConfigJsonFile);
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
@@ -168,12 +194,20 @@ namespace Microsoft.AspNetCore.Hosting
             return hostBuilder;
         }
 #else
-        public static IHostBuilder CreateHostBuilder(string[] args, string startupStatusFile, string sharedKey = null, string specialKey = null)
+        public static IHostBuilder CreateHostBuilder(string[] args, string startupStatusFile)
         {
-            string contentRoot = CONTENT_ROOT;
+            // 内容根目录
+            string contentRoot = GetContentRoot(args);
+            M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
+
+            // 自定义配置文件
+            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
+            M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
+
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey] = argsConfigJsonFile;
+
 
             var hostBuilder = Host.CreateDefaultBuilder(args);
             if (!string.IsNullOrWhiteSpace(startupStatusFile))
@@ -191,7 +225,7 @@ namespace Microsoft.AspNetCore.Hosting
                 .ConfigureAppConfiguration((context, builder) =>
                 {
                     var env = context.HostingEnvironment;
-                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, CUSTOM_CONFIG_JSONFILE, args, argsConfigJsonFile);
+                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, customConfigJsonFile, args, argsConfigJsonFile);
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
@@ -260,11 +294,8 @@ namespace Microsoft.AspNetCore.Hosting
         /// </summary>
         /// <param name="args">启动参数</param>
         /// <param name="file">写入的文件</param>
-        /// <param name="sharedKey">consul共享Key</param>
-        /// <param name="specialKey">consul特定Key</param>
-        public static void WriteStartupLog(string[] args, string file, string sharedKey = null, string specialKey = null)
+        public static void WriteStartupLog(string[] args, string file)
         {
-            // 是否迁移数据库
             StringBuilder sb = new StringBuilder();
             // 入口程序集名
             var entryName = Assembly.GetEntryAssembly().GetName().Name;
@@ -276,13 +307,13 @@ namespace Microsoft.AspNetCore.Hosting
 #if RELEASE
             sb.AppendLine("RELEASE");
 #endif
-            string contentRoot = CONTENT_ROOT;
+            string contentRoot = GetContentRoot(args);
             sb.AppendFormat($"ContentRoot: \"{contentRoot}\"");
             sb.AppendLine();
             sb.AppendLine();
             sb.Append("=============================== 配置说明 ===============================");
             sb.AppendLine();
-            string localConfigInfo = @"所有的配置都是键值对，在环境变量中使用双下划线'__'代替英文冒号':'，在参数中格式为'--Key=Value'
+            string localConfigInfo = @"所有的配置都是键值对，在环境变量中使用双下划线'__'代替英文冒号':'，在参数中推荐格式为'--Key Value','-key val'
 键值对的值安配置加载顺序，后面的覆盖前面的值
 配置加载顺序
   默认配置(详情见 https://docs.microsoft.com/zh-cn/aspnet/)
@@ -306,7 +337,7 @@ namespace Microsoft.AspNetCore.Hosting
     *.ini
   自定义配置文件 ( ContentRoot 上级目录开始向根目录递归查找，建议存放多个项目通用的配置信息)
     *config.json
-  指定配置文件 ( 必须是Json配置文件，由命令行参数指定 )
+  参数指定配置文件 ( 必须是Json配置文件，由命令行参数指定 )
   命令行参数";
             sb.Append(localConfigInfo);
             sb.AppendLine();
@@ -314,8 +345,8 @@ namespace Microsoft.AspNetCore.Hosting
             sb.AppendLine();
             sb.AppendLine();
             sb.Append("参数信息，建议 ContentRoot 目录添加 help.info 文件，用于参数说明").AppendLine();
+            sb.Append($"  {M.cr_arg} | {M.ContentRoot_Arg}  <dir>  指定内容根目录(ContentRoot)").AppendLine();
             sb.Append($"  {M.cf_arg} | {M.ConfigFile_Arg}  <path>  指定配置文件").AppendLine();
-
 
             string helpFile = Path.Combine(contentRoot, "help.info");
             if (File.Exists(helpFile))
@@ -332,6 +363,8 @@ namespace Microsoft.AspNetCore.Hosting
             sb.AppendLine();
             sb.AppendFormat("input args: {0}", string.Join(" ", args));
             sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendFormat($"{M.ContentRootKey}: \"{M.TEMP_CONFIG_DIC[M.ContentRootKey]}\"");
             sb.AppendLine();
             sb.AppendFormat($"{M.DefaultConfigFileKey}: \"{M.TEMP_CONFIG_DIC[M.DefaultConfigFileKey]}\"");
             sb.AppendLine();
@@ -369,7 +402,7 @@ namespace Microsoft.AspNetCore.Hosting
         /// <param name="file"></param>
         public static void WriteExitLog(string file)
         {
-            string msg = string.Format("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program Exited. ContentRoot: \"{1}\" ", DateTimeOffset.Now, CONTENT_ROOT);
+            string msg = string.Format("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program Exited. ContentRoot: \"{1}\" ", DateTimeOffset.Now, s_ContentRoot);
             using (var streamWriter = File.AppendText(file))
             {
                 streamWriter.WriteLine(msg);

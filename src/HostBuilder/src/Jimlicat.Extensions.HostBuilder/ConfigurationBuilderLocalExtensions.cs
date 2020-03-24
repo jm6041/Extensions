@@ -80,28 +80,6 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="argsConfigJsonFile">参数指定配置目录</param>
         public static IConfigurationBuilder AddLocalConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile, string[] args, string argsConfigJsonFile)
         {
-            builder.AddExtendedConfiguration(contentRoot, environmentName, customConfigJsonFile);
-            if (args != null)
-            {
-                // 参数指定配置文件
-                if (!string.IsNullOrEmpty(argsConfigJsonFile))
-                {
-                    builder.AddJsonFile(argsConfigJsonFile, true, true);
-                }
-                builder.AddCommandLine(args);
-            }
-            return builder;
-        }
-
-        /// <summary>
-        /// 添加扩展的配置，扩展默认文件，config配置，secrets 目录配置文件，config 目录配置文件, 自定义配置文件
-        /// </summary>
-        /// <param name="builder"></param>
-        /// <param name="contentRoot"></param>
-        /// <param name="environmentName"></param>
-        /// <param name="customConfigJsonFile">自定义配置目录</param>
-        internal static IConfigurationBuilder AddExtendedConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile)
-        {
             // 默认配置文件
             builder.AddDefaultConfigFile(contentRoot, environmentName);
 
@@ -128,6 +106,15 @@ namespace Microsoft.Extensions.Configuration
             if (!string.IsNullOrEmpty(customConfigJsonFile))
             {
                 builder.AddJsonFile(customConfigJsonFile, true, true);
+            }
+            if (args != null)
+            {
+                // 参数指定配置文件
+                if (!string.IsNullOrEmpty(argsConfigJsonFile))
+                {
+                    builder.AddJsonFile(argsConfigJsonFile, true, true);
+                }
+                builder.AddCommandLine(args);
             }
             return builder;
         }

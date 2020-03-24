@@ -22,7 +22,7 @@ namespace WebNet461
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            string contentRoot = P.GetContentRoot();
+            string contentRoot = P.GetContentRoot(args);
             // 日志目录
             string logsDir = Path.Combine(contentRoot, "logs");
             Directory.CreateDirectory(logsDir);
