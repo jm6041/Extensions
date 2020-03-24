@@ -9,18 +9,44 @@ using Microsoft.Extensions.Logging;
 
 namespace EFCore3App
 {
+    /// <summary>
+    /// 入口程序
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// 入口方法
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
+            string contentRoot = P.GetContentRoot(args);
+            // 日志目录
+            string logsDir = P.GetDefaultLogDirectory(contentRoot);
+            // 状态文件
+            string statusFileName = P.GetFileName(logsDir, "status");
+            // 系统崩溃错误文件
+            string errorFileName = P.GetFileName(logsDir, "error");
+            try
+            {
+                IHostBuilder hostBuilder = P.CreateHostBuilder(args, statusFileName);
+                hostBuilder.ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
+                var host = hostBuilder.Build();
+                P.WriteStartupLog(args, statusFileName);
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                P.WriteErrorLog(ex, errorFileName);
+                throw;
+            }
+            finally
+            {
+                P.WriteExitLog(statusFileName);
+            }
+        }
     }
 }

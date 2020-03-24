@@ -10,7 +10,7 @@ namespace EFCoreEntities
         /// <summary>
         /// Id
         /// </summary>
-        public Guid Id { get; set; }
+        public int Id { get; set; }
         /// <summary>
         /// 名字
         /// </summary>
@@ -18,7 +18,7 @@ namespace EFCoreEntities
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTimeOffset Created { get; set; }
+        public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
         /// <summary>
         /// 性别
         /// </summary>

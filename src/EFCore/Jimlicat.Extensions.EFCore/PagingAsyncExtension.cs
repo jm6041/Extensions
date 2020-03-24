@@ -8,7 +8,7 @@ namespace Microsoft.EntityFrameworkCore
     /// <summary>
     /// 分页异步扩展
     /// </summary>
-    static class PagingAsyncExtension
+    public static class PagingAsyncExtension
     {
         /// <summary>
         /// 从全量数据生成分页数据
