@@ -1,0 +1,1 @@
+Get-ChildItem . -recurse *.log -force | Remove-Item -force

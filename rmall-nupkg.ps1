@@ -1,0 +1,1 @@
+Get-ChildItem . -recurse *.nupkg -force | Remove-Item -force
