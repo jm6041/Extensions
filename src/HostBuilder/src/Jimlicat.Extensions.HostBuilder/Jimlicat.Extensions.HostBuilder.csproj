@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;netcoreapp2.1;net461</TargetFrameworks>
     <Description>扩展默认HostBuilder，扩展本地配置，默认集成Serilog</Description>
-    <Version>1.0.0</Version>
+    <Version>$(HostBuilderVer)</Version>
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">

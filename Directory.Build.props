@@ -21,5 +21,8 @@
     <NoWarn>$(NoWarn);CA2235</NoWarn>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <LinqVer>1.0.0</LinqVer>
+    <EFCoreVer>1.0.0</EFCoreVer>
+    <HostBuilderVer>1.0.0</HostBuilderVer>
   </PropertyGroup>
 </Project>

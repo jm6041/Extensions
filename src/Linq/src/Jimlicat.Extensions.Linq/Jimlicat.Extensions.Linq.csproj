@@ -6,6 +6,7 @@
     <Description>添加按字段名排序分页</Description>
     <PackageTags>Jimlicat,Linq,Page</PackageTags>
     <PackageReleaseNotes>扩展System.Linq，添加分页排序</PackageReleaseNotes>
+    <Version>$(LinqVer)</Version>
   </PropertyGroup>
 
   <PropertyGroup>

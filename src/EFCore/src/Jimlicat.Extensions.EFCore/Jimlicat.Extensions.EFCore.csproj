@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
+    <Version>$(EFCoreVer)</Version>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -15,7 +16,7 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\..\Linq\Jimlicat.Extensions.Linq\Jimlicat.Extensions.Linq.csproj" />
+    <ProjectReference Include="..\..\..\Linq\src\Jimlicat.Extensions.Linq\Jimlicat.Extensions.Linq.csproj" />
   </ItemGroup>
 
 </Project>

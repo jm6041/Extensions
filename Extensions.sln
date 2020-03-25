@@ -11,7 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Linq", "Linq", "{80421F8C-5FD6-4C6F-8B0D-686738560FC4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.Linq", "src\Linq\Jimlicat.Extensions.Linq\Jimlicat.Extensions.Linq.csproj", "{91020C31-837C-4B09-BD28-4B6804B03647}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.Linq", "src\Linq\src\Jimlicat.Extensions.Linq\Jimlicat.Extensions.Linq.csproj", "{91020C31-837C-4B09-BD28-4B6804B03647}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "src\Linq\samples\ConsoleApp\ConsoleApp.csproj", "{14351A0B-24C4-4B2C-8241-1B5F86253125}"
 EndProject
@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{3D85
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EFCore", "EFCore", "{D7F2A794-8D89-4A32-AD50-89DE7BC30CA9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.EFCore", "src\EFCore\Jimlicat.Extensions.EFCore\Jimlicat.Extensions.EFCore.csproj", "{EA43D968-553D-4105-BB19-74CB94679488}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.EFCore", "src\EFCore\src\Jimlicat.Extensions.EFCore\Jimlicat.Extensions.EFCore.csproj", "{EA43D968-553D-4105-BB19-74CB94679488}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BCL", "BCL", "{2550926B-ED2D-44C0-927F-59FDFD385CFD}"
 EndProject
@@ -39,7 +39,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCore2App", "src\EFCore\sa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCore3App", "src\EFCore\samples\EFCore3App\EFCore3App.csproj", "{6065F253-DD44-42C2-9842-E49E0FE68EC4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.EFCoreRelational", "src\EFCore\Jimlicat.Extensions.EFCoreRelational\Jimlicat.Extensions.EFCoreRelational.csproj", "{DE78B1DD-E2BE-471D-B030-0262FBC78617}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.EFCoreRelational", "src\EFCore\src\Jimlicat.Extensions.EFCoreRelational\Jimlicat.Extensions.EFCoreRelational.csproj", "{DE78B1DD-E2BE-471D-B030-0262FBC78617}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EFCoreEntities", "src\EFCore\samples\EFCoreEntities\EFCoreEntities.csproj", "{6C673868-AFCE-44C8-8A8F-87EE29A6713D}"
 EndProject
