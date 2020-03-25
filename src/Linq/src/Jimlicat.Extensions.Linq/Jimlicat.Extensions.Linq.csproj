@@ -13,8 +13,4 @@
     <Product>Jimlicat Linq 排序分页扩展</Product>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="System.Collections.Immutable" />
-  </ItemGroup>
-
 </Project>
