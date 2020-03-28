@@ -353,12 +353,6 @@ namespace Microsoft.AspNetCore.Hosting
             var entryName = GetEntryAssemblyName();
             sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program {1} Starting", DateTimeOffset.Now, entryName);
             sb.AppendLine();
-#if DEBUG
-            sb.AppendLine("DEBUG");
-#endif
-#if RELEASE
-            sb.AppendLine("RELEASE");
-#endif
             string contentRoot = GetContentRoot(args);
             sb.AppendFormat($"ContentRoot: \"{contentRoot}\"");
             sb.AppendLine();
