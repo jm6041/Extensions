@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\HostBuilder\src\Jimlicat.Extensions.HostBuilder\Jimlicat.Extensions.HostBuilder.csproj" />
+    <ProjectReference Include="..\..\src\Jimlicat.Extensions.EFCoreRelational\Jimlicat.Extensions.EFCoreRelational.csproj" />
     <ProjectReference Include="..\..\src\Jimlicat.Extensions.EFCore\Jimlicat.Extensions.EFCore.csproj" />
     <ProjectReference Include="..\EFCoreEntitiesConfigs\EFCoreEntitiesConfigs.csproj" />
   </ItemGroup>

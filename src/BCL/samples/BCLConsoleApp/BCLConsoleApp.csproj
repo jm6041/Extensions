@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Wiry.Base32.Patched" Version="1.0.6.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Jimlicat.BCLExt\Jimlicat.BCLExt.csproj" />
   </ItemGroup>
 
