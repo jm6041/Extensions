@@ -1,0 +1,16 @@
+Add-Migration MyFirstMigration
+Add-Migration MyFirstMigration -StartupProject EFCore3App.DbMigration
+Add-Migration MyFirstMigration -Project EFCore3App.DbMigration -StartupProject EFCore3App.DbMigration
+
+Update-Database -StartupProject EFCore3App.DbMigration
+Update-Database -Verbose
+Update-Database -Debug
+Update-Database -Project EFCore3App.DbMigration -StartupProject EFCore3App.DbMigration
+Update-Database -Migration -StartupProject EFCore3App.DbMigration
+
+Script-Migration -From MyFirstMigration -To FileName1000Migration
+Script-Migration -Project EFCore3App.DbMigration -StartupProject EFCore3App.DbMigration
+
+Remove-Migration -Project EFCore3App.DbMigration -StartupProject EFCore3App.DbMigration
+
+UserDbContext

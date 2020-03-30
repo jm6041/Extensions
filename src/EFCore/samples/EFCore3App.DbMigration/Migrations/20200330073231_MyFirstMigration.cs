@@ -16,8 +16,8 @@ namespace EFCore3App.Migrations
                     Name = table.Column<string>(maxLength: 100, nullable: false, comment: "名字"),
                     Created = table.Column<DateTimeOffset>(nullable: false, comment: "创建时间"),
                     Sex = table.Column<int>(nullable: false, comment: "性别"),
-                    IntV = table.Column<int>(nullable: false),
-                    DouV = table.Column<double>(nullable: false)
+                    IntV = table.Column<int>(nullable: false, comment: "Int32值"),
+                    DouV = table.Column<double>(nullable: false, comment: "Double值")
                 },
                 constraints: table =>
                 {

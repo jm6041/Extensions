@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 
 namespace EFCoreEntities
 {
@@ -18,6 +19,7 @@ namespace EFCoreEntities
         /// <summary>
         /// 创建时间
         /// </summary>
+        [Description("时间")]
         public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
         /// <summary>
         /// 性别
@@ -26,10 +28,12 @@ namespace EFCoreEntities
         /// <summary>
         /// int32
         /// </summary>
+        [Description("Int32值")]
         public int IntV { get; set; }
         /// <summary>
         /// double
         /// </summary>
+        [Description("Double值")]
         public double DouV { get; set; }        
     }
 

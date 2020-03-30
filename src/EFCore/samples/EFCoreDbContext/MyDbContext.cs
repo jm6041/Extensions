@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using EFCoreEntities;
 using Microsoft.EntityFrameworkCore;
 
-namespace EFCore3App.Data
+namespace EFCoreData
 {
     /// <summary>
     /// 上下文
@@ -31,17 +31,16 @@ namespace EFCore3App.Data
             base.OnModelCreating(modelBuilder);
 
             // 表名使用类型名表示
-            foreach (var entity in modelBuilder.Model.GetEntityTypes())
-            {
-                Regex regex = new Regex(@"`\d+$");
-                string tableName = regex.Replace(entity.ClrType.Name, string.Empty);
-                modelBuilder.Entity(entity.ClrType).ToTable(tableName);
-
-                //foreach (var property in entity.GetProperties())
-                //{
-                //    property.Relational().ColumnName = property.Name.ToLower();
-                //}
-            }
+            //foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            //{
+            //    Regex regex = new Regex(@"`\d+$");
+            //    string tableName = regex.Replace(entity.ClrType.Name, string.Empty);
+            //    modelBuilder.Entity(entity.ClrType).ToTable(tableName);
+            //}
+            modelBuilder.DefalutTableName()
+                .DefalutColumnName()
+                .DetaultStringMaxLength(2000)
+                .DefaultComment();
 
             // 限制一对多级联删除
             foreach (var relationship in modelBuilder.Model.GetEntityTypes()
@@ -58,15 +57,15 @@ namespace EFCore3App.Data
             //}
 
             // 字符串默认长度设置为 2000
-            foreach (var property in modelBuilder.Model.GetEntityTypes()
-                .SelectMany(t => t.GetProperties())
-                .Where(p => p.ClrType == typeof(string)))
-            {
-                if (property.GetMaxLength() == null)
-                {
-                    property.SetMaxLength(2000);
-                }
-            }
+            //foreach (var property in modelBuilder.Model.GetEntityTypes()
+            //    .SelectMany(t => t.GetProperties())
+            //    .Where(p => p.ClrType == typeof(string)))
+            //{
+            //    if (property.GetMaxLength() == null)
+            //    {
+            //        property.SetMaxLength(2000);
+            //    }
+            //}
 
             modelBuilder.ApplyConfigurationsFromAssembly(EFCoreEntities.AssemblyInfo.Assembly);
             // Customize the ASP.NET Identity model and override the defaults if needed.

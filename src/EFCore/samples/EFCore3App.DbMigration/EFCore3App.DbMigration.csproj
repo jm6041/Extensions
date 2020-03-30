@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <RootNamespace>EFCore3App</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,16 +11,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
-    <PackageReference Include="NSwag.AspNetCore" Version="13.3.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\HostBuilder\src\Jimlicat.Extensions.HostBuilder\Jimlicat.Extensions.HostBuilder.csproj" />
-    <!--<ProjectReference Include="..\..\src\Jimlicat.Extensions.EFCoreRelational\Jimlicat.Extensions.EFCoreRelational.csproj" />-->
-    <ProjectReference Include="..\..\src\Jimlicat.Extensions.EFCore\Jimlicat.Extensions.EFCore.csproj" />
     <ProjectReference Include="..\EFCoreDbContext\EFCoreDbContext.csproj" />
   </ItemGroup>
-
 
 </Project>

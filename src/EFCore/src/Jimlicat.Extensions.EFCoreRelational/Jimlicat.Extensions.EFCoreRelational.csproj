@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
-    <Version>$(EFCoreVer)</Version>
+    <VersionSuffix>preview.1</VersionSuffix>
   </PropertyGroup>
 
   <PropertyGroup>

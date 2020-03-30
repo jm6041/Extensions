@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>EFCoreData</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Jimlicat.Extensions.EFCoreRelational\Jimlicat.Extensions.EFCoreRelational.csproj" />
+    <ProjectReference Include="..\EFCoreEntitiesConfigs\EFCoreEntitiesConfigs.csproj" />
+  </ItemGroup>
+
+</Project>

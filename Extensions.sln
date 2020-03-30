@@ -53,6 +53,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{53C4
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.HostBuilder", "src\HostBuilder\src\Jimlicat.Extensions.HostBuilder\Jimlicat.Extensions.HostBuilder.csproj", "{00FF23CD-1C92-4C4D-9131-192032ECF1B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCore3App.DbMigration", "src\EFCore\samples\EFCore3App.DbMigration\EFCore3App.DbMigration.csproj", "{9C72D792-767E-467E-96AD-B475B6382EE1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EFCoreDbContext", "src\EFCore\samples\EFCoreDbContext\EFCoreDbContext.csproj", "{BACC4E19-2711-4C79-970C-222C4F4C017B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,6 +111,14 @@ Global
 		{00FF23CD-1C92-4C4D-9131-192032ECF1B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00FF23CD-1C92-4C4D-9131-192032ECF1B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00FF23CD-1C92-4C4D-9131-192032ECF1B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9C72D792-767E-467E-96AD-B475B6382EE1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C72D792-767E-467E-96AD-B475B6382EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C72D792-767E-467E-96AD-B475B6382EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C72D792-767E-467E-96AD-B475B6382EE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BACC4E19-2711-4C79-970C-222C4F4C017B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BACC4E19-2711-4C79-970C-222C4F4C017B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BACC4E19-2711-4C79-970C-222C4F4C017B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BACC4E19-2711-4C79-970C-222C4F4C017B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -129,6 +141,8 @@ Global
 		{5D645E8E-5FD5-4120-AE75-0A0D16971D3F} = {608F87D9-C91B-4BF7-967E-A8A73D690D52}
 		{53C4888E-44B9-465C-9DA0-E4673FA214E3} = {608F87D9-C91B-4BF7-967E-A8A73D690D52}
 		{00FF23CD-1C92-4C4D-9131-192032ECF1B6} = {5D645E8E-5FD5-4120-AE75-0A0D16971D3F}
+		{9C72D792-767E-467E-96AD-B475B6382EE1} = {F5501B15-A14F-4A01-93ED-3ECE848BB481}
+		{BACC4E19-2711-4C79-970C-222C4F4C017B} = {F5501B15-A14F-4A01-93ED-3ECE848BB481}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5CA4204-8E60-43E2-A55C-A02655B2B6EA}
