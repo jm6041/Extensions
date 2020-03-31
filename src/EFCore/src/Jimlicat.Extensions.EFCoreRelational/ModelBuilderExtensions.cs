@@ -96,13 +96,16 @@ namespace Microsoft.EntityFrameworkCore
             {
                 foreach (var property in entity.GetProperties())
                 {
-                    var attr = property.PropertyInfo.GetCustomAttributes(typeof(DescriptionAttribute), false).FirstOrDefault();
-                    if(attr != null)
+                    if (property.PropertyInfo != null)
                     {
-                        DescriptionAttribute descAttr = attr as DescriptionAttribute;
-                        if (!string.IsNullOrWhiteSpace(descAttr.Description))
+                        var attr = property.PropertyInfo.GetCustomAttributes(typeof(DescriptionAttribute), false)?.FirstOrDefault();
+                        if (attr != null)
                         {
-                            property.SetComment(descAttr.Description);
+                            DescriptionAttribute descAttr = attr as DescriptionAttribute;
+                            if (!string.IsNullOrWhiteSpace(descAttr.Description))
+                            {
+                                property.SetComment(descAttr.Description);
+                            }
                         }
                     }
                 }
