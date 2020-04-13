@@ -33,14 +33,17 @@ namespace Jimlicat.Functions
         /// </summary>
         public string Description { get; set; }
         /// <summary>
-        /// 是否启用，默认为 true
+        /// 授权是否启用，默认为启用
         /// </summary>
-        public bool Enabled { get; set; } = true;
+        public bool AuthorizationEnable { get; set; }
         /// <summary>
         /// 日志是否启用，默认为启用
         /// </summary>
         public bool LoggingEnable { get; set; } = true;
-
+        /// <summary>
+        /// 是否启用，默认为 true
+        /// </summary>
+        public bool Enabled { get; set; } = true;
         /// <summary>
         /// 重写 Equals
         /// </summary>
