@@ -7,11 +7,13 @@
 
   <ItemGroup>
     <PackageReference Include="AspectCore.Extensions.DependencyInjection" Version="2.1.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="9.0.0-preview3" />
     <PackageReference Include="NSwag.AspNetCore" Version="13.3.0" />
   </ItemGroup>
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Jimlicat.Functions.Interceptors\Jimlicat.Functions.Interceptors.csproj" />
     <ProjectReference Include="..\Jimlicat.Services.Abstraction\Jimlicat.Services.Abstraction.csproj" />
     <ProjectReference Include="..\Jimlicat.Services.Core\Jimlicat.Services.Core.csproj" />
   </ItemGroup>

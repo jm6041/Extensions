@@ -7,11 +7,13 @@ using AspectCore.DynamicProxy;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Jimlicat.Functions.Interceptors
 {
+    /// <summary>
+    /// <see cref="FunctionAttribute"/>拦截器
+    /// </summary>
     public sealed class FunctionInterceptorAttribute : AbstractInterceptorAttribute
     {
         /// <summary>
@@ -41,6 +43,12 @@ namespace Jimlicat.Functions.Interceptors
             return failures;
         }
 
+        /// <summary>
+        /// 拦截器调用方法
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="next"></param>
+        /// <returns></returns>
         public async override Task Invoke(AspectContext context, AspectDelegate next)
         {
             var serviceProvider = context.ServiceProvider;
@@ -61,13 +69,14 @@ namespace Jimlicat.Functions.Interceptors
                 {
                     Console.WriteLine("PropertyName:{0}   Code:{1}   Error:{2}", f.PropertyName, f.ErrorCode, f.ErrorMessage);
                 }
-                return;
+                //return;
+                throw new ArgumentException("验证错误");
             }
             // 是否启用运行日志
             bool loggingEnable = funInfo.LoggingEnable;
             try
             {
-                var httpContextAccessor = context.ServiceProvider.GetRequiredService<IHttpContextAccessor>();
+                var httpContextAccessor = context.ServiceProvider.GetService<IHttpContextAccessor>();
                 string path = httpContextAccessor.HttpContext.Request.Path;
                 //Console.WriteLine(string.Format("Entered Method:{0}, Arguments: {1}", methodName, string.Join(",", invocation.Arguments)));
                 if (loggingEnable)

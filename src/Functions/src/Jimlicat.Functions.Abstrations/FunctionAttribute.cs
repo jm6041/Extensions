@@ -63,7 +63,10 @@ namespace Jimlicat.Functions
             }
             return false;
         }
-
+        /// <summary>
+        /// 重写 GetHashCode
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             return Name == null ? 0 : Name.GetHashCode();

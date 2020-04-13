@@ -13,7 +13,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using WebApp2.Interceptors;
+using Jimlicat.Functions.Interceptors;
+using Jimlicat.Functions;
+using FluentValidation;
 
 namespace WebApp2
 {
@@ -41,16 +43,19 @@ namespace WebApp2
             services.AddHttpContextAccessor();
             services.AddScoped<IOrgService, OrgService>();
 
-            services.AddSingleton<CommonInterceptorAttribute>();
+            services.AddSingleton<IFunctionStore, FunctionStore>();
+            services.AddSingleton<FunctionInterceptorAttribute>();
+            services.AddValidatorsFromAssembly(AssemblyInfo.Assembly);
             services.ConfigureDynamicProxy(config =>
             {
-                config.Interceptors.AddTyped<CommonInterceptorAttribute>();
+                config.Interceptors.AddTyped<FunctionInterceptorAttribute>(Predicates.Implement(typeof(IOrgService)));
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.ApplicationServices.GetService<ILogger<Startup>>();
 
             if (env.IsDevelopment())
             {

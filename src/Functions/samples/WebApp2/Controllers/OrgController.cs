@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,15 +20,21 @@ namespace WebApp2.Controllers
         }
 
         [HttpPost]
-        public void Add([FromBody]OrgAddDto org)
+        public async Task Create([FromBody]OrgAddDto org)
         {
-            _orgService.Add(org);
+            await _orgService.Create(org);
         }
 
         [HttpGet]
-        public OrgDto[] Get()
+        public async Task<OrgDto[]> Get()
         {
-            return _orgService.Get();
+            return await _orgService.Get();
+        }
+
+        [HttpGet]
+        public async Task<OrgDto[]> Get2()
+        {
+            return await _orgService.Get2();
         }
     }
 }

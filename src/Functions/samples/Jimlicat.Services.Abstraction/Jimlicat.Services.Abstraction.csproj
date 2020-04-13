@@ -9,4 +9,8 @@
     <PackageReference Include="FluentValidation" Version="9.0.0-preview3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Jimlicat.Functions.Abstrations\Jimlicat.Functions.Abstrations.csproj" />
+  </ItemGroup>
+
 </Project>
