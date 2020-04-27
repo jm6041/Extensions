@@ -96,21 +96,7 @@
 
     protected override void OnInitialized()
     {
-        if (httpContextAccessor != null && httpContextAccessor.HttpContext != null &&
-             httpContextAccessor.HttpContext.Request != null && httpContextAccessor.HttpContext.Request.Headers.ContainsKey("User-Agent"))
-        {
-            var userAgent = httpContextAccessor.HttpContext.Request.Headers["User-Agent"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(userAgent))
-            {
-                if (userAgent.Contains("iPhone") || userAgent.Contains("Android") || userAgent.Contains("Googlebot"))
-                {
-                    sidebarExpanded = false;
-                    bodyExpanded = true;
-                }
-            }
-        }
-
-        examples = ExampleService.Examples;
+        examples = ExampleData.AllExamples;
 
         System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
     }
@@ -119,9 +105,9 @@
     {
         if (!firstRender)
         {
-            var example = ExampleService.FindCurrent(UriHelper.ToAbsoluteUri(UriHelper.Uri));
+            var example = ExampleData.FindCurrent(UriHelper.ToAbsoluteUri(UriHelper.Uri));
 
-            await JSRuntime.InvokeVoidAsync("setTitle", ExampleService.TitleFor(example));
+            await JSRuntime.InvokeVoidAsync("setTitle", ExampleData.TitleFor(example));
         }
     }
 
@@ -129,7 +115,7 @@
     {
         var term = args.Value.ToString();
 
-        examples = ExampleService.Filter(term);
+        examples = ExampleData.Filter(term);
     }
 
     void ChangeTheme(object value)
