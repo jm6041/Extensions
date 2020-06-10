@@ -8,7 +8,7 @@
 
   <PropertyGroup>
     <Product>Jimlicat EntityFrameworkCore 扩展</Product>
-    <PackageReleaseNotes>Jimlicat EntityFrameworkCore 扩展，添加自定义排序，分页，模型配置支持程序集</PackageReleaseNotes> 
+    <PackageReleaseNotes>Jimlicat EntityFrameworkCore 扩展，添加自定义排序，分页</PackageReleaseNotes> 
   </PropertyGroup>
   
   <ItemGroup>
