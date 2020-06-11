@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace Microsoft.AspNetCore.Builder
+namespace System
 {
     /// <summary>
     /// Startup相关帮助信息
