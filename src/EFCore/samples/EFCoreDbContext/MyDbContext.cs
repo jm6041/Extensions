@@ -37,17 +37,14 @@ namespace EFCoreData
             //    string tableName = regex.Replace(entity.ClrType.Name, string.Empty);
             //    modelBuilder.Entity(entity.ClrType).ToTable(tableName);
             //}
-            modelBuilder.DefalutTableName()
-                .DefalutColumnName()
-                .DetaultStringMaxLength(2000)
-                .DefaultComment();
+            modelBuilder.DetaultStringMaxLength(2000).DefaultDeleteBehavior();
 
-            // 限制一对多级联删除
-            foreach (var relationship in modelBuilder.Model.GetEntityTypes()
-                .SelectMany(e => e.GetForeignKeys()))
-            {
-                relationship.DeleteBehavior = DeleteBehavior.Restrict;
-            }
+            //// 限制一对多级联删除
+            //foreach (var relationship in modelBuilder.Model.GetEntityTypes()
+            //    .SelectMany(e => e.GetForeignKeys()))
+            //{
+            //    relationship.DeleteBehavior = DeleteBehavior.Restrict;
+            //}
 
             //foreach (var property in modelBuilder.Model.GetEntityTypes()
             //    .SelectMany(t => t.GetProperties())

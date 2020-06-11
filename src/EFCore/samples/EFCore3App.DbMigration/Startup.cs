@@ -28,7 +28,7 @@ namespace EFCore3App
         {
             string connectionString = Configuration.GetConnectionString(Configuration.GetSection("db:ConnectionName")?.Value ?? "DefaultConnection");
             string assemblyFullName = this.GetType().Assembly.FullName;
-            services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly(assemblyFullName)));
+            services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly(assemblyFullName)).UseDocCommentConvention());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -19,21 +19,18 @@ namespace EFCoreEntities
         /// <summary>
         /// 创建时间
         /// </summary>
-        [Description("时间")]
         public DateTimeOffset Created { get; set; } = DateTimeOffset.Now;
         /// <summary>
         /// 性别
         /// </summary>
         public Sex Sex { get; set; }
         /// <summary>
-        /// int32
+        /// 整形
         /// </summary>
-        [Description("Int32值")]
         public int IntV { get; set; }
         /// <summary>
-        /// double
+        /// 浮点数
         /// </summary>
-        [Description("Double值")]
         public double DouV { get; set; }        
     }
 

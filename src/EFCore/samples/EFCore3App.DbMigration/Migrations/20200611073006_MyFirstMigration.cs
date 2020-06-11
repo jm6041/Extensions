@@ -8,24 +8,24 @@ namespace EFCore3App.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "User",
+                name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<int>(nullable: false, comment: "Id")
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(maxLength: 100, nullable: false, comment: "名字"),
                     Created = table.Column<DateTimeOffset>(nullable: false, comment: "创建时间"),
                     Sex = table.Column<int>(nullable: false, comment: "性别"),
-                    IntV = table.Column<int>(nullable: false, comment: "Int32值"),
-                    DouV = table.Column<double>(nullable: false, comment: "Double值")
+                    IntV = table.Column<int>(nullable: false, comment: "整形"),
+                    DouV = table.Column<double>(nullable: false, comment: "浮点数")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_User", x => x.Id);
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
 
             migrationBuilder.InsertData(
-                table: "User",
+                table: "Users",
                 columns: new[] { "Id", "Created", "DouV", "IntV", "Name", "Sex" },
                 values: new object[,]
                 {
@@ -135,7 +135,7 @@ namespace EFCore3App.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "User");
+                name: "Users");
         }
     }
 }

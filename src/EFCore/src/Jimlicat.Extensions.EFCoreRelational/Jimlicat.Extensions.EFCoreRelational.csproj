@@ -4,11 +4,11 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
     <VersionSuffix>preview.1</VersionSuffix>
+    <Version>1.0.0-$(VersionSuffix)</Version>
   </PropertyGroup>
 
   <PropertyGroup>
     <Product>Jimlicat EntityFrameworkCore 扩展</Product>
-    <PackageReleaseNotes>Jimlicat EntityFrameworkCore 扩展，新增实体元数据配置</PackageReleaseNotes>
   </PropertyGroup>
   
   <ItemGroup>

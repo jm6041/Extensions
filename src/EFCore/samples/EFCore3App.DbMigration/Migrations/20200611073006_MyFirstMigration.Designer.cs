@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCore3App.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20200330073231_MyFirstMigration")]
+    [Migration("20200611073006_MyFirstMigration")]
     partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -26,6 +26,7 @@ namespace EFCore3App.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
+                        .HasComment("Id")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<DateTimeOffset>("Created")
@@ -34,11 +35,11 @@ namespace EFCore3App.Migrations
 
                     b.Property<double>("DouV")
                         .HasColumnType("float")
-                        .HasComment("Double值");
+                        .HasComment("浮点数");
 
                     b.Property<int>("IntV")
                         .HasColumnType("int")
-                        .HasComment("Int32值");
+                        .HasComment("整形");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -52,7 +53,7 @@ namespace EFCore3App.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("Users");
 
                     b.HasData(
                         new
