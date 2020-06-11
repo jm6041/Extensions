@@ -11,9 +11,9 @@ using Microsoft.Extensions.Logging;
 namespace Microsoft.AspNetCore.Builder
 {
     /// <summary>
-    /// Startup相关信息
+    /// Startup相关帮助信息
     /// </summary>
-    public static class S
+    public static class StartupHelper
     {
         /// <summary>
         /// 获得系统信息
@@ -66,25 +66,29 @@ namespace Microsoft.AspNetCore.Builder
 
             b.AppendLine();
             b.Append("Configuration").AppendLine();
-#if DEBUG
-            foreach (var c in configuration.AsEnumerable())
+
+            if (HostHelper.IsDebug)
             {
-                b.Append(c.Key);
-                if (!string.IsNullOrEmpty(c.Value))
+                foreach (var c in configuration.AsEnumerable())
                 {
-                    b.Append("=\"").Append(c.Value).Append("\"");
-                }
-                b.AppendLine();
-            }
-#else
-            foreach (var c in configuration.GetSection("Kestrel:EndPoints").AsEnumerable())
-            {
-                if (c.Key.EndsWith("Url", StringComparison.OrdinalIgnoreCase))
-                {
-                    b.Append(c.Key).Append("=\"").Append(c.Value).AppendLine("\"");
+                    b.Append(c.Key);
+                    if (!string.IsNullOrEmpty(c.Value))
+                    {
+                        b.Append("=\"").Append(c.Value).Append("\"");
+                    }
+                    b.AppendLine();
                 }
             }
-#endif
+            else
+            {
+                foreach (var c in configuration.GetSection("Kestrel:EndPoints").AsEnumerable())
+                {
+                    if (c.Key.EndsWith("Url", StringComparison.OrdinalIgnoreCase))
+                    {
+                        b.Append(c.Key).Append("=\"").Append(c.Value).AppendLine("\"");
+                    }
+                }
+            }
             return b;
         }
 

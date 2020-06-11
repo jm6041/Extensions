@@ -26,6 +26,20 @@ namespace Microsoft.Extensions.Configuration
             return Array.Empty<string>();
         }
         /// <summary>
+        /// 获得信任证书的序列号 GetSection("TrustCertificates:SerialNumbers")
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <returns>证书序列号集合</returns>
+        public static string[] GetTrustCertificatesSerialNumbers(this IConfiguration configuration)
+        {
+            string vals = configuration.GetSection("TrustCertificates:SerialNumbers").Value;
+            if (vals != null)
+            {
+                return vals.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+            }
+            return Array.Empty<string>();
+        }
+        /// <summary>
         /// 获得链接字符串 GetSection("db:ConnectionName").Value ?? entryName
         /// </summary>
         /// <param name="configuration"></param>

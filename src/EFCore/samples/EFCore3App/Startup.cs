@@ -14,13 +14,23 @@ using EFCoreData;
 
 namespace EFCore3App
 {
+    /// <summary>
+    /// 启动
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
+        /// <summary>
+        /// 配置信息
+        /// </summary>
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -33,7 +43,7 @@ namespace EFCore3App
             string connectionString = Configuration.GetConnectionString(Configuration.GetSection("db:ConnectionName")?.Value ?? "DefaultConnection");
             string assemblyFullName = this.GetType().Assembly.FullName;
             services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly(assemblyFullName)));
-            S.WriteConnectionString(connectionString, Configuration);
+            StartupHelper.WriteConnectionString(connectionString, Configuration);
 
             services.AddOpenApiDocument(c =>
             {
@@ -46,7 +56,11 @@ namespace EFCore3App
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// 管道配置
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -73,7 +87,7 @@ namespace EFCore3App
                 endpoints.MapControllers();
             });
 
-            S.WriteAndLogConfiguration(app.ApplicationServices.GetService<ILogger<Startup>>(), env, Configuration);
+            StartupHelper.WriteAndLogConfiguration(app.ApplicationServices.GetService<ILogger<Startup>>(), env, Configuration);
         }
     }
 }

@@ -9,17 +9,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Serilog;
 using Serilog.Events;
-
-#if NETCOREAPP3_1
-namespace Microsoft.Extensions.Hosting
+#if NETCOREAPP2_1 || NET461
+using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Hosting;
 #else
-namespace Microsoft.AspNetCore.Hosting
+using Microsoft.Extensions.Hosting;
 #endif
+
+namespace System
 {
     /// <summary>
-    /// 与系统启动相关函数
+    /// 与系统启动相关帮助函数
     /// </summary>
-    public static class P
+    public static class HostHelper
     {
         /// <summary>
         /// 是否Windows服务托管
@@ -33,6 +35,16 @@ namespace Microsoft.AspNetCore.Hosting
         /// 入口程序集名
         /// </summary>
         private static volatile string s_EntryAssemblyName;
+
+        /// <summary>
+        /// 是否为调试模式，在入口处设置
+        /// <c>
+        /// #if DEBUG
+        /// #endif
+        /// </c>
+        /// </summary>
+        public static bool IsDebug { get; set; } = false;
+
         /// <summary>
         /// 创建 <see cref="ConfigurationBuilder"/>
         /// </summary>
@@ -256,24 +268,26 @@ namespace Microsoft.AspNetCore.Hosting
 
         private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration)
         {
+            LogEventLevel logEventLevel = LogEventLevel.Warning;
+            if (IsDebug)
+            {
+                logEventLevel = LogEventLevel.Debug;
+            }
             var logConfig = new LoggerConfiguration();
             if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认
             {
                 string logDir = GetDefaultLogDirectory(contentRoot);
                 string entryName = GetEntryAssemblyName();
                 string logPath = Path.Combine(logDir, $"{entryName}-log.log");
-                logConfig.WriteTo.File(path: logPath,
-#if DEBUG
-            restrictedToMinimumLevel: LogEventLevel.Debug,
-#endif
-#if RELEASE
-            restrictedToMinimumLevel: LogEventLevel.Warning,
-#endif
-            fileSizeLimitBytes: 20 * 1024 * 1024,
-            flushToDiskInterval: TimeSpan.FromMinutes(1),
-            rollingInterval: RollingInterval.Day,
-            rollOnFileSizeLimit: true,
-            retainedFileCountLimit: 4);
+                logConfig.WriteTo.File(
+                    path: logPath,
+                    restrictedToMinimumLevel: logEventLevel,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext:l}] {Message:lj}{NewLine}{Exception}",
+                    fileSizeLimitBytes: 20 * 1024 * 1024,
+                    flushToDiskInterval: TimeSpan.FromMinutes(1),
+                    rollingInterval: RollingInterval.Day,
+                    rollOnFileSizeLimit: true,
+                    retainedFileCountLimit: 4);
             }
             return logConfig.ReadFrom.Configuration(configuration)
                 .CreateLogger();
