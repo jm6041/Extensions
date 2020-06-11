@@ -23,6 +23,6 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <LinqVer>1.0.0</LinqVer>
     <EFCoreVer>1.0.0</EFCoreVer>
-    <HostBuilderVer>1.0.0</HostBuilderVer>
+    <HostBuilderVer>2.0.0</HostBuilderVer>
   </PropertyGroup>
 </Project>
