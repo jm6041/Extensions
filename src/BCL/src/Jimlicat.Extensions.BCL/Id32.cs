@@ -34,7 +34,7 @@ namespace System
             // 1个字符
             string hour = XMath.XConvert36(now.Hour);
             // Guid部分，26个字符
-            string guid = Base32.ToBase32(Guid.NewGuid().ToByteArray());
+            string guid = Base32.ToBase32NP(Guid.NewGuid().ToByteArray());
 
             List<char> idcs = new List<char>(32);
             idcs.AddRange(year);
