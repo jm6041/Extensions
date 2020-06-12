@@ -1,21 +1,55 @@
+// Copyright (c) .NET Foundation. All rights reserved.
+// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+
 using System;
 using System.Text;
 
 namespace System
 {
     /// <summary>
-    /// 顺序Base32，字符串"234567ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    /// Base32
     /// </summary>
-    internal static class OrderBase32
+    public static class Base32
     {
-        private static readonly string _base32Chars = "234567ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        private static readonly string _base32Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
         /// <summary>
-        /// 转换为Base32字符串，保持顺序，没有"="结尾
+        /// 转换为Base32字符串
+        /// </summary>
+        /// <param name="input">输入的byte数组</param>
+        /// <returns>Base32字符串</returns>
+        public static string ToBase32(byte[] input)
+        {
+            if (input == null)
+            {
+                throw new ArgumentNullException(nameof(input));
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int offset = 0; offset < input.Length;)
+            {
+                byte a, b, c, d, e, f, g, h;
+                int numCharsToOutput = GetNextGroup(input, ref offset, out a, out b, out c, out d, out e, out f, out g, out h);
+
+                sb.Append((numCharsToOutput >= 1) ? _base32Chars[a] : '=');
+                sb.Append((numCharsToOutput >= 2) ? _base32Chars[b] : '=');
+                sb.Append((numCharsToOutput >= 3) ? _base32Chars[c] : '=');
+                sb.Append((numCharsToOutput >= 4) ? _base32Chars[d] : '=');
+                sb.Append((numCharsToOutput >= 5) ? _base32Chars[e] : '=');
+                sb.Append((numCharsToOutput >= 6) ? _base32Chars[f] : '=');
+                sb.Append((numCharsToOutput >= 7) ? _base32Chars[g] : '=');
+                sb.Append((numCharsToOutput >= 8) ? _base32Chars[h] : '=');
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// 转换为Base32字符串，没有"="结尾
         /// </summary>
         /// <param name="input">输入的byte数组</param>
         /// <returns>Base32字符串，没有"="</returns>
-        public static string ToBase32(byte[] input)
+        public static string ToBase32NP(byte[] input)
         {
             if (input == null)
             {

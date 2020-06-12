@@ -76,6 +76,28 @@ namespace BCLConsoleApp
             }
             Console.WriteLine();
 
+            Console.WriteLine("Guid测试：");
+            for (int i = 0; i <= 10; i++)
+            {
+                Guid nid = Guid.NewGuid();
+                Console.WriteLine(nid.ToString("N"));
+                byte[] gbs = nid.ToByteArray();
+                string gidb32A = Base32.ToBase32(gbs);
+                string gidb32B = Base32Encoding.Standard.GetString(gbs);
+                string gidb32C = Base32.ToBase32NP(gbs);
+
+                Console.WriteLine(gidb32A);
+                Console.WriteLine(gidb32B);
+                Console.WriteLine(gidb32C);
+
+                byte[] tbs = Base32.FromBase32(gidb32C);
+                Guid tid = new Guid(tbs);
+
+                Console.WriteLine(tid.ToString("N"));
+
+                Console.WriteLine("-------------------------------");
+            }
+
             for (int i = 0; i <= 10; i++)
             {
                 Guid nid = Guid.NewGuid();
