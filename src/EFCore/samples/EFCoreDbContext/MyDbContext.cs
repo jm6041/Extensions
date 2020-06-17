@@ -37,6 +37,7 @@ namespace EFCoreData
             //    string tableName = regex.Replace(entity.ClrType.Name, string.Empty);
             //    modelBuilder.Entity(entity.ClrType).ToTable(tableName);
             //}
+            modelBuilder.SetTableName((c) => c.DisplayName()).SetIndexName(x => x.GetName());
             modelBuilder.DetaultStringMaxLength(2000).DefaultDeleteBehavior();
 
             //// 限制一对多级联删除
@@ -74,5 +75,9 @@ namespace EFCoreData
         /// 用户
         /// </summary>
         public virtual DbSet<User> Users { get; set; }
+        /// <summary>
+        /// 订单
+        /// </summary>
+        public virtual DbSet<Order<string>> Orders { get; set; }
     }
 }

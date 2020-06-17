@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCore3App.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20200611073006_MyFirstMigration")]
+    [Migration("20200617111716_MyFirstMigration")]
     partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -20,6 +20,29 @@ namespace EFCore3App.Migrations
                 .HasAnnotation("ProductVersion", "3.1.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("EFCoreEntities.Order<string>", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nchar(32)")
+                        .IsFixedLength(true)
+                        .HasComment("Id")
+                        .HasMaxLength(32);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("名字")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasName("OrderNameIndex");
+
+                    b.ToTable("Orders");
+                });
 
             modelBuilder.Entity("EFCoreEntities.User", b =>
                 {

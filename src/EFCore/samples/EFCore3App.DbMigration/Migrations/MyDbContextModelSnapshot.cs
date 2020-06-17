@@ -19,6 +19,29 @@ namespace EFCore3App.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+            modelBuilder.Entity("EFCoreEntities.Order<string>", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nchar(32)")
+                        .IsFixedLength(true)
+                        .HasComment("Id")
+                        .HasMaxLength(32);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)")
+                        .HasComment("名字")
+                        .HasMaxLength(100);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasName("OrderNameIndex");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("EFCoreEntities.User", b =>
                 {
                     b.Property<int>("Id")

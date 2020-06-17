@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore.Metadata;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,6 +13,82 @@ namespace Microsoft.EntityFrameworkCore
     /// </summary>
     public static class ModelBuilderExtensions
     {
+        /// <summary>
+        /// 设置实体对应数据表名
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        /// <param name="nameFunc">名字委托</param>
+        /// <param name="schema">数据库 schema</param>
+        /// <returns></returns>
+        public static ModelBuilder SetTableName(this ModelBuilder modelBuilder, Func<IMutableEntityType, string> nameFunc, string schema = null)
+        {
+            if (nameFunc == null)
+            {
+                return modelBuilder;
+            }
+            foreach (var entity in modelBuilder.Model.GetEntityTypes())
+            {
+                // 数据表名
+                string name = nameFunc.Invoke(entity);
+                if (!string.IsNullOrEmpty(name))
+                {
+                    if (string.IsNullOrWhiteSpace(schema))
+                    {
+                        modelBuilder.Entity(entity.ClrType).ToTable(name);
+                    }
+                    else
+                    {
+                        modelBuilder.Entity(entity.ClrType).ToTable(name, schema);
+                    }
+                }
+            }
+            return modelBuilder;
+        }
+
+        /// <summary>
+        /// 设置实体属性对应数据表列名
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        /// <param name="nameFunc">名字委托</param>
+        /// <returns></returns>
+        public static ModelBuilder SetColumnName(this ModelBuilder modelBuilder, Func<IMutableProperty, string> nameFunc)
+        {
+            if (nameFunc != null)
+            {
+                foreach (var entity in modelBuilder.Model.GetEntityTypes())
+                {
+                    foreach (var property in entity.GetProperties())
+                    {
+                        string name = nameFunc.Invoke(property);
+                        property.SetColumnName(name);
+                    }
+                }
+            }
+            return modelBuilder;
+        }
+
+        /// <summary>
+        /// 设置实体索引名
+        /// </summary>
+        /// <param name="modelBuilder"></param>
+        /// <param name="nameFunc">名字委托</param>
+        /// <returns></returns>
+        public static ModelBuilder SetIndexName(this ModelBuilder modelBuilder, Func<IMutableIndex, string> nameFunc)
+        {
+            if (nameFunc != null)
+            {
+                foreach (var entity in modelBuilder.Model.GetEntityTypes())
+                {
+                    foreach (var index in entity.GetIndexes())
+                    {
+                        string name = nameFunc.Invoke(index);
+                        index.SetName(name);
+                    }
+                }
+            }
+            return modelBuilder;
+        }
+
         /// <summary>
         /// 设置默认的字符串属性对应数据表列的最大长度
         /// </summary>

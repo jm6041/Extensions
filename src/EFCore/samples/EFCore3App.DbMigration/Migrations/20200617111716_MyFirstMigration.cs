@@ -8,6 +8,18 @@ namespace EFCore3App.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<string>(fixedLength: true, maxLength: 32, nullable: false, comment: "Id"),
+                    Name = table.Column<string>(maxLength: 100, nullable: false, comment: "名字")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -130,10 +142,19 @@ namespace EFCore3App.Migrations
                     { 37, new DateTimeOffset(new DateTime(2020, 3, 12, 12, 33, 12, 0, DateTimeKind.Unspecified), new TimeSpan(0, 8, 0, 0, 0)), 36.100000000000001, 36, "Test36", 0 },
                     { 100, new DateTimeOffset(new DateTime(2020, 3, 12, 12, 33, 12, 0, DateTimeKind.Unspecified), new TimeSpan(0, 8, 0, 0, 0)), 99.099999999999994, 99, "Test99", 0 }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "OrderNameIndex",
+                table: "Orders",
+                column: "Name",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Orders");
+
             migrationBuilder.DropTable(
                 name: "Users");
         }
