@@ -1,4 +1,4 @@
-﻿<Window x:Class="FileTools.MainWindow"
+<Window x:Class="FileTools.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -24,7 +24,7 @@
             </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
                 <Button x:Name="BtnSearch" Content="查看文件" Height="32" Width="60" Click="BtnSearch_Click"/>
-                <Button x:Name="BtnRemoveDup" Content="移除重复" Height="32" Width="60" Margin="10,0,0,0" Click="BtnRemoveDup_Click"/>
+                <Button x:Name="BtnRemoveDup" Content="移除重复" IsEnabled="{Binding FileHashComputed}" Height="32" Width="60" Margin="10,0,0,0" Click="BtnRemoveDup_Click"/>
             </StackPanel>
         </Grid>
         <ListView x:Name="FileList" ItemsSource="{Binding FileItems}" Grid.Row="1" >

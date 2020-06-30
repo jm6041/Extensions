@@ -7,4 +7,8 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Jimlicat.FileHash\Jimlicat.FileHash.csproj" />
+  </ItemGroup>
+
 </Project>

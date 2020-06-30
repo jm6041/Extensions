@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WinForm = System.Windows.Forms;
+using Jimlicat.FileHash;
 
 namespace FileTools
 {
@@ -27,6 +28,9 @@ namespace FileTools
         private readonly FilesView filesView;
         private readonly string DefaultFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();
@@ -36,7 +40,7 @@ namespace FileTools
             DataContext = filesView;
         }
 
-        public void InitializeOther()
+        private void InitializeOther()
         {
             folderBrowserDialog = new WinForm.FolderBrowserDialog()
             {
@@ -46,6 +50,7 @@ namespace FileTools
 
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
+            filesView.FileHashComputed = false;
             WinForm.DialogResult result = folderBrowserDialog.ShowDialog();
             if (result == WinForm.DialogResult.OK)
             {
@@ -53,68 +58,54 @@ namespace FileTools
             }
         }
 
-        private void BtnSearch_Click(object sender, RoutedEventArgs e)
+        private async void BtnSearch_Click(object sender, RoutedEventArgs e)
         {
-            SetFileItems(filesView, filesView.FolderName);
-        }
-
-        private void SetFileItems(FilesView fv, string dir)
-        {
-            if (string.IsNullOrEmpty(dir))
+            if (string.IsNullOrEmpty(filesView.FolderName))
             {
                 return;
             }
-            dir = dir.Trim();
+            if (!Directory.Exists(filesView.FolderName))
+            {
+                return;
+            }
             try
             {
-                if (!Directory.Exists(dir))
-                {
-                    return;
-                }
-                DirectoryInfo dirInfo = new DirectoryInfo(dir);
+                filesView.FileHashComputed = false;
+                DirectoryInfo dirInfo = new DirectoryInfo(filesView.FolderName);
                 FileInfo[] files = dirInfo.GetFiles("", SearchOption.AllDirectories);
-                fv.Total = files.Length;
-                fv.FileItems.Clear();
-                using (SHA256 sha256 = SHA256.Create())
-                {
-                    int num = 0;
-                    foreach (FileInfo fInfo in files)
-                    {
-                        num++;
-                        FileStream fileStream = fInfo.Open(FileMode.Open);
-                        fileStream.Position = 0;
-                        byte[] hv = sha256.ComputeHash(fileStream);
-                        string hvs = ByteArrayToString(hv);
-                        // 相对文件夹路径的文件名
-                        string rn = System.IO.Path.GetRelativePath(dir, fInfo.FullName);
-                        FileItemView fi = new FileItemView()
-                        {
-                            Name = rn,
-                            FullName = fInfo.FullName,
-                            Length = fInfo.Length,
-                            LastWriteTime = fInfo.LastWriteTime,
-                            CreationTime = fInfo.CreationTime,
-                            SHA256 = hvs,
-                        };
-                        fv.FileItems.Add(fi);
-                        fv.Count = num;
-                        fileStream.Close();
-                    }
-                }
+                filesView.Total = files.Length;
+                filesView.FileItems.Clear();
+                filesView.Count = 0;
+                FilesHashComputer computer = new FilesHashComputer(files);
+                computer.FileHashComputed += Computer_FileHashComputed;
+                await computer.ComputeHash();
+                filesView.FileHashComputed = true;
             }
             catch (Exception ex)
             {
                 PrintError(ex);
             }
         }
-        public static string ByteArrayToString(byte[] array)
+
+        private void Computer_FileHashComputed(object sender, FileHashInfoEventArgs e)
         {
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
+            var fInfo = e.FileHash.FileInfo;
+            string rn = System.IO.Path.GetRelativePath(filesView.FolderName, fInfo.FullName);
+            Application.Current.Dispatcher.Invoke(() =>
             {
-                b.AppendFormat($"{array[i]:X2}");
-            }
-            return b.ToString();
+                FileItemView fi = new FileItemView()
+                {
+                    Name = rn,
+                    FullName = fInfo.FullName,
+                    Length = fInfo.Length,
+                    LastWriteTime = fInfo.LastWriteTime,
+                    CreationTime = fInfo.CreationTime,
+                    SHA256 = FilesHashComputer.ByteArrayToString(e.FileHash.SHA256),
+                };
+                filesView.FileItems.Add(fi);
+                int count = filesView.Count + 1;
+                filesView.Count = count;
+            });
         }
 
         private void PrintError(Exception ex)

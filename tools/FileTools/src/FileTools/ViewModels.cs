@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -19,7 +19,15 @@ namespace FileTools
         public string FolderName
         {
             get => folderName;
-            set => SetProperty(ref folderName, value);
+            set
+            {
+                string v = value;
+                if (v != null)
+                {
+                    v = v.Trim();
+                }
+                SetProperty(ref folderName, v);
+            }
         }
 
         private int total;
@@ -42,11 +50,31 @@ namespace FileTools
             set => SetProperty(ref count, value);
         }
 
+        private bool fileHashComputed;
+        /// <summary>
+        /// 文件hash计算是否完成
+        /// </summary>
+        public bool FileHashComputed
+        {
+            get => fileHashComputed;
+            set => SetProperty(ref fileHashComputed, value);
+        }
         /// <summary>
         /// 文件项集合
         /// </summary>
         public ObservableCollection<FileItemView> FileItems { get; set; } = new ObservableCollection<FileItemView>();
+        /// <summary>
+        /// 属性改变事件
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// 设置属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="field"></param>
+        /// <param name="newValue"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
         protected bool SetProperty<T>(ref T field, T newValue, string propertyName = null)
         {
             if (!EqualityComparer<T>.Default.Equals(field, newValue))
