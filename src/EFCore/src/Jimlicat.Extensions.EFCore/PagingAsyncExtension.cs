@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Microsoft.EntityFrameworkCore
@@ -16,11 +17,12 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="source"></param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
         /// <returns></returns>
-        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize)
+        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> source, int pageIndex, int pageSize, CancellationToken cancellationToken = default)
         {
-            int count = await source.CountAsync();
-            var result = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync();
+            int count = await source.CountAsync(cancellationToken);
+            var result = await source.Skip(pageIndex * pageSize).Take(pageSize).ToListAsync(cancellationToken);
             return new PagedResult<T>() { Toltal = count, Result = result };
         }
 
@@ -29,23 +31,20 @@ namespace Microsoft.EntityFrameworkCore
         /// </summary>
         /// <param name="source"></param>
         /// <param name="page">分页数据</param>
+        /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
         /// <returns></returns>
-        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> source, PageParameter page)
+        public static async Task<PagedResult<T>> ToPagedResultAsync<T>(this IQueryable<T> source, PageParameter page, CancellationToken cancellationToken = default)
         {
-            int count = await source.CountAsync();
-            IList<T> result;
             if (page == null)
             {
-                result = await source.ToListAsync();
+                throw new ArgumentNullException(nameof(page));
             }
-            else
+            int count = await source.CountAsync(cancellationToken);
+            if (page.PageSize <= 0)
             {
-                if (page.PageSize <= 0)
-                {
-                    return new PagedResult<T>() { Toltal = count, Result = Enumerable.Empty<T>().ToList(), };
-                }
-                result = await source.Page(page).ToListAsync();
+                return new PagedResult<T>() { Toltal = count, Result = Enumerable.Empty<T>().ToList(), };
             }
+            IList<T> result = await source.Page(page).ToListAsync(cancellationToken);
             return new PagedResult<T>() { Toltal = count, Result = result, };
         }
     }
