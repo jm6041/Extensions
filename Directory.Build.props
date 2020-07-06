@@ -22,7 +22,7 @@
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <LinqVer>1.0.0</LinqVer>
-    <EFCoreVer>1.0.0</EFCoreVer>
+    <EFCoreVer>1.1.0</EFCoreVer>
     <HostBuilderVer>2.0.0</HostBuilderVer>
   </PropertyGroup>
 </Project>
