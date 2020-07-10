@@ -22,7 +22,7 @@ namespace System.Linq
         public Ordering(string name, Direction direction)
         {
             Name = name;
-            Direction = direction;
+            Dir = direction;
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace System.Linq
         public Ordering(Ordering ordering)
         {
             Name = ordering.Name;
-            Direction = ordering.Direction;
+            Dir = ordering.Dir;
         }
 
         /// <summary>
@@ -44,6 +44,6 @@ namespace System.Linq
         /// 排序方向
         /// </summary>
         [DataMember(Order = 20)]
-        public Direction Direction { get; set; }
+        public Direction Dir { get; set; }
     }
 }

@@ -33,7 +33,7 @@ namespace ConsoleApp
             Print(datas);
             var list = datas.ToList();
             list.OrderBy(x => x.Name);
-            Ordering ordering0 = new Ordering { Name = "Id", Direction = Direction.Desc };
+            Ordering ordering0 = new Ordering { Name = "Id", Dir = Direction.Desc };
             var descDatas = datas.OrderBy(ordering0);
             Console.WriteLine("倒序后的值");
             Print(descDatas);

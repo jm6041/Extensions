@@ -47,7 +47,7 @@ namespace System.Linq
             {
                 throw new ArgumentNullException(nameof(ordering));
             }
-            string methodName = ordering.Direction == Direction.Asc ? "OrderBy" : "OrderByDescending";
+            string methodName = ordering.Dir == Direction.Asc ? "OrderBy" : "OrderByDescending";
             return CallOrderedQueryable(query, methodName, ordering.Name, null);
         }
         /// <summary>
@@ -88,7 +88,7 @@ namespace System.Linq
             {
                 throw new ArgumentNullException(nameof(ordering));
             }
-            string methodName = ordering.Direction == Direction.Asc ? "ThenBy" : "ThenByDescending";
+            string methodName = ordering.Dir == Direction.Asc ? "ThenBy" : "ThenByDescending";
             return CallOrderedQueryable(query, methodName, ordering.Name, null);
         }
 
