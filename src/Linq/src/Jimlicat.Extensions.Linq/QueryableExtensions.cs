@@ -93,7 +93,6 @@ namespace System.Linq
         }
 
         /// <summary>
-        /// 
         /// 调用排序查询，在(Entity Framework, Linq to Sql)中，不应该使用比较器
         /// </summary>
         public static IOrderedQueryable<T> CallOrderedQueryable<T>(this IQueryable<T> query, string methodName, string propertyName, IComparer<object> comparer = null)

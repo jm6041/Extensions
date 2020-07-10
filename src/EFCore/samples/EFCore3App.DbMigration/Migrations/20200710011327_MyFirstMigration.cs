@@ -8,7 +8,7 @@ namespace EFCore3App.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Orders",
+                name: "Order",
                 columns: table => new
                 {
                     Id = table.Column<string>(fixedLength: true, maxLength: 32, nullable: false, comment: "Id"),
@@ -16,11 +16,11 @@ namespace EFCore3App.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.PrimaryKey("PK_Order", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "User",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false, comment: "Id")
@@ -33,11 +33,11 @@ namespace EFCore3App.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_User", x => x.Id);
                 });
 
             migrationBuilder.InsertData(
-                table: "Users",
+                table: "User",
                 columns: new[] { "Id", "Created", "DouV", "IntV", "Name", "Sex" },
                 values: new object[,]
                 {
@@ -145,7 +145,7 @@ namespace EFCore3App.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "OrderNameIndex",
-                table: "Orders",
+                table: "Order",
                 column: "Name",
                 unique: true);
         }
@@ -153,10 +153,10 @@ namespace EFCore3App.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Orders");
+                name: "Order");
 
             migrationBuilder.DropTable(
-                name: "Users");
+                name: "User");
         }
     }
 }

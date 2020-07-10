@@ -37,7 +37,13 @@ namespace EFCoreData
             //    string tableName = regex.Replace(entity.ClrType.Name, string.Empty);
             //    modelBuilder.Entity(entity.ClrType).ToTable(tableName);
             //}
-            modelBuilder.SetTableName((c) => c.DisplayName()).SetIndexName(x => x.GetName());
+            modelBuilder.SetTableName((c) => {
+                if (c.ClrType.IsGenericType)
+                {
+                    return Regex.Replace(c.ClrType.Name, @"`\d+$", string.Empty);
+                }
+                return c.DisplayName();
+            });
             modelBuilder.DetaultStringMaxLength(2000).DefaultDeleteBehavior();
 
             //// 限制一对多级联删除

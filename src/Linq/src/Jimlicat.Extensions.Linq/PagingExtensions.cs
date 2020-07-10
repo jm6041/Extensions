@@ -75,10 +75,6 @@ namespace System.Linq
             {
                 throw new ArgumentNullException(nameof(page));
             }
-            if (page == null)
-            {
-                return query;
-            }
             // 先排序
             if (page.Orderings != null && page.Orderings.Any())
             {

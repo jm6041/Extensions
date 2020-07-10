@@ -39,7 +39,7 @@ namespace EFCore3App.Migrations
                         .IsUnique()
                         .HasName("OrderNameIndex");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("EFCoreEntities.User", b =>
@@ -74,7 +74,7 @@ namespace EFCore3App.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
 
                     b.HasData(
                         new

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EFCore3App.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20200617111716_MyFirstMigration")]
+    [Migration("20200710011327_MyFirstMigration")]
     partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,7 +41,7 @@ namespace EFCore3App.Migrations
                         .IsUnique()
                         .HasName("OrderNameIndex");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Order");
                 });
 
             modelBuilder.Entity("EFCoreEntities.User", b =>
@@ -76,7 +76,7 @@ namespace EFCore3App.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("User");
 
                     b.HasData(
                         new
