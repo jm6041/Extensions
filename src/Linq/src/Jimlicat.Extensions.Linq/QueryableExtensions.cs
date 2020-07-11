@@ -1,3 +1,4 @@
+using Jimlicat.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -95,7 +96,7 @@ namespace System.Linq
         /// <summary>
         /// 调用排序查询，在(Entity Framework, Linq to Sql)中，不应该使用比较器
         /// </summary>
-        public static IOrderedQueryable<T> CallOrderedQueryable<T>(this IQueryable<T> query, string methodName, string propertyName, IComparer<object> comparer = null)
+        private static IOrderedQueryable<T> CallOrderedQueryable<T>(this IQueryable<T> query, string methodName, string propertyName, IComparer<object> comparer = null)
         {
             var param = Expression.Parameter(typeof(T), "x");
 
@@ -121,6 +122,154 @@ namespace System.Linq
                         Expression.Lambda(body, param)
                     )
                 );
+        }
+
+        /// <summary>
+        /// 执行多重排序
+        /// </summary>
+        /// <typeparam name="T">数据源类型</typeparam>
+        /// <param name="query">数据源</param>
+        /// <param name="orders">排序信息</param>
+        /// <returns>排序结果</returns>
+        private static IOrderedQueryable<T> OrderAndThenBy<T>(this IQueryable<T> query, IEnumerable<Ordering> orders)
+        {
+            Checker.NotNull(query, nameof(query));
+            Checker.NotEmpty(orders, nameof(orders));
+            if (!(orders is IList<Ordering> orderList))
+            {
+                orderList = new List<Ordering>(orders);
+            }
+            var orderedQuery = query.OrderBy(orderList[0]);
+            int count = orderList.Count;
+            for (int i = 1; i < count; i++)
+            {
+                orderedQuery = orderedQuery.ThenBy(orderList[i]);
+            }
+            return orderedQuery;
+        }
+
+        /// <summary>
+        /// 执行分页, 自动排序
+        /// </summary>
+        /// <typeparam name="T">数据源类型</typeparam>
+        /// <param name="query">数据源</param>
+        /// <param name="page">分页参数</param>
+        /// <returns>排序分页后的数据</returns>
+        public static IQueryable<T> Page<T>(this IQueryable<T> query, PageParameter page)
+        {
+            Checker.NotNull(query, nameof(query));
+            Checker.CheckPageParameter(page, nameof(page));
+            // 先排序
+            if (page.Orderings != null && page.Orderings.Any())
+            {
+                query = query.OrderAndThenBy(page.Orderings);
+            }
+            // 后分页
+            query = query.Skip(page.PageIndex * page.PageSize).Take(page.PageSize);
+            return query;
+        }
+
+        /// <summary>
+        /// 从全量数据生成分页数据
+        /// </summary>
+        /// <param name="source">源数据</param>
+        /// <param name="page">分页数据</param>
+        /// <returns>分页后的数据</returns>
+        public static DataResult<T> ToPagedResult<T>(this IQueryable<T> source, PageParameter page)
+        {
+            Checker.NotNull(source, nameof(source));
+            Checker.CheckPageParameter(page, nameof(page));
+            int count = source.Count();
+            IList<T> result;
+            if (page == null)
+            {
+                result = source.ToList();
+            }
+            else
+            {
+                result = source.Page(page).ToList();
+            }
+            return new DataResult<T>() { Count = count, Result = result, };
+        }
+
+        /// <summary>
+        /// OData查询，支持 top, skip, orderby
+        /// </summary>
+        /// <typeparam name="T">数据源类型</typeparam>
+        /// <param name="query">数据源</param>
+        /// <param name="top">加载的数据量</param>
+        /// <param name="skip">跳过的数据量</param>
+        /// <param name="orderby">排序信息</param>
+        /// <returns>排序分页后的数据</returns>
+        public static IQueryable<T> ODataQuery<T>(this IQueryable<T> query, int top, int skip, string orderby)
+        {
+            IDictionary<string, Direction> orderings = ODataParameter.ToOrderingDictionary(orderby);
+            return ODataQuery(query, top, skip, orderings);
+        }
+        /// <summary>
+        /// OData查询，支持 top, skip, orderby
+        /// </summary>
+        /// <typeparam name="T">数据源类型</typeparam>
+        /// <param name="query">数据源</param>
+        /// <param name="para">OData参数</param>
+        /// <returns></returns>
+        public static IQueryable<T> ODataQuery<T>(this IQueryable<T> query, ODataParameter para)
+        {
+            Checker.NotNull(query, nameof(query));
+            Checker.CheckODataParameter(para, nameof(para));
+            return ODataQuery(query, para.Top, para.Skip, para.Orderings);
+        }
+
+        /// <summary>
+        /// OData查询
+        /// </summary>
+        /// <typeparam name="T">数据源类型</typeparam>
+        /// <param name="query">数据源</param>
+        /// <param name="top">加载的数据量</param>
+        /// <param name="skip">跳过的数据量</param>
+        /// <param name="orderings">排序信息</param>
+        /// <returns>排序分页后的数据</returns>
+        private static IQueryable<T> ODataQuery<T>(IQueryable<T> query, int top, int skip, IDictionary<string, Direction> orderings)
+        {
+            Checker.NotNull(query, nameof(query));
+            Checker.CheckMustNonNegativeInteger(top, nameof(top));
+            Checker.CheckMustNonNegativeInteger(skip, nameof(skip));
+            // 先排序
+            if (orderings != null && orderings.Any())
+            {
+                var ods = orderings.Select(x => new Ordering { Name = x.Key, Dir = x.Value }).ToArray();
+                query = query.OrderAndThenBy(ods);
+            }
+            // 后分页
+            query = query.Skip(skip).Take(top);
+            return query;
+        }
+
+        /// <summary>
+        /// 从全量数据生成分页数据
+        /// </summary>
+        /// <param name="source">源数据</param>
+        /// <param name="para">分页数据</param>
+        /// <returns>分页后的数据</returns>
+        public static DataResult<T> ToODataResult<T>(this IQueryable<T> source, ODataParameter para)
+        {
+            Checker.NotNull(source, nameof(source));
+            Checker.CheckODataParameter(para, nameof(para));
+            int count = 0;
+            if (para.Count)
+            {
+                count = source.Count();
+            }
+            IList<T> result;
+            if (para == null)
+            {
+                result = source.ToList();
+            }
+            else
+            {
+                result = ODataQuery(source, para.Top, para.Skip, para.Orderings).ToList();
+            }
+            return new DataResult<T>() { Count = count, Result = result, };
         }
     }
 }

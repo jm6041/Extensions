@@ -18,6 +18,10 @@ namespace EFCore3App.Controllers
     public class UserController : ControllerBase
     {
         private readonly MyDbContext _context;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="context"></param>
         public UserController(MyDbContext context)
         {
             _context = context;
@@ -29,7 +33,7 @@ namespace EFCore3App.Controllers
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<PagedResult<User>> GetPagedData([FromBody]QueryDto query)
+        public async Task<DataResult<User>> GetPagedData([FromBody]QueryDto query)
         {
             var source = _context.Users.Where(x => 1 == 1);
             if (query.Min != null)
@@ -53,7 +57,7 @@ namespace EFCore3App.Controllers
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<PagedResult<User>> GetPagedData2([FromBody]QueryDto2 query)
+        public async Task<DataResult<User>> GetODataData([FromBody]QueryDto2 query)
         {
             var source = _context.Users.Where(x => 1 == 1);
             if (query.Min != null)
@@ -68,7 +72,7 @@ namespace EFCore3App.Controllers
             {
                 source = source.OrderBy(x => x.Id);
             }
-            return await source.ToPagedResultAsync(query.PageIndex, query.PageSize, query.Orderings);
+            return await source.ToODataResultAsync(query);
         }
 
         /// <summary>
@@ -101,21 +105,8 @@ namespace EFCore3App.Controllers
     /// <summary>
     /// 分页查询
     /// </summary>
-    public class QueryDto2
+    public class QueryDto2:ODataParameter
     {
-        /// <summary>
-        /// 页索引
-        /// </summary>
-        public int PageIndex { get; set; }
-        /// <summary>
-        /// 页大小
-        /// </summary>
-        public int PageSize { get; set; }
-        /// <summary>
-        /// 排序信息
-        /// </summary>
-        public Dictionary<string, Direction> Orderings { get; set; } = new Dictionary<string, Direction>();
-
         /// <summary>
         /// 最小值
         /// </summary>

@@ -45,7 +45,7 @@ namespace ConsoleApp
             Print(pageDatas);
 
             var pagedResult = datas.ToPagedResult(pageParameter);
-            Console.WriteLine($"分页结果 Toltal:{pagedResult.Toltal}");
+            Console.WriteLine($"分页结果 Toltal:{pagedResult.Count}");
             Print(pagedResult.Result);
 
             Console.ReadLine();
