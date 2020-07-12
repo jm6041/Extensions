@@ -12,7 +12,7 @@ namespace System.Linq
     public class DataResult<T>
     {
         /// <summary>
-        /// 分页数据结果
+        /// 数据结果
         /// </summary>
         public IList<T> Result { get; set; }
         /// <summary>
