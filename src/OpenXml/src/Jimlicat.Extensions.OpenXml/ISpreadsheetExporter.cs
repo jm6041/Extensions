@@ -1,11 +1,11 @@
-﻿using System.IO;
+using System.IO;
 
-namespace Gov.DocumentFormat.OpenXml
+namespace Jimlicat.OpenXml
 {
     /// <summary>
-    /// 电子表格导出接口
+    /// 电子表格导出器接口
     /// </summary>
-    public interface ISpreadsheetExport
+    public interface ISpreadsheetExporter
     {
         /// <summary>
         /// 导出

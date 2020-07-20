@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Gov.DocumentFormat.OpenXml
+namespace Jimlicat.OpenXml
 {
     /// <summary>
     /// 列引用标记实用方法

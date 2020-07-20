@@ -1,4 +1,4 @@
-﻿using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
@@ -7,12 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Gov.DocumentFormat.OpenXml
+namespace Jimlicat.OpenXml
 {
     /// <summary>
     /// 电子表格导出
     /// </summary>
-    public class SpreadsheetExport<T> : ISpreadsheetExport where T : class
+    public class SpreadsheetExporter<T> : ISpreadsheetExporter where T : class
     {
         /// <summary>
         /// 导出数据集合
@@ -27,7 +27,8 @@ namespace Gov.DocumentFormat.OpenXml
         /// 构造函数
         /// </summary>
         /// <param name="sourceDatas">要导出的数据</param>
-        public SpreadsheetExport(IEnumerable<T> sourceDatas, ColumnCollection columns, string sheetName)
+        /// <param name="columns">列信息</param>
+        public SpreadsheetExporter(IEnumerable<T> sourceDatas, ColumnCollection columns)
         {
             if (sourceDatas == null)
             {
@@ -36,15 +37,15 @@ namespace Gov.DocumentFormat.OpenXml
             _sourceDatas = sourceDatas;
             _columnCollection = columns;
             _propertyDic = GetPropertyDic(typeof(T));
-            SheetName = sheetName;
+            SheetName = typeof(T).Name;
         }
 
         /// <summary>
         /// 通过反射获得属性
         /// </summary>
-        /// <param name="datas"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
-        protected static Dictionary<string, PropertyInfo> GetPropertyDic(Type type)
+        private static Dictionary<string, PropertyInfo> GetPropertyDic(Type type)
         {
             return type.GetRuntimeProperties().Where(x => x.CanRead).ToDictionary(k => k.Name);
         }
@@ -52,8 +53,12 @@ namespace Gov.DocumentFormat.OpenXml
         /// <summary>
         /// Sheet名
         /// </summary>
-        public string SheetName { get; set; } = "Data";
+        public string SheetName { get; set; }
 
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <returns></returns>
         public MemoryStream Export()
         {
             MemoryStream ms = new MemoryStream();
@@ -192,6 +197,7 @@ namespace Gov.DocumentFormat.OpenXml
         /// 格式化文本
         /// </summary>
         /// <param name="v"></param>
+        /// <param name="dt">数据类型</param>
         /// <returns></returns>
         private string FormatValue(object v, Type dt)
         {
@@ -257,8 +263,6 @@ namespace Gov.DocumentFormat.OpenXml
             return vs;
         }
 
-        // 每批处理的数据条数
-        private const int BatchCount = 5000;
         /// <summary>
         /// 表格内容
         /// </summary>

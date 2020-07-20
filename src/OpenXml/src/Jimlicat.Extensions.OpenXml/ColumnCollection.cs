@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Gov.DocumentFormat.OpenXml
+namespace Jimlicat.OpenXml
 {
     /// <summary>
     /// 列信息
@@ -34,7 +34,11 @@ namespace Gov.DocumentFormat.OpenXml
             }
             set => _width = value;
         }
-
+        /// <summary>
+        /// 重写 Equals
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             if (!ReferenceEquals(this, obj))
@@ -52,6 +56,10 @@ namespace Gov.DocumentFormat.OpenXml
             return true;
         }
 
+        /// <summary>
+        /// 重写 GetHashCode
+        /// </summary>
+        /// <returns></returns>
         public override int GetHashCode()
         {
             int h = 0;
