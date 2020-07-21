@@ -80,6 +80,9 @@ namespace Jimlicat.OpenXml
 
             WorksheetPart worksheetPart1 = workbookPart1.AddNewPart<WorksheetPart>("rId1");
             GenerateWorksheetPartContent(worksheetPart1);
+
+            SharedStringTablePart sharedStringTablePart1 = workbookPart1.AddNewPart<SharedStringTablePart>("rId4");
+            GenerateSharedStringTablePartContent(sharedStringTablePart1);
         }
 
         private void GenerateWorkbookPartContent(WorkbookPart workbookPart)
@@ -131,32 +134,52 @@ namespace Jimlicat.OpenXml
 
             // 字体
             Fonts fonts = new Fonts(
-                new Font( // 0 默认
-                ),
-                new Font( // 1 表头
+                // 0 默认
+                new Font(),
+                // 1 表头
+                new Font(
                     new Bold()
                 ));
 
             // 填充
             Fills fills = new Fills(
-                    new Fill(new PatternFill() { PatternType = PatternValues.None }) // 0 默认
+                    new Fill(new PatternFill() { PatternType = PatternValues.None }), // 0 默认
+                    new Fill(new PatternFill() { PatternType = PatternValues.Gray125 }) // 0 默认
                 );
 
             // 边框
             Borders borders = new Borders(
-                    new Border(), // 0 默认
+                    // 0 默认，无边框
+                    new Border(
+                        new LeftBorder(),
+                        new RightBorder(),
+                        new TopBorder(),
+                        new BottomBorder(),
+                        new DiagonalBorder()),
                     new Border(   // 1 四周边框
                         new LeftBorder(new Color() { Auto = true }) { Style = BorderStyleValues.Thin },
                         new RightBorder(new Color() { Auto = true }) { Style = BorderStyleValues.Thin },
                         new TopBorder(new Color() { Auto = true }) { Style = BorderStyleValues.Thin },
                         new BottomBorder(new Color() { Auto = true }) { Style = BorderStyleValues.Thin },
                         new DiagonalBorder())
+                    );
+
+            // 表格总体样式格式
+            CellStyleFormats cellStyleFormats = new CellStyleFormats(
+                new CellFormat() { NumberFormatId = 0, FontId = 0, FillId = 0, BorderId = 0 }
                 );
 
+            // 表格格式
             CellFormats cellFormats = new CellFormats(
-                    new CellFormat(), // 默认
-                    new CellFormat { FontId = 1, FillId = 0, BorderId = 1, ApplyBorder = true }, // 表头
-                    new CellFormat { FontId = 0, FillId = 0, BorderId = 1, ApplyBorder = true }  // 内容
+                    new CellFormat() { NumberFormatId = 0, FontId = 0, FillId = 0, BorderId = 0, FormatId = 0 }, // 默认
+                    new CellFormat() { NumberFormatId = 0, FontId = 1, FillId = 0, BorderId = 1, FormatId = 0, ApplyFont = true, ApplyBorder = true }, // 表头
+                    new CellFormat() { NumberFormatId = 0, FontId = 0, FillId = 0, BorderId = 1, FormatId = 0, ApplyBorder = true },  // 文本内容
+                    new CellFormat() { NumberFormatId = 0, FontId = 0, FillId = 0, BorderId = 1, FormatId = 0, ApplyNumberFormat = true, ApplyBorder = true }  // 数字内容
+                );
+
+            // 表格样式
+            CellStyles cellStyles = new CellStyles(
+                new CellStyle() { FormatId = 0, BuiltinId = 0 }
                 );
 
             StylesheetExtensionList stylesheetExtensionList = new StylesheetExtensionList();
@@ -172,7 +195,9 @@ namespace Jimlicat.OpenXml
             styleSheet.Append(fonts);
             styleSheet.Append(fills);
             styleSheet.Append(borders);
+            styleSheet.Append(cellStyleFormats);
             styleSheet.Append(cellFormats);
+            styleSheet.Append(cellStyles);
             styleSheet.Append(stylesheetExtensionList);
 
             workbookStylesPart.Stylesheet = styleSheet;
@@ -192,6 +217,106 @@ namespace Jimlicat.OpenXml
                 DataType = new EnumValue<CellValues>(dataType),
                 StyleIndex = styleIndex
             };
+        }
+        // 共享字符串与索引对应关系
+        private readonly Dictionary<string, string> stringIndexDic = new Dictionary<string, string>();
+        private uint curIndex = 0;
+        private uint totalCount = 0;
+        /// <summary>
+        /// Put 共享字符串
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns>字符串索引</returns>
+        private string PutSharedString(string str)
+        {
+            totalCount++;
+            if (stringIndexDic.TryGetValue(str, out string indexStr))
+            {
+                return indexStr;
+            }
+            else
+            {
+                indexStr = curIndex.ToString();
+                stringIndexDic.Add(str, indexStr);
+                curIndex++;
+                return indexStr;
+            }
+        }
+        /// <summary>
+        /// 构造Cell
+        /// </summary>
+        /// <param name="val">值</param>
+        /// <param name="valType">类型</param>
+        /// <returns></returns>
+        private Cell ConstructCell2(object val, Type valType)
+        {
+            Cell cell = new Cell();
+            if (val is null)
+            {
+                CellSetString(cell, string.Empty);
+            }
+            else if (val is string vstr)
+            {
+                CellSetString(cell, vstr);
+            }
+            else if (Utils.IsNumericType(val))
+            {
+                cell.DataType = new EnumValue<CellValues>(CellValues.Number);
+                cell.StyleIndex = 3;
+                cell.CellValue = new CellValue(val.ToString());
+            }
+            else if (val is DateTimeOffset vdto)
+            {
+                var cv = new CellValue(vdto);
+                CellSetString(cell, cv.InnerText);
+            }
+            else if (val is DateTimeOffset?)
+            {
+                DateTimeOffset? nvdto = (DateTimeOffset?)val;
+                var cv = new CellValue(nvdto.Value);
+                CellSetString(cell, cv.InnerText);
+            }
+            else if (val is DateTime vdt)
+            {
+                var cv = new CellValue(vdt);
+                CellSetString(cell, cv.InnerText);
+            }
+            else if (val is DateTime?)
+            {
+                DateTime? nvdt = (DateTime?)val;
+                var cv = new CellValue(nvdt.Value);
+                CellSetString(cell, cv.InnerText);
+            }
+            else if (val is Guid gv)
+            {
+                CellSetString(cell, gv.ToString());
+            }
+            else if (val is Guid?)
+            {
+                Guid? ngv = (Guid?)val;
+                CellSetString(cell, ngv.Value.ToString());
+            }
+            else
+            {
+                cell.CellValue = new CellValue(val.ToString());
+                cell.DataType = new EnumValue<CellValues>(CellValues.String);
+                cell.StyleIndex = 2;
+            }
+            return cell;
+        }
+        /// <summary>
+        /// Cell 设置字符串
+        /// </summary>
+        /// <param name="cell"></param>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        private Cell CellSetString(Cell cell, string str)
+        {
+            cell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
+            cell.StyleIndex = 2;
+            string indexStr = PutSharedString(str);
+            cell.CellValue = new CellValue(indexStr);
+            return cell;
         }
         /// <summary>
         /// 格式化文本
@@ -271,7 +396,6 @@ namespace Jimlicat.OpenXml
         {
             using (OpenXmlWriter writer = OpenXmlWriter.Create(worksheetPart))
             {
-
                 // worksheet 开始
                 writer.WriteStartElement(new Worksheet());
 
@@ -316,7 +440,7 @@ namespace Jimlicat.OpenXml
                         PropertyInfo pi = _propertyDic[citem.PropertyName];
                         object v = pi.GetValue(data, null);
                         string vs = FormatValue(v, pi.PropertyType);
-                        Cell cell = ConstructCell(vs, CellValues.String, 2);
+                        Cell cell = ConstructCell2(v, pi.PropertyType);
                         cell.CellReference = CellReferenceUtil.GetCellReference(rowIndex - 1, (uint)k);
                         // 写入 c
                         writer.WriteElement(cell);
@@ -333,5 +457,35 @@ namespace Jimlicat.OpenXml
                 writer.Close();
             }
         }
+        /// <summary>
+        /// 共享字符串
+        /// </summary>
+        /// <param name="sharedStringTablePart"></param>
+        private void GenerateSharedStringTablePartContent(SharedStringTablePart sharedStringTablePart)
+        {
+            using (OpenXmlWriter writer = OpenXmlWriter.Create(sharedStringTablePart))
+            {
+                // SharedStringTable 开始
+                writer.WriteStartElement(new SharedStringTable() { Count = totalCount, UniqueCount = (uint)stringIndexDic.Keys.Count });
+
+                foreach (var str in stringIndexDic.Keys)
+                {
+                    // SharedStringItem 开始
+                    writer.WriteStartElement(new SharedStringItem());
+
+                    // 写入 Text
+                    writer.WriteElement(new Text(str));
+
+                    // SharedStringItem 结束
+                    writer.WriteEndElement();
+                }
+
+                // SharedStringTable 结束
+                writer.WriteEndElement();
+
+                writer.Close();
+            }
+        }
+
     }
 }
