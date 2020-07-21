@@ -246,9 +246,23 @@ namespace Jimlicat.OpenXml
         /// 构造Cell
         /// </summary>
         /// <param name="val">值</param>
-        /// <param name="valType">类型</param>
         /// <returns></returns>
-        private Cell ConstructCell2(object val, Type valType)
+        private Cell ConstructHeadCell(string val)
+        {
+            Cell cell = new Cell();
+            if (val == null)
+            {
+                val = string.Empty;
+            }
+            CellSetString(cell, val, 1);
+            return cell;
+        }
+        /// <summary>
+        /// 构造Cell
+        /// </summary>
+        /// <param name="val">值</param>
+        /// <returns></returns>
+        private Cell ConstructCell(object val)
         {
             Cell cell = new Cell();
             if (val is null)
@@ -309,11 +323,12 @@ namespace Jimlicat.OpenXml
         /// </summary>
         /// <param name="cell"></param>
         /// <param name="str"></param>
+        /// <param name="styleIndex">样式索引</param>
         /// <returns></returns>
-        private Cell CellSetString(Cell cell, string str)
+        private Cell CellSetString(Cell cell, string str, uint styleIndex = 2)
         {
             cell.DataType = new EnumValue<CellValues>(CellValues.SharedString);
-            cell.StyleIndex = 2;
+            cell.StyleIndex = styleIndex;
             string indexStr = PutSharedString(str);
             cell.CellValue = new CellValue(indexStr);
             return cell;
@@ -412,8 +427,7 @@ namespace Jimlicat.OpenXml
                     Column column = new Column() { Min = cindex, Max = cindex, Width = citem.Width, CustomWidth = true };
                     // col
                     writer.WriteElement(column);
-
-                    Cell cell = ConstructCell(citem.Show, CellValues.String, 1);
+                    Cell cell = ConstructHeadCell(citem.Show);
                     cell.CellReference = CellReferenceUtil.GetCellReference(0, (uint)i);
                     headCells[i] = cell;
                 }
@@ -439,8 +453,7 @@ namespace Jimlicat.OpenXml
                         ColumnItem citem = _columnCollection.Items[k];
                         PropertyInfo pi = _propertyDic[citem.PropertyName];
                         object v = pi.GetValue(data, null);
-                        string vs = FormatValue(v, pi.PropertyType);
-                        Cell cell = ConstructCell2(v, pi.PropertyType);
+                        Cell cell = ConstructCell(v);
                         cell.CellReference = CellReferenceUtil.GetCellReference(rowIndex - 1, (uint)k);
                         // 写入 c
                         writer.WriteElement(cell);
