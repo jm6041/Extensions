@@ -7,7 +7,7 @@ namespace Jimlicat.OpenXml
     /// <summary>
     /// 列信息
     /// </summary>
-    public class ColumnItem
+    public class ColumnInfo
     {
         /// <summary>
         /// 属性字段名
@@ -17,23 +17,31 @@ namespace Jimlicat.OpenXml
         /// 显示名
         /// </summary>
         public string Show { get; set; }
+        /// <summary>
+        /// 格式字符串
+        /// </summary>
+        public string FormatString { get; set; }
 
-        private double _width = 16.5;
+        private double? _width = null;
         /// <summary>
         /// 长度
         /// </summary>
-        public double Width
+        public double? Width
         {
             get
             {
-                if (_width < 4)
+                if (_width != null && _width.Value < 1)
                 {
-                    return 4;
+                    return 1;
                 }
                 return _width;
             }
             set => _width = value;
         }
+        /// <summary>
+        /// 是否自动确定长度
+        /// </summary>
+        public bool AutoWidth { get; set; } = true;
         /// <summary>
         /// 重写 Equals
         /// </summary>
@@ -47,7 +55,7 @@ namespace Jimlicat.OpenXml
                 {
                     return false;
                 }
-                if (!(obj is ColumnItem other))
+                if (!(obj is ColumnInfo other))
                 {
                     return false;
                 }
@@ -69,16 +77,5 @@ namespace Jimlicat.OpenXml
             }
             return h ^ 17;
         }
-    }
-
-    /// <summary>
-    /// 列信息集合
-    /// </summary>
-    public class ColumnCollection
-    {
-        /// <summary>
-        /// 列集合
-        /// </summary>
-        public List<ColumnItem> Items { get; set; } = new List<ColumnItem>();
     }
 }

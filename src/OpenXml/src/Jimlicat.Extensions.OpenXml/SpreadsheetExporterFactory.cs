@@ -14,17 +14,27 @@ namespace Jimlicat.OpenXml
         /// 创建<see cref="ISpreadsheetExporter"/>
         /// </summary>
         /// <returns></returns>
-        public static ISpreadsheetExporter Create<T>(IEnumerable<T> sourceDatas, ColumnCollection columns) where T : class
+        public static ISpreadsheetExporter Create<T>(IEnumerable<T> sourceDatas) where T : class
         {
-            ISpreadsheetExporter export = new SpreadsheetExporter<T>(sourceDatas, columns);
-            return export;
+            ISpreadsheetExporter exporter = new SpreadsheetExporter<T>(sourceDatas);
+            return exporter;
         }
 
         /// <summary>
         /// 创建<see cref="ISpreadsheetExporter"/>
         /// </summary>
         /// <returns></returns>
-        public static ISpreadsheetExporter Create(object sourceDatas, ColumnCollection columns)
+        public static ISpreadsheetExporter Create<T>(IEnumerable<T> sourceDatas, IEnumerable<ColumnInfo> columns) where T : class
+        {
+            ISpreadsheetExporter exporter = new SpreadsheetExporter<T>(sourceDatas, columns);
+            return exporter;
+        }
+
+        /// <summary>
+        /// 创建<see cref="ISpreadsheetExporter"/>
+        /// </summary>
+        /// <returns></returns>
+        public static ISpreadsheetExporter Create(object sourceDatas, IEnumerable<ColumnInfo> columns)
         {
             var sdType = sourceDatas.GetType();
             if (sdType.IsGenericType && sdType.GetInterfaces().Any(x => x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))

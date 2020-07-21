@@ -3,6 +3,8 @@ using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -22,24 +24,108 @@ namespace Jimlicat.OpenXml
         /// 属性名对应属性字典
         /// </summary>
         private readonly Dictionary<string, PropertyInfo> _propertyDic;
-        private readonly ColumnCollection _columnCollection;
+        /// <summary>
+        /// 列信息
+        /// </summary>
+        private readonly List<ColumnInfo> _columnInfos;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="sourceDatas">要导出的数据</param>
-        /// <param name="columns">列信息</param>
-        public SpreadsheetExporter(IEnumerable<T> sourceDatas, ColumnCollection columns)
+        public SpreadsheetExporter(IEnumerable<T> sourceDatas)
         {
             if (sourceDatas == null)
             {
                 throw new ArgumentNullException(nameof(sourceDatas));
             }
             _sourceDatas = sourceDatas;
-            _columnCollection = columns;
+            _columnInfos = GetColumnInfos(typeof(T));
             _propertyDic = GetPropertyDic(typeof(T));
             SheetName = typeof(T).Name;
+            InitBoolText();
+        }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="sourceDatas">要导出的数据</param>
+        /// <param name="columns">列信息</param>
+        public SpreadsheetExporter(IEnumerable<T> sourceDatas, IEnumerable<ColumnInfo> columns)
+        {
+            if (sourceDatas == null)
+            {
+                throw new ArgumentNullException(nameof(sourceDatas));
+            }
+            _sourceDatas = sourceDatas;
+            _columnInfos = new List<ColumnInfo>();
+            _columnInfos.AddRange(columns);
+            _propertyDic = GetPropertyDic(typeof(T));
+            foreach (var c in _columnInfos)
+            {
+                if (c.AutoWidth)
+                {
+                    if (_propertyDic.TryGetValue(c.PropertyName, out var pv))
+                    {
+                        c.Width = GetWidth(pv.PropertyType);
+                    }
+                }
+            }
+            SheetName = typeof(T).Name;
+            InitBoolText();
+        }
+        private static readonly CultureInfo ZhCN = CultureInfo.GetCultureInfo("zh-CN");
+        private static readonly CultureInfo EN = CultureInfo.GetCultureInfo("en");
+        private void InitBoolText()
+        {
+            if (CultureInfo.CurrentCulture.Equals(ZhCN))
+            {
+                BoolTrueText = "是";
+                BoolFalseText = "否";
+            }
+            if (CultureInfo.CurrentCulture.Parent.Equals(EN) || CultureInfo.CurrentCulture.Equals(EN))
+            {
+                BoolTrueText = "Yes";
+                BoolFalseText = "No";
+            }
         }
 
+        private static List<ColumnInfo> GetColumnInfos(Type type)
+        {
+            List<ColumnInfo> cs = new List<ColumnInfo>();
+            foreach (var p in type.GetRuntimeProperties().Where(x => x.CanRead))
+            {
+                ColumnInfo c = new ColumnInfo() { PropertyName = p.Name };
+                var dn = p.GetCustomAttribute<DisplayNameAttribute>();
+                if (dn != null)
+                {
+                    c.Show = dn.DisplayName;
+                }
+                else
+                {
+                    c.Show = p.Name;
+                }
+                c.Width = GetWidth(p.PropertyType);
+                cs.Add(c);
+            }
+            return cs;
+        }
+        private static readonly Dictionary<Type, double> TypeWidthDic = new Dictionary<Type, double>()
+        {
+            { typeof(string), 18 },
+            { typeof(DateTime), 18 },
+            { typeof(DateTime?), 18 },
+            { typeof(DateTimeOffset), 18 },
+            { typeof(DateTimeOffset?), 18 },
+            { typeof(Guid), 18 },
+            { typeof(Guid?), 18 },
+        };
+        private static double? GetWidth(Type type)
+        {
+            if (TypeWidthDic.TryGetValue(type, out double w))
+            {
+                return w;
+            }
+            return null;
+        }
         /// <summary>
         /// 通过反射获得属性
         /// </summary>
@@ -54,6 +140,14 @@ namespace Jimlicat.OpenXml
         /// Sheet名
         /// </summary>
         public string SheetName { get; set; }
+        /// <summary>
+        /// <see cref="bool"/> true 文本
+        /// </summary>
+        public string BoolTrueText { get; set; }
+        /// <summary>
+        /// <see cref="bool"/> false 文本
+        /// </summary>
+        public string BoolFalseText { get; set; }
 
         /// <summary>
         /// 导出
@@ -68,7 +162,6 @@ namespace Jimlicat.OpenXml
             }
             return ms;
         }
-
 
         private void CreateParts(SpreadsheetDocument document)
         {
@@ -202,22 +295,6 @@ namespace Jimlicat.OpenXml
 
             workbookStylesPart.Stylesheet = styleSheet;
         }
-        /// <summary>
-        /// 构造Cell
-        /// </summary>
-        /// <param name="value">值</param>
-        /// <param name="dataType">类型</param>
-        /// <param name="styleIndex">样式编号CellFormats中对应的编号</param>
-        /// <returns></returns>
-        private static Cell ConstructCell(string value, CellValues dataType, uint styleIndex = 0)
-        {
-            return new Cell()
-            {
-                CellValue = new CellValue(value),
-                DataType = new EnumValue<CellValues>(dataType),
-                StyleIndex = styleIndex
-            };
-        }
         // 共享字符串与索引对应关系
         private readonly Dictionary<string, string> stringIndexDic = new Dictionary<string, string>();
         private uint curIndex = 0;
@@ -261,8 +338,10 @@ namespace Jimlicat.OpenXml
         /// 构造Cell
         /// </summary>
         /// <param name="val">值</param>
+        /// <param name="format">格式字符串</param>
+        /// <param name="valType">值类型</param>
         /// <returns></returns>
-        private Cell ConstructCell(object val)
+        private Cell ConstructCell(object val, string format, Type valType)
         {
             Cell cell = new Cell();
             if (val is null)
@@ -281,34 +360,70 @@ namespace Jimlicat.OpenXml
             }
             else if (val is DateTimeOffset vdto)
             {
-                var cv = new CellValue(vdto);
-                CellSetString(cell, cv.InnerText);
+                string fv = FormatDateTimeOffset(vdto, format);
+                CellSetString(cell, fv);
             }
             else if (val is DateTimeOffset?)
             {
                 DateTimeOffset? nvdto = (DateTimeOffset?)val;
-                var cv = new CellValue(nvdto.Value);
-                CellSetString(cell, cv.InnerText);
+                string fv = FormatDateTimeOffset(nvdto.Value, format);
+                CellSetString(cell, fv);
             }
             else if (val is DateTime vdt)
             {
-                var cv = new CellValue(vdt);
-                CellSetString(cell, cv.InnerText);
+                string fv = FormatDateTime(vdt, format);
+                CellSetString(cell, fv);
             }
             else if (val is DateTime?)
             {
                 DateTime? nvdt = (DateTime?)val;
-                var cv = new CellValue(nvdt.Value);
-                CellSetString(cell, cv.InnerText);
+                string fv = FormatDateTime(nvdt.Value, format);
+                CellSetString(cell, fv);
             }
             else if (val is Guid gv)
             {
-                CellSetString(cell, gv.ToString());
+                string fv = FormatGuid(gv, format);
+                CellSetString(cell, fv);
             }
             else if (val is Guid?)
             {
                 Guid? ngv = (Guid?)val;
-                CellSetString(cell, ngv.Value.ToString());
+                string fv = FormatGuid(ngv.Value, format);
+                CellSetString(cell, fv);
+            }
+            else if (val is bool vb)
+            {
+                string fv = FormatBool(vb);
+                CellSetString(cell, fv);
+            }
+            else if (val is bool?)
+            {
+                bool? nvb = (bool?)val;
+                string fv = FormatBool(nvb.Value);
+                CellSetString(cell, fv);
+            }
+            else if (valType.IsEnum)
+            {
+                string name = Enum.GetName(valType, val);
+                string text;
+                if (name == null)
+                {
+                    text = string.Empty;
+                }
+                else
+                {
+                    FieldInfo field = valType.GetField(name);
+                    DescriptionAttribute attribute = field.GetCustomAttribute<DescriptionAttribute>();
+                    if (attribute != null && !string.IsNullOrEmpty(attribute.Description))
+                    {
+                        text = attribute.Description;
+                    }
+                    else
+                    {
+                        text = val.ToString();
+                    }
+                }
+                CellSetString(cell, text);
             }
             else
             {
@@ -333,74 +448,66 @@ namespace Jimlicat.OpenXml
             cell.CellValue = new CellValue(indexStr);
             return cell;
         }
-        /// <summary>
-        /// 格式化文本
-        /// </summary>
-        /// <param name="v"></param>
-        /// <param name="dt">数据类型</param>
-        /// <returns></returns>
-        private string FormatValue(object v, Type dt)
-        {
-            if (dt == typeof(bool))
-            {
-                bool vv = (bool)v;
-                return FormatBool(vv);
-            }
-            else if (dt == typeof(bool?))
-            {
-                if (v == null)
-                {
-                    return string.Empty;
-                }
-                bool vv = ((bool?)v).Value;
-                return FormatBool(vv);
-            }
-            else if (dt.DeclaringType == typeof(DateTime))
-            {
-                DateTime vv = (DateTime)v;
-                return FormatDateTime(vv);
-            }
-            else if (dt.DeclaringType == typeof(DateTime?))
-            {
-                if (v == null)
-                {
-                    return string.Empty;
-                }
-                DateTime vv = (DateTime)v;
-                return FormatDateTime(vv);
-            }
-            else
-            {
-                return v == null ? "" : v.ToString();
-            }
-        }
 
         private string FormatBool(bool v)
         {
-            string vs;
             if (v)
             {
-                vs = "√";
+                if (!string.IsNullOrEmpty(BoolTrueText))
+                {
+                    return BoolTrueText;
+                }
             }
             else
             {
-                vs = "×";
+                if (!string.IsNullOrEmpty(BoolFalseText))
+                {
+                    return BoolFalseText;
+                }
             }
-            return vs;
+            return v.ToString();
         }
 
-        private string FormatDateTime(DateTime v)
+        private string FormatDateTime(DateTime v, string format)
         {
-            string vs;
-            if (v.Hour == 0 && v.Minute == 0 && v.Second == 0)
+            string fv;
+            if (string.IsNullOrEmpty(format))
             {
-                vs = v.ToString("yyyy-MM-dd");
+                fv = v.ToString(format);
             }
             else
             {
-                vs = v.ToString("yyyy-MM-dd HH:mm:ss");
+                fv = v.ToString();
             }
-            return vs;
+            return fv;
+        }
+
+        private string FormatDateTimeOffset(DateTimeOffset v, string format)
+        {
+            string fv;
+            if (string.IsNullOrEmpty(format))
+            {
+                fv = v.ToString(format);
+            }
+            else
+            {
+                fv = v.ToString();
+            }
+            return fv;
+        }
+
+        private string FormatGuid(Guid v, string format)
+        {
+            string fv;
+            if (string.IsNullOrEmpty(format))
+            {
+                fv = v.ToString(format);
+            }
+            else
+            {
+                fv = v.ToString();
+            }
+            return fv;
         }
 
         /// <summary>
@@ -414,26 +521,38 @@ namespace Jimlicat.OpenXml
                 // worksheet 开始
                 writer.WriteStartElement(new Worksheet());
 
-                // cols 开始
-                writer.WriteStartElement(new Columns());
-                int columnCount = _columnCollection.Items.Count;
+                // 是否有自定义列
+                bool hasCustomColume = _columnInfos.Any(x => x.Width != null);
+                if (hasCustomColume)
+                {
+                    // cols 开始
+                    writer.WriteStartElement(new Columns());
+                }
+                int columnCount = _columnInfos.Count;
                 // 表头
-                Row headRow = new Row() { RowIndex = 1 };
+                Row headRow = new Row() { RowIndex = 1, Spans = new ListValue<StringValue>() { InnerText = $"1:{columnCount}" } };
                 Cell[] headCells = new Cell[columnCount];
                 for (int i = 0; i < columnCount; i++)
                 {
-                    ColumnItem citem = _columnCollection.Items[i];
+                    ColumnInfo citem = _columnInfos[i];
                     uint cindex = (uint)i + 1;
-                    Column column = new Column() { Min = cindex, Max = cindex, Width = citem.Width, CustomWidth = true };
-                    // col
-                    writer.WriteElement(column);
+                    if (citem.Width != null)
+                    {
+                        var column = new Column() { Min = cindex, Max = cindex, Width = citem.Width.Value, BestFit = true, CustomWidth = true };
+                        // col
+                        writer.WriteElement(column);
+                    }
+                    
                     Cell cell = ConstructHeadCell(citem.Show);
                     cell.CellReference = CellReferenceUtil.GetCellReference(0, (uint)i);
                     headCells[i] = cell;
                 }
                 headRow.Append(headCells);
-                // cols 结束
-                writer.WriteEndElement();
+                if (hasCustomColume)
+                {
+                    // cols 结束
+                    writer.WriteEndElement();
+                }
 
                 // sheetData 开始
                 writer.WriteStartElement(new SheetData());
@@ -445,15 +564,15 @@ namespace Jimlicat.OpenXml
                 uint rowIndex = 2;
                 foreach (T data in _sourceDatas)
                 {
-                    Row row = new Row() { RowIndex = rowIndex };
+                    Row row = new Row() { RowIndex = rowIndex, Spans = new ListValue<StringValue>() { InnerText = $"1:{columnCount}" } };
                     // row 开始
                     writer.WriteStartElement(row);
                     for (int k = 0; k < columnCount; k++)
                     {
-                        ColumnItem citem = _columnCollection.Items[k];
+                        ColumnInfo citem = _columnInfos[k];
                         PropertyInfo pi = _propertyDic[citem.PropertyName];
                         object v = pi.GetValue(data, null);
-                        Cell cell = ConstructCell(v);
+                        Cell cell = ConstructCell(v, citem.FormatString, pi.PropertyType);
                         cell.CellReference = CellReferenceUtil.GetCellReference(rowIndex - 1, (uint)k);
                         // 写入 c
                         writer.WriteElement(cell);
