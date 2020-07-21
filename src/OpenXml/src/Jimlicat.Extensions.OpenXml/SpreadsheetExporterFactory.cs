@@ -8,7 +8,7 @@ namespace Jimlicat.OpenXml
     /// <summary>
     /// <see cref="ISpreadsheetExporter"/>工厂
     /// </summary>
-    public class SpreadsheetExportFactory
+    public class SpreadsheetExporterFactory
     {
         /// <summary>
         /// 创建<see cref="ISpreadsheetExporter"/>

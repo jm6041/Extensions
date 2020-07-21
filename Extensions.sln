@@ -85,9 +85,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ODataDemo", "src\EFCore\sam
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{DEDA2228-A7E2-4316-997C-307215691FC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jimlicat.Extensions.OpenXml", "src\OpenXml\src\Jimlicat.Extensions.OpenXml\Jimlicat.Extensions.OpenXml.csproj", "{C5C323AF-6747-4AC4-87D8-8CD9864345DC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.OpenXml", "src\OpenXml\src\Jimlicat.Extensions.OpenXml\Jimlicat.Extensions.OpenXml.csproj", "{C5C323AF-6747-4AC4-87D8-8CD9864345DC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.OpenXml", "src\OpenXml\src\Jimlicat.OpenXml\Jimlicat.OpenXml.csproj", "{95350749-F101-4FD6-96A2-8742D26D30BF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{77A365CB-9CF9-4A41-BEDC-42A492A3BAE2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenXmlConsoleApp", "src\OpenXml\samples\OpenXmlConsoleApp\OpenXmlConsoleApp.csproj", "{89D7A7B7-DE46-4330-89B3-0A3C6DF42A97}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -187,6 +191,10 @@ Global
 		{95350749-F101-4FD6-96A2-8742D26D30BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95350749-F101-4FD6-96A2-8742D26D30BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95350749-F101-4FD6-96A2-8742D26D30BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89D7A7B7-DE46-4330-89B3-0A3C6DF42A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89D7A7B7-DE46-4330-89B3-0A3C6DF42A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89D7A7B7-DE46-4330-89B3-0A3C6DF42A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89D7A7B7-DE46-4330-89B3-0A3C6DF42A97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -226,6 +234,8 @@ Global
 		{DEDA2228-A7E2-4316-997C-307215691FC4} = {649BF7E9-4638-412C-8B8C-ECEE48C91A42}
 		{C5C323AF-6747-4AC4-87D8-8CD9864345DC} = {DEDA2228-A7E2-4316-997C-307215691FC4}
 		{95350749-F101-4FD6-96A2-8742D26D30BF} = {DEDA2228-A7E2-4316-997C-307215691FC4}
+		{77A365CB-9CF9-4A41-BEDC-42A492A3BAE2} = {649BF7E9-4638-412C-8B8C-ECEE48C91A42}
+		{89D7A7B7-DE46-4330-89B3-0A3C6DF42A97} = {77A365CB-9CF9-4A41-BEDC-42A492A3BAE2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5CA4204-8E60-43E2-A55C-A02655B2B6EA}
