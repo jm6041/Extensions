@@ -14,7 +14,7 @@ namespace System.Linq
     public class ODataParameter
     {
         /// <summary>
-        /// $top
+        /// $top 返回数据数量，如果返回所有数据，传递 <see cref="int.MaxValue"/>
         /// </summary>
         [DataMember(Order = 10000)]
         public int Top { get; set; }

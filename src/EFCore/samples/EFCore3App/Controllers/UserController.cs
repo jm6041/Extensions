@@ -52,7 +52,7 @@ namespace EFCore3App.Controllers
         }
 
         /// <summary>
-        /// 获得分页数据
+        /// 获得OData数据
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
@@ -74,7 +74,21 @@ namespace EFCore3App.Controllers
             }
             return await source.ToODataResultAsync(query);
         }
-
+        /// <summary>
+        /// 获得所有数据
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public async Task<DataResult<User>> GetAllData()
+        {
+            QueryDto2 query = new QueryDto2()
+            {
+                Skip = 0,
+                Top = int.MaxValue,
+                Count = false,
+            };            
+            return await GetODataData(query);
+        }
         /// <summary>
         /// 获得跳过后获得的数据
         /// </summary>

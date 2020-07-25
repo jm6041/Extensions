@@ -240,8 +240,15 @@ namespace System.Linq
                 var ods = orderings.Select(x => new Ordering { Name = x.Key, Dir = x.Value }).ToArray();
                 query = query.OrderAndThenBy(ods);
             }
-            // 后分页
-            query = query.Skip(skip).Take(top);
+            // 后缩小查询范围
+            if (skip != 0)
+            {
+                query = query.Skip(skip);
+            }
+            if (top != int.MaxValue)
+            {
+                query = query.Take(top);
+            }
             return query;
         }
 
