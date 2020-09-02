@@ -105,6 +105,10 @@ namespace System
             {
                 throw new ArgumentOutOfRangeException(xrangerr);
             }
+            if (n == 0)
+            {
+                return "0";
+            }
             List<char> rs = new List<char>(32);
             var tn = n;
             while (tn != 0)
