@@ -10,11 +10,11 @@ namespace System.Net.Http
     public static class HttpClientHandlerHelper
     {
         /// <summary>
-        /// 根据配置信任证书配置信息获得信任证书的 HttpClientHandler
+        /// 创建信任证书的 HttpClientHandler 根据配置信任证书配置信息
         /// Debug模式，默认信任 CN=localhost 自签名证书
         /// </summary>
         /// <returns></returns>
-        public static HttpClientHandler GetTrustCertificateHttpClientHandler(IConfiguration configuration)
+        public static HttpClientHandler CreateTrustCertificateHttpClientHandler(IConfiguration configuration)
         {
             var trustSerialNumbers = configuration.GetTrustCertificatesSerialNumbers();
             var trustThumbprints = configuration.GetTrustCertificatesThumbprints();
