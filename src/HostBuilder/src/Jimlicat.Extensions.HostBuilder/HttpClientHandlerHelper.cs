@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace System.Net.Http
 {
@@ -11,13 +10,14 @@ namespace System.Net.Http
     public static class HttpClientHandlerHelper
     {
         /// <summary>
-        /// 信任证书的 HttpClientHandler
+        /// 根据配置信任证书配置信息获得信任证书的 HttpClientHandler
+        /// Debug模式，默认信任 CN=localhost 自签名证书
         /// </summary>
         /// <returns></returns>
-        public static HttpClientHandler TrustCertificateHttpClientHandler(IServiceProvider serviceProvider)
+        public static HttpClientHandler GetTrustCertificateHttpClientHandler(IConfiguration configuration)
         {
-            var trustSerialNumbers = serviceProvider.GetRequiredService<IConfiguration>().GetTrustCertificatesSerialNumbers();
-            var trustThumbprints = serviceProvider.GetRequiredService<IConfiguration>().GetTrustCertificatesThumbprints();            
+            var trustSerialNumbers = configuration.GetTrustCertificatesSerialNumbers();
+            var trustThumbprints = configuration.GetTrustCertificatesThumbprints();
             var handler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) =>
