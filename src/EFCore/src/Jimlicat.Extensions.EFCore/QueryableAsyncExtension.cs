@@ -39,7 +39,7 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="para">分页数据</param>
         /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
         /// <returns></returns>
-        public static async Task<DataResult<T>> ToODataResultAsync<T>(this IQueryable<T> source, ODataParameter para, CancellationToken cancellationToken = default)
+        public static async Task<DataResult<T>> ToODataResultAsync<T>(this IQueryable<T> source, IODataParameter para, CancellationToken cancellationToken = default)
         {
             Checker.NotNull(source, nameof(source));
             Checker.CheckODataParameter(para, nameof(para));

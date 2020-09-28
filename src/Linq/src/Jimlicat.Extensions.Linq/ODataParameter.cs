@@ -11,7 +11,7 @@ namespace System.Linq
     /// </summary>
     [Serializable]
     [DataContract]
-    public class ODataParameter
+    public class ODataParameter : IODataParameter
     {
         /// <summary>
         /// $top 返回数据数量，如果返回所有数据，传递 <see cref="int.MaxValue"/>
@@ -28,16 +28,49 @@ namespace System.Linq
         /// </summary>
         [DataMember(Order = 10002)]
         public string OrderBy { get; set; }
-
+        // 排序字段字典
+        private Dictionary<string, Direction> _orderings = new Dictionary<string, Direction>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
-        /// 排序清单
+        /// 添加排序属性
+        /// </summary>
+        /// <param name="prop">属性或者字段名</param>
+        /// <param name="dir"></param>
+        public void AddOrder(string prop, Direction dir)
+        {
+            if (prop == null)
+            {
+                return;
+            }
+            string p = prop.Trim();
+            if (string.IsNullOrEmpty(p))
+            {
+                return;
+            }
+            if (!_orderings.ContainsKey(p))
+            {
+                _orderings.Add(p, dir);
+            }
+        }
+        /// <summary>
+        /// 获得排序清单
         /// </summary>
         [IgnoreDataMember]
-        public Dictionary<string, Direction> Orderings
+        public IReadOnlyDictionary<string, Direction> Orderings
         {
             get
             {
-                return ToOrderingDictionary(OrderBy);
+                var dic = ToOrderingDictionary(OrderBy);
+                if (dic != null)
+                {
+                    foreach (var kv in dic)
+                    {
+                        if (!_orderings.ContainsKey(kv.Key))
+                        {
+                            _orderings.Add(kv.Key, kv.Value);
+                        }
+                    }
+                }
+                return _orderings;
             }
         }
         /// <summary>
@@ -90,7 +123,8 @@ namespace System.Linq
         /// </summary>
         public bool OrderingsIsNullOrEmpty()
         {
-            return Orderings == null || (!Orderings.Any());
+            var orderings = Orderings;
+            return orderings == null || (!orderings.Any());
         }
 
         /// <summary>

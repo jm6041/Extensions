@@ -12,8 +12,8 @@ namespace Jimlicat.Utils
         private static readonly string PageIndexMustNonNegativeInteger = nameof(PageParameter.PageIndex) + " " + SR.MustNonNegativeInteger;
         private static readonly string PageSizeMustNonNegativeInteger = nameof(PageParameter.PageSize) + " " + SR.MustNonNegativeInteger;
 
-        private static readonly string TopMustNonNegativeInteger = nameof(ODataParameter.Top) + " " + SR.MustNonNegativeInteger;
-        private static readonly string SkipMustNonNegativeInteger = nameof(ODataParameter.Skip) + " " + SR.MustNonNegativeInteger;
+        private static readonly string TopMustNonNegativeInteger = nameof(IODataParameter.Top) + " " + SR.MustNonNegativeInteger;
+        private static readonly string SkipMustNonNegativeInteger = nameof(IODataParameter.Skip) + " " + SR.MustNonNegativeInteger;
 
         /// <summary>
         /// 检查 <see cref="PageParameter"/>
@@ -34,11 +34,11 @@ namespace Jimlicat.Utils
         }
 
         /// <summary>
-        /// 检查 <see cref="ODataParameter"/>
+        /// 检查 <see cref="IODataParameter"/>
         /// </summary>
         /// <param name="parameter"></param>
         /// <param name="paraName"></param>
-        public static void CheckODataParameter(ODataParameter parameter, string paraName)
+        public static void CheckODataParameter(IODataParameter parameter, string paraName)
         {
             NotNull(parameter, paraName);
             if (parameter.Top < 0)

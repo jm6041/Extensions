@@ -11,16 +11,24 @@ namespace ConsoleApp
         public string Content { get; set; }
         public double Value { get; set; }
 
+        public OrderInfo Order { get; set; }
+
         public static IQueryable<UserInfo> GetSource()
         {
             List<UserInfo> datas = new List<UserInfo>();
             int count = 10;
             for (int i = 0; i < count; i++)
             {
-                datas.Add(new UserInfo() { Id = i + 1, Name = "Asdfwef", Content = "sfsdfsdddssd", Value = i * 100.1 });
+                datas.Add(new UserInfo() { Id = i + 1, Name = "Asdfwef", Content = "sfsdfsdddssd", Value = i * 100.1, Order = new OrderInfo() { Id = i + 2, Name = "Order" + (i + 1) } });
             }
             return datas.AsQueryable();
         }
+    }
+
+    public class OrderInfo
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
     }
 
     class Program
@@ -33,13 +41,19 @@ namespace ConsoleApp
             Print(datas);
             var list = datas.ToList();
             list.OrderBy(x => x.Name);
-            Ordering ordering0 = new Ordering { Name = "Id", Dir = Direction.Desc };
+            Ordering ordering0 = new Ordering { Name = "id", Dir = Direction.Desc };
             var descDatas = datas.OrderBy(ordering0);
             Console.WriteLine("倒序后的值");
             Print(descDatas);
 
+            ODataParameter odataPara = new ODataParameter() { Top = 20, OrderBy = "Order.Name desc, id asc" };
+            odataPara.AddOrder("Id", Direction.Asc);
+            var descDatas1 = datas.ToODataResult(odataPara);
+            Console.WriteLine("订单名字倒序后的值");
+            Print(descDatas1.Result);
+
             List<Ordering> orderings = new List<Ordering>() { ordering0 };
-            PageParameter pageParameter = new PageParameter() { PageIndex = -1, PageSize = 3, Orderings = orderings };
+            PageParameter pageParameter = new PageParameter() { PageIndex = 0, PageSize = 3, Orderings = orderings };
             var pageDatas = datas.Page(pageParameter);
             Console.WriteLine($"分页后的值 PageIndex:{pageParameter.PageIndex}   PageSize:{pageParameter.PageSize}");
             Print(pageDatas);

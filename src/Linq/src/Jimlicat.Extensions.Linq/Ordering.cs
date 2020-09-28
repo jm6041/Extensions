@@ -45,5 +45,14 @@ namespace System.Linq
         /// </summary>
         [DataMember(Order = 20)]
         public Direction Dir { get; set; }
+
+        /// <summary>
+        /// 重写 ToString()
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString()
+        {
+            return Name + " " + Dir;
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace System.Linq
     /// </summary>
     /// <typeparam name="T">数据源类型</typeparam>
     [Serializable]
-    public class DataResult<T>
+    public class DataResult<T> : IDataResult<T>
     {
         /// <summary>
         /// 数据结果
@@ -19,5 +19,17 @@ namespace System.Linq
         /// 数据总量
         /// </summary>
         public int Count { get; set; }
+        /// <summary>
+        /// 空 DataResult
+        /// </summary>
+        /// <returns></returns>
+        public static DataResult<T> Empty()
+        {
+            return new DataResult<T>()
+            {
+                Result = Enumerable.Empty<T>().ToList(),
+                Count = 0,
+            };
+        }
     }
 }

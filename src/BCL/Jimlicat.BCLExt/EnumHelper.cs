@@ -13,31 +13,27 @@ namespace Jimlicat.Extensions
 	/// </summary>
 	public class EnumField
 	{
-		public int Value
-		{
-			get;
-			set;
-		}
-
-		public string Name
-		{
-			get;
-			set;
-		}
-
-		public virtual string Description
-		{
-			get;
-			set;
-		}
-
-		internal FieldInfo FieldInfo
-		{
-			get;
-			set;
-		}
+		/// <summary>
+		/// 枚举值
+		/// </summary>
+		public int Value { get; set; }
+		/// <summary>
+		/// 枚举名
+		/// </summary>
+		public string Name { get; set; }
+		/// <summary>
+		/// 枚举描述
+		/// </summary>
+		public virtual string Description { get; set; }
+		/// <summary>
+		/// 枚举字段信息
+		/// </summary>
+		internal FieldInfo FieldInfo { get; set; }
 	}
 
+	/// <summary>
+	/// 枚举帮助
+	/// </summary>
 	public class EnumHelper
 	{
 		private static readonly Assembly LocalAssembly;
@@ -127,12 +123,23 @@ namespace Jimlicat.Extensions
 			}
 			return resourceStringInner;
 		}
-
+		/// <summary>
+		/// 枚举转换为字典
+		/// </summary>
+		/// <param name="enumType"></param>
+		/// <param name="getText"></param>
+		/// <returns></returns>
 		public static Dictionary<int, string> EnumToDictionary(Type enumType, Func<EnumField, string> getText = null)
 		{
 			return EnumToDictionary(enumType, CultureInfo.CurrentCulture, getText);
 		}
-
+		/// <summary>
+		/// 枚举转换为字典
+		/// </summary>
+		/// <param name="enumType"></param>
+		/// <param name="culture"></param>
+		/// <param name="getText"></param>
+		/// <returns></returns>
 		public static Dictionary<int, string> EnumToDictionary(Type enumType, CultureInfo culture, Func<EnumField, string> getText = null)
 		{
 			EnumField[] enumFields = GetEnumFields(enumType, culture);
@@ -158,12 +165,20 @@ namespace Jimlicat.Extensions
 			}
 			return dictionary;
 		}
-
+		/// <summary>
+		/// 获得枚举字段
+		/// </summary>
+		/// <param name="enumType"></param>
+		/// <returns></returns>
 		public static EnumField[] GetEnumFields(Type enumType)
 		{
 			return GetEnumFields(enumType, CultureInfo.CurrentCulture);
 		}
-
+		/// <summary>
+		/// 获取枚举字段
+		/// </summary>
+		/// <param name="enumType"></param>
+		/// <returns></returns>
 		public static EnumField[] GetEnumFields(string enumType)
 		{
 			if (enumType == null)
@@ -177,7 +192,12 @@ namespace Jimlicat.Extensions
 			}
 			return GetEnumFields(keyValuePair.Key);
 		}
-
+		/// <summary>
+		/// 获得枚举字段
+		/// </summary>
+		/// <param name="enumType"></param>
+		/// <param name="culture"></param>
+		/// <returns></returns>
 		public static EnumField[] GetEnumFields(Type enumType, CultureInfo culture)
 		{
 			if (!enumType.IsEnum)

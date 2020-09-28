@@ -1,8 +1,10 @@
 using Jimlicat.Utils;
 using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Text;
+using System.Reflection;
 
 namespace System.Linq
 {
@@ -135,10 +137,7 @@ namespace System.Linq
         {
             Checker.NotNull(query, nameof(query));
             Checker.NotEmpty(orders, nameof(orders));
-            if (!(orders is IList<Ordering> orderList))
-            {
-                orderList = new List<Ordering>(orders);
-            }
+            var orderList = ClearNot(typeof(T), orders).ToList();
             var orderedQuery = query.OrderBy(orderList[0]);
             int count = orderList.Count;
             for (int i = 1; i < count; i++)
@@ -146,6 +145,34 @@ namespace System.Linq
                 orderedQuery = orderedQuery.ThenBy(orderList[i]);
             }
             return orderedQuery;
+        }
+        private static IEnumerable<Ordering> ClearNot(Type type, IEnumerable<Ordering> orders)
+        {
+            var pfs = GetPropertiesAndFields(type);
+            foreach (var order in orders)
+            {
+                if (pfs.Any(x => x.Equals(order.Name, StringComparison.OrdinalIgnoreCase)
+                || order.Name.StartsWith(x + ".", StringComparison.OrdinalIgnoreCase)))
+                {
+                    yield return order;
+                }
+            }
+        }
+        private static ConcurrentDictionary<Type, string[]> TypeCache = new ConcurrentDictionary<Type, string[]>();
+        private static string[] GetPropertiesAndFields(Type type)
+        {
+            bool s = TypeCache.TryGetValue(type, out var pfs);
+            if (!s)
+            {
+                var ps = type.GetRuntimeProperties().Where(x => x.CanRead).Select(x => x.Name);
+                var fs = type.GetRuntimeFields().Where(x => x.IsPublic).Select(x => x.Name);
+                List<string> list = new List<string>();
+                list.AddRange(ps);
+                list.AddRange(fs);
+                pfs = list.ToArray();
+                TypeCache.TryAdd(type, pfs);
+            }
+            return pfs;
         }
 
         /// <summary>
@@ -203,7 +230,7 @@ namespace System.Linq
         /// <returns>排序分页后的数据</returns>
         public static IQueryable<T> ODataQuery<T>(this IQueryable<T> query, int top, int skip, string orderby)
         {
-            IDictionary<string, Direction> orderings = ODataParameter.ToOrderingDictionary(orderby);
+            IReadOnlyDictionary<string, Direction> orderings = ODataParameter.ToOrderingDictionary(orderby);
             return ODataQuery(query, top, skip, orderings);
         }
         /// <summary>
@@ -213,7 +240,7 @@ namespace System.Linq
         /// <param name="query">数据源</param>
         /// <param name="para">OData参数</param>
         /// <returns></returns>
-        public static IQueryable<T> ODataQuery<T>(this IQueryable<T> query, ODataParameter para)
+        public static IQueryable<T> ODataQuery<T>(this IQueryable<T> query, IODataParameter para)
         {
             Checker.NotNull(query, nameof(query));
             Checker.CheckODataParameter(para, nameof(para));
@@ -229,7 +256,7 @@ namespace System.Linq
         /// <param name="skip">跳过的数据量</param>
         /// <param name="orderings">排序信息</param>
         /// <returns>排序分页后的数据</returns>
-        private static IQueryable<T> ODataQuery<T>(IQueryable<T> query, int top, int skip, IDictionary<string, Direction> orderings)
+        private static IQueryable<T> ODataQuery<T>(IQueryable<T> query, int top, int skip, IReadOnlyDictionary<string, Direction> orderings)
         {
             Checker.NotNull(query, nameof(query));
             Checker.CheckMustNonNegativeInteger(top, nameof(top));
@@ -258,7 +285,7 @@ namespace System.Linq
         /// <param name="source">源数据</param>
         /// <param name="para">分页数据</param>
         /// <returns>分页后的数据</returns>
-        public static DataResult<T> ToODataResult<T>(this IQueryable<T> source, ODataParameter para)
+        public static DataResult<T> ToODataResult<T>(this IQueryable<T> source, IODataParameter para)
         {
             Checker.NotNull(source, nameof(source));
             Checker.CheckODataParameter(para, nameof(para));
