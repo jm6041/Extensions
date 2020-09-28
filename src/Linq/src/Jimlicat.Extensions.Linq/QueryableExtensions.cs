@@ -244,7 +244,8 @@ namespace System.Linq
         {
             Checker.NotNull(query, nameof(query));
             Checker.CheckODataParameter(para, nameof(para));
-            return ODataQuery(query, para.Top, para.Skip, para.Orderings);
+            var orders = para.GetOrderings();
+            return ODataQuery(query, para.Top, para.Skip, orders);
         }
 
         /// <summary>
@@ -301,7 +302,8 @@ namespace System.Linq
             }
             else
             {
-                result = ODataQuery(source, para.Top, para.Skip, para.Orderings).ToList();
+                var orders = para.GetOrderings();
+                result = ODataQuery(source, para.Top, para.Skip, orders).ToList();
             }
             return new DataResult<T>() { Count = count, Result = result, };
         }

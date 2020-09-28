@@ -30,7 +30,10 @@ namespace ConsoleApp
         public int Id { get; set; }
         public string Name { get; set; }
     }
-
+    public class MyODataParameter : ODataParameter
+    {
+        
+    }
     class Program
     {
         static void Main(string[] args)
@@ -46,7 +49,7 @@ namespace ConsoleApp
             Console.WriteLine("倒序后的值");
             Print(descDatas);
 
-            ODataParameter odataPara = new ODataParameter() { Top = 20, OrderBy = "Order.Name desc, id asc" };
+            MyODataParameter odataPara = new MyODataParameter() { Top = 20, OrderBy = "Order.Name desc, id asc" };
             odataPara.AddOrder("Id", Direction.Asc);
             var descDatas1 = datas.ToODataResult(odataPara);
             Console.WriteLine("订单名字倒序后的值");

@@ -68,7 +68,7 @@ namespace EFCore3App.Controllers
             {
                 source = source.Where(x => x.DouV <= query.Max.Value);
             }
-            if (query.Orderings==null|| !query.Orderings.Any())
+            if (query.OrderingsIsNullOrEmpty())
             {
                 source = source.OrderBy(x => x.Id);
             }
@@ -119,7 +119,7 @@ namespace EFCore3App.Controllers
     /// <summary>
     /// 分页查询
     /// </summary>
-    public class QueryDto2:ODataParameter
+    public class QueryDto2 : ODataParameter
     {
         /// <summary>
         /// 最小值

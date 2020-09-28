@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace System.Linq
 {
     /// <summary>
@@ -27,9 +25,5 @@ namespace System.Linq
         /// $count 返回结果是否包含总数量
         /// </summary>
         bool Count { get; set; }
-        /// <summary>
-        /// 获得排序清单
-        /// </summary>
-        IReadOnlyDictionary<string, Direction> Orderings { get; }
     }
 }

@@ -138,4 +138,24 @@ namespace System.Linq
         [DataMember(Order = 1004)]
         public bool Count { get; set; } = true;
     }
+
+    /// <summary>
+    /// <see cref="IODataParameter"/>扩展
+    /// </summary>
+    public static class IODataParameterExtensions
+    {
+        /// <summary>
+        /// 获得排序字段集合
+        /// </summary>
+        /// <param name="para"></param>
+        /// <returns></returns>
+        public static IReadOnlyDictionary<string, Direction> GetOrderings(this IODataParameter para)
+        {
+            if (para is ODataParameter opara)
+            {
+                return opara.Orderings;
+            }
+            return ODataParameter.ToOrderingDictionary(para.OrderBy);
+        }
+    }
 }
