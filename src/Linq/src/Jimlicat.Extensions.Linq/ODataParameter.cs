@@ -80,39 +80,36 @@ namespace System.Linq
         /// <returns>排序字典</returns>
         public static Dictionary<string, Direction> ToOrderingDictionary(string orderby)
         {
-            if (orderby == null)
-            {
-                return null;
-            }
             Dictionary<string, Direction> dic = new Dictionary<string, Direction>();
-            if (!string.IsNullOrEmpty(orderby))
+            if (string.IsNullOrEmpty(orderby))
             {
-                foreach (string order in orderby.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                return dic;
+            }
+            foreach (string order in orderby.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                string[] arr = order.Split(new char[] { ' ', '+' }, StringSplitOptions.RemoveEmptyEntries);
+                if (arr.Length == 1)
                 {
-                    string[] arr = order.Split(new char[] { ' ', '+' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (arr.Length == 1)
+                    dic.Add(arr[0], Direction.Asc);
+                }
+                else if (arr.Length == 2)
+                {
+                    string k = arr[0];
+                    string v = arr[1];
+                    Direction dir;
+                    if (v.Equals("asc", StringComparison.OrdinalIgnoreCase))
                     {
-                        dic.Add(arr[0], Direction.Asc);
+                        dir = Direction.Asc;
                     }
-                    else if (arr.Length == 2)
+                    else if (v.Equals("desc", StringComparison.OrdinalIgnoreCase))
                     {
-                        string k = arr[0];
-                        string v = arr[1];
-                        Direction dir;
-                        if (v.Equals("asc", StringComparison.OrdinalIgnoreCase))
-                        {
-                            dir = Direction.Asc;
-                        }
-                        else if (v.Equals("desc", StringComparison.OrdinalIgnoreCase))
-                        {
-                            dir = Direction.Desc;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                        dic.Add(k, dir);
+                        dir = Direction.Desc;
                     }
+                    else
+                    {
+                        continue;
+                    }
+                    dic.Add(k, dir);
                 }
             }
             return dic;
