@@ -90,8 +90,9 @@ namespace FileTools
     /// <summary>
     /// 文件项
     /// </summary>
-    public class FileItemView
+    public class FileItemView: INotifyPropertyChanged
     {
+        internal System.IO.FileInfo FileInfo { get; set; }
         /// <summary>
         /// 名字
         /// </summary>
@@ -144,9 +145,38 @@ namespace FileTools
         /// 创建时间
         /// </summary>
         public DateTime CreationTime { get; set; }
+
+        private string sha256;
         /// <summary>
         /// SHA256
         /// </summary>
-        public string SHA256 { get; set; }
+        public string SHA256
+        {
+            get => sha256;
+            set => SetProperty(ref sha256, value);
+        }
+
+        /// <summary>
+        /// 属性改变事件
+        /// </summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        /// <summary>
+        /// 设置属性
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="field"></param>
+        /// <param name="newValue"></param>
+        /// <param name="propertyName"></param>
+        /// <returns></returns>
+        protected bool SetProperty<T>(ref T field, T newValue, string propertyName = null)
+        {
+            if (!EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                field = newValue;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                return true;
+            }
+            return false;
+        }
     }
 }

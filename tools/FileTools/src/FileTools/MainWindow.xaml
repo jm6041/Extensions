@@ -33,7 +33,7 @@
                     <GridViewColumn Header="文件名" Width="300" DisplayMemberBinding="{Binding Name}"/>
                     <GridViewColumn Header="大小" Width="80" DisplayMemberBinding="{Binding LengthDesc}"/>
                     <GridViewColumn Header="修改时间" Width="140" DisplayMemberBinding="{Binding LastWriteTimeDesc}"/>
-                    <GridViewColumn Header="SHA256" DisplayMemberBinding="{Binding SHA256}"/>
+                    <GridViewColumn Header="SHA256" Width="300" DisplayMemberBinding="{Binding SHA256}"/>
                 </GridView>
             </ListView.View>
         </ListView>

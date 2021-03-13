@@ -73,13 +73,46 @@ namespace FileTools
                 filesView.FileHashComputed = false;
                 DirectoryInfo dirInfo = new DirectoryInfo(filesView.FolderName);
                 FileInfo[] files = dirInfo.GetFiles("", SearchOption.AllDirectories);
+                if (!files.Any())
+                {
+                    return;
+                }
                 filesView.Total = files.Length;
-                filesView.FileItems.Clear();
-                filesView.Count = 0;
-                FilesHashComputer computer = new FilesHashComputer(files);
-                computer.FileHashComputed += Computer_FileHashComputed;
-                await computer.ComputeHash();
-                filesView.FileHashComputed = true;
+                filesView.FileItems.Clear();                
+                List<FileItemView> fis = new List<FileItemView>();
+                foreach (var f in files)
+                {
+                    string rn = System.IO.Path.GetRelativePath(filesView.FolderName, f.FullName);
+                    FileItemView fi = new FileItemView()
+                    {
+                        FileInfo = f,
+                        Name = rn,
+                        FullName = f.FullName,
+                        Length = f.Length,
+                        LastWriteTime = f.LastWriteTime,
+                        CreationTime = f.CreationTime,
+                    };
+                    fis.Add(fi);
+                    filesView.FileItems.Add(fi);
+                }
+                List<FileInfo> hashFiles = new List<FileInfo>();
+                var lenGroup = fis.GroupBy(x => x.Length);
+                foreach (var g in lenGroup)
+                {
+                    if (g.Count() >= 2)
+                    {
+                        hashFiles.AddRange(g.Select(x => x.FileInfo));
+                    }
+                }
+                int hashCount = hashFiles.Count;
+                filesView.Count = files.Length - hashCount;
+                if (hashCount >= 1)
+                {
+                    FilesHashComputer computer = new FilesHashComputer(hashFiles);
+                    computer.FileHashComputed += Computer_FileHashComputed;
+                    await computer.ComputeHash();
+                    filesView.FileHashComputed = true;
+                }
             }
             catch (Exception ex)
             {
@@ -93,16 +126,11 @@ namespace FileTools
             string rn = System.IO.Path.GetRelativePath(filesView.FolderName, fInfo.FullName);
             Application.Current.Dispatcher.Invoke(() =>
             {
-                FileItemView fi = new FileItemView()
+                var f = filesView.FileItems.FirstOrDefault(x => x.FileInfo == fInfo);
+                if (f != null)
                 {
-                    Name = rn,
-                    FullName = fInfo.FullName,
-                    Length = fInfo.Length,
-                    LastWriteTime = fInfo.LastWriteTime,
-                    CreationTime = fInfo.CreationTime,
-                    SHA256 = FilesHashComputer.ByteArrayToString(e.FileHash.SHA256),
-                };
-                filesView.FileItems.Add(fi);
+                    f.SHA256 = FilesHashComputer.ByteArrayToString(e.FileHash.SHA256);
+                }
                 int count = filesView.Count + 1;
                 filesView.Count = count;
             });
@@ -116,7 +144,7 @@ namespace FileTools
         private void BtnRemoveDup_Click(object sender, RoutedEventArgs e)
         {
             List<FileItemView> removeFiles = new List<FileItemView>();
-            foreach (var files in filesView.FileItems.GroupBy(x => x.SHA256))
+            foreach (var files in filesView.FileItems.Where(x => false == string.IsNullOrEmpty(x.SHA256)).GroupBy(x => x.SHA256))
             {
                 removeFiles.AddRange(files.OrderBy(x => x.CreationTime).Skip(1));
             }

@@ -20,12 +20,12 @@ namespace Jimlicat.FileHash
     /// </summary>
     public class FilesHashComputer
     {
-        private readonly FileInfo[] _files;
+        private readonly ICollection<FileInfo> _files;
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="files">文件信息</param>
-        public FilesHashComputer(FileInfo[] files)
+        public FilesHashComputer(ICollection<FileInfo> files)
         {
             _files = files;
         }
