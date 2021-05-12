@@ -1,0 +1,13 @@
+@model IEnumerable<FileDirModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">文件目录</h1>
+    @foreach (var fd in Model)
+    {
+        <p><a href="@fd.Path">@fd.Path</a></p>
+    }
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
