@@ -78,7 +78,7 @@ namespace FileTools
                     return;
                 }
                 filesView.Total = files.Length;
-                filesView.FileItems.Clear();                
+                filesView.FileItems.Clear();
                 List<FileItemView> fis = new List<FileItemView>();
                 foreach (var f in files)
                 {
@@ -182,13 +182,43 @@ namespace FileTools
         private DirectoryInfo GetRemoveDir()
         {
             DirectoryInfo dir = new DirectoryInfo(filesView.FolderName);
-            string rdn = dir.Name + "_dup_"+Guid.NewGuid().ToString("N");            
+            string rdn = dir.Name + "_dup_" + Guid.NewGuid().ToString("N");
             string path = System.IO.Path.Combine(dir.Parent.FullName, rdn);
             if (!Directory.Exists(path))
             {
                 return Directory.CreateDirectory(path);
             }
             return new DirectoryInfo(path);
+        }
+
+        private void FileDetails_Click(object sender, RoutedEventArgs e)
+        {
+            if (fileGrid.SelectedValue is FileItemView fv)
+            {
+                if (string.IsNullOrEmpty(fv.SHA256) || string.IsNullOrEmpty(fv.PreBytes))
+                {
+                    FileStream fs = fv.FileInfo.Open(FileMode.Open);                    
+                    if (string.IsNullOrEmpty(fv.SHA256))
+                    {
+                        fs.Position = 0;
+                        using (SHA256 sha256 = SHA256.Create())
+                        {
+                            byte[] hv = sha256.ComputeHash(fs);
+                            fv.SHA256 = FilesHashComputer.ByteArrayToString(hv);
+                        }
+                    }
+                    if (string.IsNullOrEmpty(fv.PreBytes))
+                    {
+                        fs.Position = 0;
+                        byte[] prebs = new byte[4];
+                        fs.Read(prebs, 0, 4);
+                        fv.PreBytes = FilesHashComputer.ByteArrayToString(prebs);
+                    }
+                    fs.Close();
+                }
+                var fdd = new FileDetailsDialog(fv);                
+                fdd.ShowDialog();
+            }
         }
     }
 }

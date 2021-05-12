@@ -156,6 +156,16 @@ namespace FileTools
             set => SetProperty(ref sha256, value);
         }
 
+        private string preBytes;
+        /// <summary>
+        /// PreBytes
+        /// </summary>
+        public string PreBytes
+        {
+            get => preBytes;
+            set => SetProperty(ref preBytes, value);
+        }
+
         /// <summary>
         /// 属性改变事件
         /// </summary>

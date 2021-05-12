@@ -27,16 +27,19 @@
                 <Button x:Name="BtnRemoveDup" Content="移除重复" IsEnabled="{Binding FileHashComputed}" Height="32" Width="60" Margin="10,0,0,0" Click="BtnRemoveDup_Click"/>
             </StackPanel>
         </Grid>
-        <ListView x:Name="FileList" ItemsSource="{Binding FileItems}" Grid.Row="1" >
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="文件名" Width="300" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="大小" Width="80" DisplayMemberBinding="{Binding LengthDesc}"/>
-                    <GridViewColumn Header="修改时间" Width="140" DisplayMemberBinding="{Binding LastWriteTimeDesc}"/>
-                    <GridViewColumn Header="SHA256" Width="300" DisplayMemberBinding="{Binding SHA256}"/>
-                </GridView>
-            </ListView.View>
-        </ListView>
+        <DataGrid x:Name="fileGrid" ItemsSource="{Binding FileItems}" Grid.Row="1" AutoGenerateColumns="False" CanUserAddRows="False" >
+            <DataGrid.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="详情" Click="FileDetails_Click"/>
+                </ContextMenu>
+            </DataGrid.ContextMenu>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="文件名" Width="300" Binding="{Binding Name, Mode=OneWay}"/>
+                <DataGridTextColumn Header="大小" Width="80" Binding="{Binding LengthDesc, Mode=OneWay}"/>
+                <DataGridTextColumn Header="修改时间" Width="140" Binding="{Binding LastWriteTimeDesc, Mode=OneWay}"/>
+                <DataGridTextColumn Header="SHA256" Width="300" Binding="{Binding SHA256, Mode=OneWay}"/>
+            </DataGrid.Columns>
+        </DataGrid>
         <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"></ColumnDefinition>
