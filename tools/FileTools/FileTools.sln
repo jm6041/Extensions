@@ -9,7 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{85E9FDDC-9D8
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.FileHash", "src\Jimlicat.FileHash\Jimlicat.FileHash.csproj", "{84268ED1-663B-404F-B583-C2FC34295520}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleFileServer", "src\SampleFileServer\SampleFileServer.csproj", "{557093C7-4CA0-4FD4-A1BE-78B962AE7C8F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleFileServer", "src\SampleFileServer\SampleFileServer.csproj", "{557093C7-4CA0-4FD4-A1BE-78B962AE7C8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfDemo", "WpfDemo\WpfDemo.csproj", "{FF7E00F4-DD19-44F6-B7CF-A8944B0C7463}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{557093C7-4CA0-4FD4-A1BE-78B962AE7C8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{557093C7-4CA0-4FD4-A1BE-78B962AE7C8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{557093C7-4CA0-4FD4-A1BE-78B962AE7C8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF7E00F4-DD19-44F6-B7CF-A8944B0C7463}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF7E00F4-DD19-44F6-B7CF-A8944B0C7463}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF7E00F4-DD19-44F6-B7CF-A8944B0C7463}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF7E00F4-DD19-44F6-B7CF-A8944B0C7463}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -37,6 +43,7 @@ Global
 		{079FF1E6-0F16-410B-9D71-7814524FA5D2} = {85E9FDDC-9D88-42ED-A487-E83FE32E749A}
 		{84268ED1-663B-404F-B583-C2FC34295520} = {85E9FDDC-9D88-42ED-A487-E83FE32E749A}
 		{557093C7-4CA0-4FD4-A1BE-78B962AE7C8F} = {85E9FDDC-9D88-42ED-A487-E83FE32E749A}
+		{FF7E00F4-DD19-44F6-B7CF-A8944B0C7463} = {85E9FDDC-9D88-42ED-A487-E83FE32E749A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6630F50C-77DC-417A-A473-B07F1BAC6C8A}
