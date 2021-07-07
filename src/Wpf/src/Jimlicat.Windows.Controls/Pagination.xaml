@@ -1,0 +1,49 @@
+<UserControl x:Class="Jimlicat.Windows.Controls.Pagination"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Jimlicat.Windows.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="800">
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <StackPanel.Resources>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="Width" Value="22"/>
+                <Setter Property="Height" Value="22"/>
+            </Style>
+        </StackPanel.Resources>
+        <TextBlock VerticalAlignment="Center">
+                                <Run Text="总计"/>
+                                <Run Text="{Binding QueryView.Count}"/>
+                                <Run Text="条|"/>
+        </TextBlock>
+        <TextBlock VerticalAlignment="Center" Text="显示"/>
+        <ComboBox Name="CB_SelectPageSize" VerticalContentAlignment="Center" Height="22" SelectionChanged="CB_SelectPageSize_SelectionChanged"/>
+        <TextBlock VerticalAlignment="Center">
+                            <Run Text="{Binding QueryView.CurrentPage}"/>
+                            <Run Text="/"/>
+                            <Run Text="{Binding QueryView.TotalPage}"/>
+        </TextBlock>
+        <Button x:Name="BtnFirstPage" Margin="5,0" Click="BtnFirstPage_Click">
+            <Path Width="7" Height="10" Data="M0,0L0,10 M0,5L6,2 6,8 0,5" Stroke="Black" StrokeThickness="1" Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        </Button>
+        <Button x:Name="BtnPreviousPage" Margin="0,0,5,0" Click="BtnPreviousPage_Click">
+            <Path Width="8" Height="8" Data="M0,4L8,0 8,8z" Stroke="Black" Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center" />
+        </Button>
+        <Button Margin="5,0" x:Name="BtnNextPage" Click="BtnNextPage_Click">
+            <Path Width="8" Height="8" Data="M0,4L8,0 8,8z" Stroke="Black" Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Path.RenderTransform>
+                    <RotateTransform Angle="180" CenterX="4" CenterY="4" />
+                </Path.RenderTransform>
+            </Path>
+        </Button>
+        <Button Margin="0,0,5,0" x:Name="BtnLastPage" Click="BtnLastPage_Click">
+            <Path x:Name="MainPath" Width="7" Height="10" Data="M0,0L0,10 M0,5 L6,2 6,8 0,5" Stroke="Black" StrokeThickness="1" Fill="Black" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <Path.RenderTransform>
+                    <RotateTransform Angle="180" CenterX="3" CenterY="5" />
+                </Path.RenderTransform>
+            </Path>
+        </Button>
+    </StackPanel>
+</UserControl>
