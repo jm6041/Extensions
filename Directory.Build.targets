@@ -10,7 +10,7 @@
     <Copy SourceFiles="$(BaseOutputPath)\$(Configuration)\$(PackageId).$(PackageVersion).nupkg" DestinationFolder="$(SolutionDir)\nupkgs\" ContinueOnError="false" />
   </Target>
   -->
-  <ItemGroup>
+  <!--<ItemGroup>
     <PackageReference Update="System.Collections.Immutable" Version="1.7.0" />
-  </ItemGroup>
+  </ItemGroup>-->
 </Project>
