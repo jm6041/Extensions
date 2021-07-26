@@ -22,6 +22,15 @@ namespace System
         {
             return XConvert(n, 36);
         }
+        /// <summary>
+        /// 36进制转换
+        /// </summary>
+        /// <param name="n">数字</param>
+        /// <returns>转换后的字符串</returns>
+        public static string XConvert36(uint n)
+        {
+            return XConvert(n, 36);
+        }
 
         /// <summary>
         /// 36进制转换
@@ -29,6 +38,15 @@ namespace System
         /// <param name="n">数字</param>
         /// <returns>转换后的字符串</returns>
         public static string XConvert36(long n)
+        {
+            return XConvert(n, 36);
+        }
+        /// <summary>
+        /// 36进制转换
+        /// </summary>
+        /// <param name="n">数字</param>
+        /// <returns>转换后的字符串</returns>
+        public static string XConvert36(ulong n)
         {
             return XConvert(n, 36);
         }
@@ -110,12 +128,46 @@ namespace System
                 return "0";
             }
             List<char> rs = new List<char>(32);
-            var tn = n;
+            int tn = n;
             while (tn != 0)
             {
                 int y = Math.Abs(tn % x);
                 rs.Add(c36[y]);
                 tn /= x;
+            }
+            rs.Reverse();
+            string cs = new string(rs.ToArray());
+            if (n < 0)
+            {
+                cs = "-" + cs;
+            }
+            return cs;
+        }
+
+        /// <summary>
+        /// 进制转换
+        /// </summary>
+        /// <param name="n">数字</param>
+        /// <param name="x">进制，2到36</param>
+        /// <returns>转换后的字符串</returns>
+        public static string XConvert(uint n, int x)
+        {
+            if (x < 2 || x > 36)
+            {
+                throw new ArgumentOutOfRangeException(xrangerr);
+            }
+            if (n == 0)
+            {
+                return "0";
+            }
+            List<char> rs = new List<char>(32);
+            uint tn = n;
+            uint tx = (uint)x;
+            while (tn != 0)
+            {
+                int y = Math.Abs((int)(tn % tx));
+                rs.Add(c36[y]);
+                tn /= tx;
             }
             rs.Reverse();
             string cs = new string(rs.ToArray());
@@ -138,8 +190,12 @@ namespace System
             {
                 throw new ArgumentOutOfRangeException(xrangerr);
             }
+            if (n == 0)
+            {
+                return "0";
+            }
             List<char> rs = new List<char>(64);
-            var tn = n;
+            long tn = n;
             while (tn != 0)
             {
                 int y = Math.Abs((int)(tn % x));
@@ -152,6 +208,35 @@ namespace System
             {
                 cs = "-" + cs;
             }
+            return cs;
+        }
+        /// <summary>
+        /// 进制转换
+        /// </summary>
+        /// <param name="n">数字</param>
+        /// <param name="x">进制，2到36</param>
+        /// <returns>转换后的字符串</returns>
+        public static string XConvert(ulong n, int x)
+        {
+            if (x < 2 || x > 36)
+            {
+                throw new ArgumentOutOfRangeException(xrangerr);
+            }
+            if (n == 0)
+            {
+                return "0";
+            }
+            List<char> rs = new List<char>(64);
+            ulong tn = n;
+            ulong tx = (ulong)x;
+            while (tn != 0)
+            {
+                int y = Math.Abs((int)(tn % tx));
+                rs.Add(c36[y]);
+                tn /= tx;
+            }
+            rs.Reverse();
+            string cs = new string(rs.ToArray());
             return cs;
         }
     }

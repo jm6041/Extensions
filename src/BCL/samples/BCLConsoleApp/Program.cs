@@ -8,9 +8,31 @@ namespace BCLConsoleApp
     {
         static void Main(string[] args)
         {
-            string guidb32 = Guid.NewGuid().ToBase32();
+            Guid gid = Guid.NewGuid();
+            Console.WriteLine(gid.ToString("N").ToUpper());
+            byte[] gidbs = gid.ToByteArray();
+            string guidb32 = Base32.ToBase32NP(gidbs);
             Console.WriteLine(guidb32);
             Console.WriteLine(guidb32.Length);
+
+            byte[] tnumbs = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            PrintBytes(tnumbs);
+            PrintBytes(tnumbs[0..4]);
+            PrintBytes(tnumbs[2..^3]);
+            PrintBytes(tnumbs[0..5]);
+            PrintBytes(tnumbs[5..10]);
+
+            ulong gidlp1 = BitConverter.ToUInt64(gidbs[0..8]);
+            ulong gidlp2 = BitConverter.ToUInt64(gidbs[8..]);
+            string c36g1 = XMath.XConvert36(gidlp1);
+            string c36g2 = XMath.XConvert36(gidlp2);
+            string c36max = XMath.XConvert36(ulong.MaxValue);
+            Console.WriteLine(c36g1);
+            Console.WriteLine(c36g1.Length);
+            Console.WriteLine(c36g2);
+            Console.WriteLine(c36g2.Length);
+            Console.WriteLine(c36max);
+            Console.WriteLine(c36max.Length);
 
             int maxymd = 9999 * 31 * 31 + 12 * 31 + 31;
             byte[] maxymdbs = BitConverter.GetBytes(maxymd);
@@ -98,31 +120,22 @@ namespace BCLConsoleApp
                 Console.WriteLine("-------------------------------");
             }
 
-            for (int i = 0; i <= 10; i++)
-            {
-                Guid nid = Guid.NewGuid();
-                Console.WriteLine(nid);
-                string guidb64 = nid.ToBase64Url();
-                Console.WriteLine(guidb64);
-                Console.WriteLine(guidb64.Length);
-
-                GuidHelper.TryFromBase64(guidb64, out Guid gid);
-                Console.WriteLine(gid);
-                Console.WriteLine("-------------------------------");
-            }
-
             Console.WriteLine("---------- Id32 ----------");
             for (int i = 0; i <= 10; i++)
             {
                 Console.WriteLine(Id32.NewId());
             }
 
-            for (int i = 0; i <= 10; i++)
-            {
-                Console.WriteLine(Id32.NewId2());
-            }
-
             Console.WriteLine("Hello World!");
+        }
+
+        public static void PrintBytes(byte[] bs)
+        {
+            foreach (var b in bs)
+            {
+                Console.Write($"{b} ");
+            }
+            Console.WriteLine();
         }
     }
 }
