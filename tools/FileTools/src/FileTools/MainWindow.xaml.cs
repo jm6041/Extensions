@@ -129,7 +129,7 @@ namespace FileTools
                 var f = filesView.FileItems.FirstOrDefault(x => x.FileInfo == fInfo);
                 if (f != null)
                 {
-                    f.SHA256 = FilesHashComputer.ByteArrayToString(e.FileHash.SHA256);
+                    f.SHA256 = FilesHashComputer.ToHexString(e.FileHash.SHA256);
                 }
                 int count = filesView.Count + 1;
                 filesView.Count = count;
@@ -191,7 +191,7 @@ namespace FileTools
             return new DirectoryInfo(path);
         }
 
-        private void FileDetails_Click(object sender, RoutedEventArgs e)
+        private async void FileDetails_Click(object sender, RoutedEventArgs e)
         {
             if (fileGrid.SelectedValue is FileItemView fv)
             {
@@ -203,16 +203,16 @@ namespace FileTools
                         fs.Position = 0;
                         using (SHA256 sha256 = SHA256.Create())
                         {
-                            byte[] hv = sha256.ComputeHash(fs);
-                            fv.SHA256 = FilesHashComputer.ByteArrayToString(hv);
+                            byte[] hv = await sha256.ComputeHashAsync(fs);
+                            fv.SHA256 = FilesHashComputer.ToHexString(hv);
                         }
                     }
                     if (string.IsNullOrEmpty(fv.PreBytes))
                     {
                         fs.Position = 0;
                         byte[] prebs = new byte[4];
-                        fs.Read(prebs, 0, 4);
-                        fv.PreBytes = FilesHashComputer.ByteArrayToString(prebs);
+                        await fs.ReadAsync(prebs, 0, 4);
+                        fv.PreBytes = FilesHashComputer.ToHexString(prebs);
                     }
                     fs.Close();
                 }

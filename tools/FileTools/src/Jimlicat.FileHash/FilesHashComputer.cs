@@ -79,14 +79,9 @@ namespace Jimlicat.FileHash
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static string ByteArrayToString(byte[] array)
+        public static string ToHexString(byte[] array)
         {
-            StringBuilder b = new StringBuilder();
-            for (int i = 0; i < array.Length; i++)
-            {
-                b.AppendFormat($"{array[i]:X2}");
-            }
-            return b.ToString();
+            return Convert.ToHexString(array);
         }
     }
 }
