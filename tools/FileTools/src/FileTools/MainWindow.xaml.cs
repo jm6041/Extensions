@@ -16,6 +16,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WinForm = System.Windows.Forms;
 using Jimlicat.FileHash;
+using System.Windows.Media.Animation;
 
 namespace FileTools
 {
@@ -138,7 +139,8 @@ namespace FileTools
 
         private void PrintError(Exception ex)
         {
-            TextError.Text = ex.GetType().Name + ": " + ex.Message;
+            string msg = ex.GetType().Name + ": " + ex.Message;
+            ShowErrorMsg(msg, false);
         }
 
         private void BtnRemoveDup_Click(object sender, RoutedEventArgs e)
@@ -219,6 +221,43 @@ namespace FileTools
                 }
                 var fdd = new FileDetailsDialog(fv);                
                 fdd.ShowDialog();
+            }
+        }
+        // 红色
+        private static readonly SolidColorBrush RedColorBrush = new SolidColorBrush(Colors.Red);
+        // 绿色
+        private static readonly SolidColorBrush GreenColorBrush = new SolidColorBrush(Colors.Green);
+        /// <summary>
+        /// 显示成功消息
+        /// </summary>
+        /// <param name="msg"></param>
+        private void ShowSuccessMsg(string msg)
+        {
+            textMsg.Opacity = 1;
+            textMsg.Foreground = GreenColorBrush;
+            textMsg.Text = msg;
+            if (FindResource("hideMsg") is Storyboard storyboard)
+            {
+                storyboard.Begin(textMsg);
+            }
+        }
+        /// <summary>
+        /// 显示异常消息
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <param name="showBox"></param>
+        private void ShowErrorMsg(string msg, bool showBox = true)
+        {
+            textMsg.Opacity = 1;
+            textMsg.Foreground = RedColorBrush;
+            textMsg.Text = msg;
+            if (FindResource("hideMsg") is Storyboard storyboard)
+            {
+                storyboard.Begin(textMsg, true);
+            }
+            if (showBox)
+            {
+                MessageBox.Show(msg, "异常", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
     }

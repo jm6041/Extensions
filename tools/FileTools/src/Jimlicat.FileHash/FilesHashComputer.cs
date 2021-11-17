@@ -41,10 +41,7 @@ namespace Jimlicat.FileHash
             List<Task<FileHashInfo>> tasks = new List<Task<FileHashInfo>>();
             foreach (var file in _files)
             {
-                Task<FileHashInfo> task = Task.Factory.StartNew(() =>
-                {
-                    return ComputeFileHash(file);
-                });
+                Task<FileHashInfo> task = ComputeFileHash(file);
                 tasks.Add(task);
             }
             if (tasks.Any())
@@ -61,13 +58,13 @@ namespace Jimlicat.FileHash
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public FileHashInfo ComputeFileHash(FileInfo file)
+        private async Task<FileHashInfo> ComputeFileHash(FileInfo file)
         {
             using (SHA256 sha256 = SHA256.Create())
             {
                 FileStream fileStream = file.Open(FileMode.Open);
                 fileStream.Position = 0;
-                byte[] hv = sha256.ComputeHash(fileStream);
+                byte[] hv = await sha256.ComputeHashAsync(fileStream);
                 FileHashInfo fi = new FileHashInfo(file, hv);
                 fileStream.Close();
                 FileHashComputed?.Invoke(this, new FileHashInfoEventArgs(fi));
