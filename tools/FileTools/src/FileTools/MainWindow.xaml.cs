@@ -197,22 +197,23 @@ namespace FileTools
             {
                 if (string.IsNullOrEmpty(fv.SHA256) || string.IsNullOrEmpty(fv.PreBytes))
                 {
-                    FileStream fs = fv.FileInfo.Open(FileMode.Open);                    
-                    if (string.IsNullOrEmpty(fv.SHA256))
-                    {
-                        fs.Position = 0;
-                        using (SHA256 sha256 = SHA256.Create())
-                        {
-                            byte[] hv = await sha256.ComputeHashAsync(fs);
-                            fv.SHA256 = FilesHashComputer.ToHexString(hv);
-                        }
-                    }
+                    FileStream fs = fv.FileInfo.Open(FileMode.Open);
                     if (string.IsNullOrEmpty(fv.PreBytes))
                     {
                         fs.Position = 0;
                         byte[] prebs = new byte[4];
                         await fs.ReadAsync(prebs, 0, 4);
                         fv.PreBytes = FilesHashComputer.ToHexString(prebs);
+                    }
+                    if (string.IsNullOrEmpty(fv.SHA256))
+                    {
+                        fs.Position = 0;
+                        using (SHA256 sha256 = SHA256.Create())
+                        {
+                            fv.SHA256 = "Sha256正在计算中...";
+                            byte[] hv = await sha256.ComputeHashAsync(fs);
+                            fv.SHA256 = FilesHashComputer.ToHexString(hv);
+                        }
                     }
                     fs.Close();
                 }
