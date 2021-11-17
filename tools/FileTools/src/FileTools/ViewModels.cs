@@ -131,16 +131,13 @@ namespace FileTools
             }
         }
         /// <summary>
+        /// 大小完整描述
+        /// </summary>
+        public string LengthFullDesc => $"{LengthDesc}({Length} B)";
+        /// <summary>
         /// 修改时间
         /// </summary>
         public DateTime LastWriteTime { get; set; }
-        /// <summary>
-        /// 修改时间描述
-        /// </summary>
-        public string LastWriteTimeDesc
-        {
-            get => LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss");
-        }
         /// <summary>
         /// 创建时间
         /// </summary>

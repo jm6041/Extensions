@@ -21,15 +21,15 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="1">
             <TextBlock>大小：</TextBlock>
-            <TextBox Text="{Binding LengthDesc, Mode=OneWay}"></TextBox>
+            <TextBox Text="{Binding LengthFullDesc, Mode=OneWay}"></TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="2">
             <TextBlock>创建时间：</TextBlock>
-            <TextBox Text="{Binding CreationTime, Mode=OneWay}"></TextBox>
+            <TextBox Text="{Binding CreationTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss},  Mode=OneWay}"></TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="3">
             <TextBlock>修改时间：</TextBlock>
-            <TextBox Text="{Binding LastWriteTimeDesc, Mode=OneWay}"></TextBox>
+            <TextBox Text="{Binding LastWriteTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}, Mode=OneWay}"></TextBox>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Row="4">
             <TextBlock>前4字节：</TextBlock>

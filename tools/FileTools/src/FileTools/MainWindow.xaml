@@ -36,7 +36,7 @@
             <DataGrid.Columns>
                 <DataGridTextColumn Header="文件名" Width="300" Binding="{Binding Name, Mode=OneWay}"/>
                 <DataGridTextColumn Header="大小" Width="80" SortMemberPath="Length" Binding="{Binding LengthDesc, Mode=OneWay}"/>
-                <DataGridTextColumn Header="修改时间" Width="140" Binding="{Binding LastWriteTimeDesc, Mode=OneWay}"/>
+                <DataGridTextColumn Header="修改时间" Width="140" Binding="{Binding LastWriteTime, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}, Mode=OneWay}"/>
                 <DataGridTextColumn Header="SHA256" Width="300" Binding="{Binding SHA256, Mode=OneWay}"/>
             </DataGrid.Columns>
         </DataGrid>
