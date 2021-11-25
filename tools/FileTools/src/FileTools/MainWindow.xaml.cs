@@ -219,7 +219,7 @@ namespace FileTools
                     }
                     fs.Close();
                 }
-                var fdd = new FileDetailsDialog(fv);                
+                var fdd = new FileDetailsDialog(fv);
                 fdd.ShowDialog();
             }
         }
