@@ -4,6 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Description>扩展默认HostBuilder，扩展本地配置，默认集成Serilog</Description>
+    <Version>3.0.0</Version>
   </PropertyGroup>
 
   <ItemGroup>

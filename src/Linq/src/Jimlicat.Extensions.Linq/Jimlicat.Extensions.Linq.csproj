@@ -6,7 +6,6 @@
     <Description>添加按字段名排序分页，支持 top skip orderby count 参数</Description>
     <PackageTags>Jimlicat,Linq,Page</PackageTags>
     <PackageReleaseNotes>扩展System.Linq，添加分页排序</PackageReleaseNotes>
-    <VersionSuffix>preview.1</VersionSuffix>
     <Version>2.0.0</Version>
   </PropertyGroup>
 
