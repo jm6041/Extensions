@@ -1,11 +1,8 @@
 syntax = "proto3";
 
-
-
 package Tests;
 
-option csharp_namespace = "Tests";
-option java_package = "com.example.tests";
+option csharp_namespace = "WebDemo";
 
 import "google/protobuf/Empty.proto";
 import "google/protobuf/wrappers.proto";

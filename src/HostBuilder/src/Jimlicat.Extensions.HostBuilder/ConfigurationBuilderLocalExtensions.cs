@@ -22,7 +22,11 @@ namespace Microsoft.Extensions.Configuration
             // 默认配置文件
             string dconfig = $"default.json";
             DirectoryInfo dir = new DirectoryInfo(contentRoot);
-            string defaultFile = DirectoryHelper.GetPathOfFileAbove(dconfig, dir.Parent);
+            if (dir.Parent == null)
+            {
+                return;
+            }
+            var defaultFile = DirectoryHelper.GetPathOfFileAbove(dconfig, dir.Parent);
             if (!string.IsNullOrEmpty(defaultFile))
             {
                 configurationBuilder.AddJsonFile(defaultFile, true, true);
@@ -30,7 +34,7 @@ namespace Microsoft.Extensions.Configuration
             }
 
             // 运行环境的默认配置文件
-            string defaultEnvFile = DirectoryHelper.GetPathOfFileAbove($"default.{environmentName}.json", dir.Parent);
+            var defaultEnvFile = DirectoryHelper.GetPathOfFileAbove($"default.{environmentName}.json", dir.Parent);
             if (!string.IsNullOrEmpty(defaultEnvFile))
             {
                 configurationBuilder.AddJsonFile(defaultEnvFile, true, true);

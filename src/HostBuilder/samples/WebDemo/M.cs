@@ -15,6 +15,6 @@ namespace WebDemo
         /// <summary>
         /// 应用名
         /// </summary>
-        internal static readonly string AppName = System.Reflection.Assembly.GetEntryAssembly().GetName().Name;
+        internal static readonly string? AppName = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name;
     }
 }

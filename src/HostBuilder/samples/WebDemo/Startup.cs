@@ -12,14 +12,20 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebDemo.Managers;
 using WebDemo.Services;
-using WebCommon.Hubs;
-using WebCommon.Works;
 using Microsoft.Extensions.Logging;
+using WebDemo.Hubs;
 
 namespace WebDemo
 {
+    /// <summary>
+    /// 启动配置
+    /// </summary>
     public class Startup
     {
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="configuration"></param>
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -30,7 +36,10 @@ namespace WebDemo
         /// </summary>
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// 依赖配置
+        /// </summary>
+        /// <param name="services"></param>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddOpenApiDocument(c =>
@@ -42,14 +51,17 @@ namespace WebDemo
             });
 
             services.AddScoped<TestsManager>();
-            services.AddHostedService<TestWorker>();
 
             services.AddSignalR();
             services.AddGrpc();
             services.AddControllers().AddNewtonsoftJson();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// 管道配置
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -76,16 +88,17 @@ namespace WebDemo
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<TestHub>("/test");
+                endpoints.MapGrpcService<GreeterService>();
                 endpoints.MapGrpcService<MyTestService>();
                 endpoints.MapControllers();
                 endpoints.MapGet("/", async context =>
                 {
-                    await context.Response.WriteAsync(S.GetSystemInfo(context.Request, env, Configuration));
+                    await context.Response.WriteAsync(AppInfoHelper.GetSystemInfo(context.Request, env, Configuration));
                 });
             });
 
-            var logger = app.ApplicationServices.GetService<ILogger<Startup>>();
-            S.WriteAndLogConfiguration(logger, env, Configuration);
+            var logger = app.ApplicationServices.GetRequiredService<ILogger<Startup>>();
+            AppInfoHelper.WriteAndLogConfiguration(logger, env, Configuration);
         }
     }
 }

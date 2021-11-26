@@ -9,14 +9,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting.WindowsServices;
 using Serilog;
 using Serilog.Events;
-#if NETCOREAPP2_1 || NET461
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
-#else
-using Microsoft.Extensions.Hosting;
-#endif
 
-namespace System
+namespace Microsoft.Extensions.Hosting
 {
     /// <summary>
     /// 与系统启动相关帮助函数
@@ -24,17 +18,17 @@ namespace System
     public static class HostHelper
     {
         /// <summary>
+        /// 启动状态文件配置Key
+        /// </summary>
+        public const string StartupStatusFileKey = "StartupStatusFile";
+        /// <summary>
         /// 是否Windows服务托管
         /// </summary>
-        private static readonly bool s_IsWindowsService = WindowsServiceHelpers.IsWindowsService();
+        private static bool IsWindowsService { get; } = WindowsServiceHelpers.IsWindowsService();
         /// <summary>
         /// ContentRoot
         /// </summary>
-        private static volatile string s_ContentRoot;
-        /// <summary>
-        /// 入口程序集名
-        /// </summary>
-        private static volatile string s_EntryAssemblyName;
+        private static volatile string? s_ContentRoot;
 
         /// <summary>
         /// 是否为调试模式，在入口处设置
@@ -55,7 +49,7 @@ namespace System
         /// 扩展的配置，与HostBuilder的扩展配置一样
         /// 默认文件，config配置，secrets 目录配置文件，config 目录配置文件，自定义配置文件，参数指定文件</remarks>
         /// <returns><see cref="ConfigurationBuilder"/></returns>
-        public static ConfigurationBuilder CreateConfigurationBuilder(string[] args, string environmentName = null)
+        public static ConfigurationBuilder CreateConfigurationBuilder(string[] args, string? environmentName = null)
         {
             if (string.IsNullOrEmpty(environmentName))
             {
@@ -90,7 +84,7 @@ namespace System
             }
             // 内容根目录，默认当前程序真实目录
             string contentRoot = AppContext.BaseDirectory;
-            bool isws = IsWindowsService();
+            bool isws = IsWindowsService;
             if (isws)
             {
                 Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
@@ -128,15 +122,6 @@ namespace System
             return logsDir;
         }
 
-        /// <summary>
-        /// 进程是否作为Windows服务托管
-        /// </summary>
-        /// <returns></returns>
-        public static bool IsWindowsService()
-        {
-            return s_IsWindowsService;
-        }
-
         private static string GetContentRootArg(string[] args)
         {
             string cr = "";
@@ -158,10 +143,14 @@ namespace System
         /// 获得自定义配置文件
         /// </summary>
         /// <returns></returns>
-        private static string GetCustomConfigJsonFile(string contentRoot)
+        public static string GetCustomConfigJsonFile(string contentRoot)
         {
             DirectoryInfo dir = new DirectoryInfo(contentRoot);
-            string file = DirectoryHelper.GetPathOfFileAbove("*config.json", dir.Parent);
+            if (dir.Parent == null)
+            {
+                return string.Empty;
+            }
+            var file = DirectoryHelper.GetPathOfFileAbove("*config.json", dir.Parent);
             // 自定义配置文件不存在，用空文件代替
             if (string.IsNullOrEmpty(file))
             {
@@ -175,67 +164,38 @@ namespace System
         /// <param name="args">参数</param>
         /// <param name="startupStatusFile">启动状态保存文件</param>
         /// <returns></returns>
-#if NETCOREAPP2_1 || NET461
-        public static IWebHostBuilder CreateHostBuilder(string[] args, string startupStatusFile)
-        {
-            // 内容根目录
-            string contentRoot = GetContentRoot(args);
-            M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
-
-            // 自定义配置文件
-            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
-            M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
-
-            // 参数指定配置文件
-            string argsConfigJsonFile = GetArgsConfigJsonFile(args);
-            M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey] = argsConfigJsonFile;
-
-            var hostBuilder = WebHost.CreateDefaultBuilder(args);
-            if (!string.IsNullOrWhiteSpace(startupStatusFile))
-            {
-                hostBuilder.ConfigureAppConfiguration((config) =>
-                {
-                    config.AddInMemoryCollection(new Dictionary<string, string>() {
-                        { M.StartupStatusFileKey, startupStatusFile }
-                    });
-                });
-            }
-            hostBuilder.UseContentRoot(contentRoot)
-                .ConfigureAppConfiguration((context, builder) =>
-                {
-                    var env = context.HostingEnvironment;
-                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, customConfigJsonFile, args, argsConfigJsonFile);
-                })
-                .ConfigureLogging((hostContext, builder) =>
-                {
-                    var logger = CreateLogger(contentRoot, hostContext.Configuration);
-                    builder.AddSerilog(logger);
-                });
-            return hostBuilder;
-        }
-#else
         public static IHostBuilder CreateHostBuilder(string[] args, string startupStatusFile)
         {
             // 内容根目录
             string contentRoot = GetContentRoot(args);
-            M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
-
             // 自定义配置文件
             string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
-            M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
-
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
-            M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey] = argsConfigJsonFile;
-
-
             var hostBuilder = Host.CreateDefaultBuilder(args);
+            return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile);
+        }
+        /// <summary>
+        /// 配置<see cref="IHostBuilder"/>
+        /// </summary>
+        /// <param name="hostBuilder"></param>
+        /// <param name="startupStatusFile">启动状态保存文件</param>
+        /// <param name="contentRoot"></param>
+        /// <param name="customConfigJsonFile">自定义配置文件</param>
+        /// <param name="args"></param>
+        /// <param name="argsConfigJsonFile">参数指定配置文件</param>
+        /// <returns></returns>
+        public static IHostBuilder ConfigurationHostBuilder(IHostBuilder hostBuilder, string startupStatusFile, string contentRoot, string customConfigJsonFile, string[] args, string argsConfigJsonFile)
+        {
+            M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
+            M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
+            M.TEMP_CONFIG_DIC[M.ArgsConfigFileKey] = argsConfigJsonFile;
             if (!string.IsNullOrWhiteSpace(startupStatusFile))
             {
                 hostBuilder.ConfigureHostConfiguration((config) =>
                 {
                     config.AddInMemoryCollection(new Dictionary<string, string>() {
-                        { M.StartupStatusFileKey, startupStatusFile }
+                        { StartupStatusFileKey, startupStatusFile }
                     });
                 });
             }
@@ -254,7 +214,6 @@ namespace System
                 });
             return hostBuilder;
         }
-#endif
         /// <summary>
         /// 是否已经配置了Serilog写文件日志
         /// </summary>
@@ -277,7 +236,7 @@ namespace System
             if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认
             {
                 string logDir = GetDefaultLogDirectory(contentRoot);
-                string entryName = GetEntryAssemblyName();
+                string entryName = EntryAssemblyName;
                 string logPath = Path.Combine(logDir, $"{entryName}-log.log");
                 logConfig.WriteTo.File(
                     path: logPath,
@@ -297,7 +256,7 @@ namespace System
         /// </summary>
         /// <param name="args">启动参数</param>
         /// <returns></returns>
-        private static string GetArgsConfigJsonFile(string[] args)
+        public static string GetArgsConfigJsonFile(string[] args)
         {
             string file = "";
             if (args != null)
@@ -318,16 +277,13 @@ namespace System
         /// 获得入口程序集名
         /// </summary>
         /// <returns></returns>
-        public static string GetEntryAssemblyName()
+        public static string EntryAssemblyName
         {
-            if (s_EntryAssemblyName != null)
+            get
             {
-                return s_EntryAssemblyName;
+                var en = Assembly.GetEntryAssembly()?.GetName().Name;
+                return en ?? string.Empty;
             }
-            // 入口程序集名
-            var en = Assembly.GetEntryAssembly().GetName().Name;
-            Interlocked.CompareExchange(ref s_EntryAssemblyName, en, null);
-            return s_EntryAssemblyName;
         }
         /// <summary>
         /// 获得指定前缀的文件名
@@ -338,7 +294,7 @@ namespace System
         /// <returns></returns>
         public static string GetFileName(string dir, string prefix, int count = 3)
         {
-            string entryName = GetEntryAssemblyName();
+            string entryName = EntryAssemblyName;
             var start = entryName + "-" + prefix;
             DirectoryInfo dirInfo = new DirectoryInfo(dir);
             // 删除早期的文件
@@ -364,7 +320,7 @@ namespace System
             sb.Append("=============================== Start ===============================");
             sb.AppendLine();
             // 入口程序集名
-            var entryName = GetEntryAssemblyName();
+            var entryName = EntryAssemblyName;
             sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program {1} Starting", DateTimeOffset.Now, entryName);
             sb.AppendLine();
             string contentRoot = GetContentRoot(args);

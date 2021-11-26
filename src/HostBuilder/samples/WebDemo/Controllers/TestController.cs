@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebDemo.Managers;
-using Tests;
 
 namespace WebDemo.Controllers
 {
@@ -19,6 +18,10 @@ namespace WebDemo.Controllers
     public class TestController : ControllerBase
     {
         private readonly TestsManager _manager;
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="manager"></param>
         public TestController(TestsManager manager)
         {
             _manager = manager;

@@ -22,32 +22,38 @@ namespace WebDemo
         /// <param name="args"></param>
         public static void Main(string[] args)
         {
-            string contentRoot = P.GetContentRoot(args);
+#if DEBUG
+            HostHelper.IsDebug = true;
+#endif
+            string contentRoot = HostHelper.GetContentRoot(args);
             // 日志目录
-            string logsDir = P.GetDefaultLogDirectory(contentRoot);
+            string logsDir = HostHelper.GetDefaultLogDirectory(contentRoot);
             // 状态文件
-            string statusFileName = P.GetFileName(logsDir, "status");
+            string statusFileName = HostHelper.GetFileName(logsDir, "status");
             // 系统崩溃错误文件
-            string errorFileName = P.GetFileName(logsDir, "error");
+            string errorFileName = HostHelper.GetFileName(logsDir, "error");
             try
             {
-                IHostBuilder hostBuilder = P.CreateHostBuilder(args, statusFileName);
-                hostBuilder.ConfigureWebHostDefaults(webBuilder =>
+                IHostBuilder hostBuilder = HostHelper.CreateHostBuilder(args, statusFileName);
+                hostBuilder.ConfigureServices(services =>
+                {
+                    services.AddHostedService<Works.TestWorker>();
+                }).ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
                 });
                 var host = hostBuilder.Build();
-                P.WriteStartupLog(args, statusFileName);
+                HostHelper.WriteStartupLog(args, statusFileName);
                 host.Run();
             }
             catch (Exception ex)
             {
-                P.WriteErrorLog(ex, errorFileName);
+                HostHelper.WriteErrorLog(ex, errorFileName);
                 throw;
             }
             finally
             {
-                P.WriteExitLog(statusFileName);
+                HostHelper.WriteExitLog(statusFileName);
             }
         }
     }

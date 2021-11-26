@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.Configuration
 {
@@ -47,7 +48,7 @@ namespace Microsoft.Extensions.Configuration
         public static string GetConnectionString(this IConfiguration configuration)
         {
             // 入口程序集名
-            var entryName = Assembly.GetEntryAssembly().GetName().Name;
+            var entryName = HostHelper.EntryAssemblyName;
             // 获得连接字符串
             string connectionString = configuration.GetConnectionString(configuration.GetSection("db:ConnectionName").Value ?? entryName);
             return connectionString;
@@ -58,7 +59,7 @@ namespace Microsoft.Extensions.Configuration
         /// </summary>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static Uri GetGrpcGateway(this IConfiguration configuration)
+        public static Uri? GetGrpcGateway(this IConfiguration configuration)
         {
             // 获得 Grpc 网关
             string gw = configuration.GetSection("Grpc:Gateway").Value;

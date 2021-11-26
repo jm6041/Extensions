@@ -16,10 +16,10 @@ namespace System.IO
         /// <param name="searchPattern">查询的文件名模式"/></param>
         /// <param name="startDir">开始的目录</param>
         /// <returns></returns>
-        public static string GetPathOfFileAbove(string searchPattern, string startDir)
+        public static string? GetPathOfFileAbove(string searchPattern, string startDir)
         {
             DirectoryInfo dir = new DirectoryInfo(startDir);
-            string ffn = GetPathOfFileAbove(searchPattern, dir);
+            var ffn = GetPathOfFileAbove(searchPattern, dir);
             return ffn;
         }
 
@@ -29,13 +29,13 @@ namespace System.IO
         /// <param name="searchPattern">查询的文件名模式</param>
         /// <param name="startDir">开始的目录</param>
         /// <returns></returns>
-        public static string GetPathOfFileAbove(string searchPattern, DirectoryInfo startDir)
+        public static string? GetPathOfFileAbove(string searchPattern, DirectoryInfo startDir)
         {
             if (!startDir.Exists)
             {
                 throw new DirectoryNotFoundException(startDir.FullName);
             }
-            GetPathOfFileAboveInner(startDir, ref searchPattern, out string ffn);
+            GetPathOfFileAboveInner(startDir, ref searchPattern, out string? ffn);
             return ffn;
         }
 
@@ -45,7 +45,7 @@ namespace System.IO
         /// <param name="dir">递归查询的目录</param>
         /// <param name="fn">查询的文件名</param>
         /// <param name="ffn">递归查找到的文件全民</param>
-        private static void GetPathOfFileAboveInner(DirectoryInfo dir, ref string fn, out string ffn)
+        private static void GetPathOfFileAboveInner(DirectoryInfo? dir, ref string fn, out string? ffn)
         {
             if (dir == null)
             {
@@ -53,7 +53,7 @@ namespace System.IO
             }
             else
             {
-                FileInfo file = dir.EnumerateFiles(fn, SearchOption.TopDirectoryOnly).OrderByDescending(x => x.LastWriteTimeUtc).FirstOrDefault();
+                FileInfo? file = dir.EnumerateFiles(fn, SearchOption.TopDirectoryOnly).OrderByDescending(x => x.LastWriteTimeUtc).FirstOrDefault();
                 if (file != null)
                 {
                     ffn = file.FullName;

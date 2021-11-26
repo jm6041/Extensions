@@ -1,44 +1,13 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:56191",
-      "sslPort": 44379
-    }
-  },
-  "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
+    "WebDemo": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
       "launchBrowser": true,
-      "launchUrl": "",
+      "applicationUrl": "https://localhost:15221",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
-    },
-    "WebDemo": {
-      "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        //"CTC_CLUSTER": "k8s",
-        //"CTC_CONSUL_HOST": "consul.yx.com",
-        //"CTC_CONSUL_PORT": "80",
-        "Kestrel__EndpointDefaults__Protocols": "Http2"
-      }
-    },
-    "Docker": {
-      "commandName": "Docker",
-      "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/",
-      "environmentVariables": {
-        "ASPNETCORE_URLS": "https://+:443",
-        "ASPNETCORE_HTTPS_PORT": "1102"
-      },
-      "useSSL": true,
-      "sslPort": 1102
     }
   }
 }

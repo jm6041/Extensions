@@ -8,11 +8,6 @@ namespace System
     internal class M
     {
         /// <summary>
-        /// 启动状态文件配置Key
-        /// </summary>
-        public const string StartupStatusFileKey = "StartupStatusFile";
-
-        /// <summary>
         /// 指定配置文件参数，简写
         /// </summary>
         public const string cf_arg = "-cf";
