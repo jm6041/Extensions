@@ -13,26 +13,6 @@ namespace Microsoft.EntityFrameworkCore
     public static class QueryableAsyncExtension
     {
         /// <summary>
-        /// 从全量数据生成分页数据
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="page">分页数据</param>
-        /// <param name="cancellationToken"><see cref="CancellationToken"/></param>
-        /// <returns></returns>
-        public static async Task<DataResult<T>> ToPagedResultAsync<T>(this IQueryable<T> source, PageParameter page, CancellationToken cancellationToken = default)
-        {
-            Checker.NotNull(source, nameof(source));
-            Checker.CheckPageParameter(page, nameof(page));
-            int count = await source.CountAsync(cancellationToken);
-            if (page.PageSize <= 0)
-            {
-                return new DataResult<T>() { Count = count, Result = Enumerable.Empty<T>().ToList(), };
-            }
-            IList<T> result = await source.Page(page).ToListAsync(cancellationToken);
-            return new DataResult<T>() { Count = count, Result = result, };
-        }
-
-        /// <summary>
         /// 从全量数据生成OData数据
         /// </summary>
         /// <param name="source"></param>

@@ -28,30 +28,6 @@ namespace EFCore3App.Controllers
         }
 
         /// <summary>
-        /// 获得分页数据
-        /// </summary>
-        /// <param name="query"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<DataResult<User>> GetPagedData([FromBody] QueryDto query)
-        {
-            var source = _context.Users.Where(x => 1 == 1);
-            if (query.Min != null)
-            {
-                source = source.Where(x => x.DouV >= query.Min.Value);
-            }
-            if (query.Max != null)
-            {
-                source = source.Where(x => x.DouV <= query.Max.Value);
-            }
-            if (query.OrderingsIsNullOrEmpty())
-            {
-                source = source.OrderBy(x => x.Id);
-            }
-            return await source.ToPagedResultAsync(query);
-        }
-
-        /// <summary>
         /// 获得OData数据
         /// </summary>
         /// <param name="query"></param>
@@ -99,21 +75,6 @@ namespace EFCore3App.Controllers
         {
             return await _context.Users.Skip(st.Skip).Take(st.Take).ToListAsync();
         }
-    }
-
-    /// <summary>
-    /// 分页查询
-    /// </summary>
-    public class QueryDto : PageParameter
-    {
-        /// <summary>
-        /// 最小值
-        /// </summary>
-        public double? Min { get; set; }
-        /// <summary>
-        /// 最大值
-        /// </summary>
-        public double? Max { get; set; }
     }
 
     /// <summary>
