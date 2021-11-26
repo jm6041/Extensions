@@ -1,10 +1,10 @@
-$outDir = "..\publish\nupkgs\local"
+$outDir = "..\publish\nupkgs\nuget"
 if(Test-Path $outDir){
     Write-Output("Delete all old nupkgs."+[System.Environment]::NewLine)
     Get-ChildItem $outDir -Recurse *.nupkg -Force | Remove-Item -Force
 }
 
-$projects=Get-Content .\projects.properties
+$projects=Get-Content .\projects-nuget.properties
 $all=Get-ChildItem ..\src -Recurse -Include $projects  *.csproj
 foreach($item in $all){
     $fn=$item.FullName
