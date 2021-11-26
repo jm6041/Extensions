@@ -11,7 +11,7 @@ namespace EFCoreEntities
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).HasMaxLength(32).IsFixedLength().IsRequired();
             builder.Property(x => x.Name).HasMaxLength(100).IsRequired().HasComment("名字");
-            builder.HasIndex(x => x.Name).IsUnique().HasName("OrderNameIndex");
+            builder.HasIndex(x => x.Name).IsUnique().HasDatabaseName("OrderNameIndex");
         }
     }
 }

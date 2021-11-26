@@ -33,7 +33,7 @@ namespace EFCore3App.Controllers
         /// <param name="query"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<DataResult<User>> GetPagedData([FromBody]QueryDto query)
+        public async Task<DataResult<User>> GetPagedData([FromBody] QueryDto query)
         {
             var source = _context.Users.Where(x => 1 == 1);
             if (query.Min != null)

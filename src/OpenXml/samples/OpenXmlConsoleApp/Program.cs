@@ -23,12 +23,18 @@ namespace OpenXmlConsoleApp
                 new ColumnInfo(){ PropertyName = nameof(Order.Updated), Show="更新时间" },
             };
             var exporter1 = SpreadsheetExporterFactory.Create(source, list);
-            MemoryStream ms1 = exporter1.Export();
-            ToFile(ms1);
+            using (var ms1 = new MemoryStream())
+            {
+                exporter1.Export(ms1);
+                ToFile(ms1);
+            }
 
             var exporter2 = SpreadsheetExporterFactory.Create(source);
-            MemoryStream ms2 = exporter2.Export();
-            ToFile(ms2);
+            using (var ms2 = new MemoryStream())
+            {
+                exporter1.Export(ms2);
+                ToFile(ms2);
+            }
 
             Console.WriteLine("Hello World!");
         }

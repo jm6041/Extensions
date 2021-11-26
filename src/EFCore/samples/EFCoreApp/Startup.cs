@@ -43,7 +43,7 @@ namespace EFCore3App
             string connectionString = Configuration.GetConnectionString(Configuration.GetSection("db:ConnectionName")?.Value ?? "DefaultConnection");
             string assemblyFullName = this.GetType().Assembly.FullName;
             services.AddDbContext<MyDbContext>(options => options.UseSqlServer(connectionString, b => b.MigrationsAssembly(assemblyFullName)));
-            StartupHelper.WriteConnectionString(connectionString, Configuration);
+            AppInfoHelper.WriteConnectionString(connectionString, Configuration);
 
             services.AddOpenApiDocument(c =>
             {
@@ -87,7 +87,7 @@ namespace EFCore3App
                 endpoints.MapControllers();
             });
 
-            StartupHelper.WriteAndLogConfiguration(app.ApplicationServices.GetService<ILogger<Startup>>(), env, Configuration);
+            AppInfoHelper.WriteAndLogConfiguration(app.ApplicationServices.GetService<ILogger<Startup>>(), env, Configuration);
         }
     }
 }

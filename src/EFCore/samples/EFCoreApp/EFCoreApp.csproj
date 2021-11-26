@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp6.0</TargetFramework>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.0" />
+    <PackageReference Include="NSwag.AspNetCore" Version="13.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\HostBuilder\src\Jimlicat.Extensions.AspNet\Jimlicat.Extensions.AspNet.csproj" />
+    <ProjectReference Include="..\..\src\Jimlicat.Extensions.EFCore\Jimlicat.Extensions.EFCore.csproj" />
+    <ProjectReference Include="..\EFCoreDbContext\EFCoreDbContext.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\EFCoreApp.DbMigration\Migrations\*" Link="Migrations\%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

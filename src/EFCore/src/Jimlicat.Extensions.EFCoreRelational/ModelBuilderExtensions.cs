@@ -82,7 +82,7 @@ namespace Microsoft.EntityFrameworkCore
                     foreach (var index in entity.GetIndexes())
                     {
                         string name = nameFunc.Invoke(index);
-                        index.SetName(name);
+                        index.SetDatabaseName(name);
                     }
                 }
             }

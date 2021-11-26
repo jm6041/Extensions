@@ -4,44 +4,45 @@ using EFCoreData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
+#nullable disable
 
 namespace EFCore3App.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    [Migration("20200710011327_MyFirstMigration")]
-    partial class MyFirstMigration
+    partial class MyDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.3")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("EFCoreEntities.Order<string>", b =>
                 {
                     b.Property<string>("Id")
+                        .HasMaxLength(32)
                         .HasColumnType("nchar(32)")
-                        .IsFixedLength(true)
-                        .HasComment("Id")
-                        .HasMaxLength(32);
+                        .IsFixedLength()
+                        .HasComment("Id");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
-                        .HasComment("名字")
-                        .HasMaxLength(100);
+                        .HasComment("名字");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique()
-                        .HasName("OrderNameIndex");
+                        .HasDatabaseName("OrderNameIndex");
 
-                    b.ToTable("Order");
+                    b.ToTable("Order", (string)null);
                 });
 
             modelBuilder.Entity("EFCoreEntities.User", b =>
@@ -49,8 +50,9 @@ namespace EFCore3App.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasComment("Id")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasComment("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetimeoffset")
@@ -66,9 +68,9 @@ namespace EFCore3App.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
-                        .HasComment("名字")
-                        .HasMaxLength(100);
+                        .HasComment("名字");
 
                     b.Property<int>("Sex")
                         .HasColumnType("int")
@@ -76,7 +78,7 @@ namespace EFCore3App.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
 
                     b.HasData(
                         new

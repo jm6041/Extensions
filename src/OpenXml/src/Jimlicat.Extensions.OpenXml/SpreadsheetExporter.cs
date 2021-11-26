@@ -148,19 +148,27 @@ namespace Jimlicat.OpenXml
         /// <see cref="bool"/> false 文本
         /// </summary>
         public string BoolFalseText { get; set; }
-
         /// <summary>
         /// 导出
         /// </summary>
         /// <returns></returns>
-        public MemoryStream Export()
+        public void Export(string path, SpreadsheetDocumentType type = SpreadsheetDocumentType.Workbook)
         {
-            MemoryStream ms = new MemoryStream();
-            using (SpreadsheetDocument document = SpreadsheetDocument.Create(ms, SpreadsheetDocumentType.Workbook))
+            using (SpreadsheetDocument document = SpreadsheetDocument.Create(path, SpreadsheetDocumentType.Workbook))
             {
                 CreateParts(document);
             }
-            return ms;
+        }
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <returns></returns>
+        public void Export(Stream stream, SpreadsheetDocumentType type = SpreadsheetDocumentType.Workbook)
+        {
+            using (SpreadsheetDocument document = SpreadsheetDocument.Create(stream, SpreadsheetDocumentType.Workbook))
+            {
+                CreateParts(document);
+            }
         }
 
         private void CreateParts(SpreadsheetDocument document)

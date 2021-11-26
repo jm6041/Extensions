@@ -1,4 +1,5 @@
 using System.IO;
+using DocumentFormat.OpenXml;
 
 namespace Jimlicat.OpenXml
 {
@@ -19,11 +20,15 @@ namespace Jimlicat.OpenXml
         /// <see cref="bool"/> false 文本
         /// </summary>
         string BoolFalseText { get; set; }
-
         /// <summary>
         /// 导出
         /// </summary>
         /// <returns></returns>
-        MemoryStream Export();
+        void Export(string path, SpreadsheetDocumentType type = SpreadsheetDocumentType.Workbook);
+        /// <summary>
+        /// 导出
+        /// </summary>
+        /// <returns></returns>
+        void Export(Stream stream, SpreadsheetDocumentType type = SpreadsheetDocumentType.Workbook);
     }
 }

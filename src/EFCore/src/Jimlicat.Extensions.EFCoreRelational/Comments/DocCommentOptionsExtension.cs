@@ -105,13 +105,18 @@ namespace Microsoft.EntityFrameworkCore
         /// </summary>
         public override bool IsDatabaseProvider => false;
         public override string LogFragment => "using DocComment ";
-        public override long GetServiceProviderHashCode()
+        public override int GetServiceProviderHashCode()
         {
             var ext = (DocCommentOptionsExtension)base.Extension;
             return ext.UseDocComment.GetHashCode() ^ 7;
         }
         public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
         {
+        }
+
+        public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
+        {
+            return true;
         }
     }
 }
