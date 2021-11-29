@@ -3,10 +3,9 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
-  </PropertyGroup>
-
-  <PropertyGroup>
+    <Description>扩展 EFCore，使用实体类注释作为数据库注释 UseDocCommentConvention()</Description>
     <Product>Jimlicat EntityFrameworkCore 扩展</Product>
+    <Version>3.0.0</Version>
   </PropertyGroup>
   
   <ItemGroup>
