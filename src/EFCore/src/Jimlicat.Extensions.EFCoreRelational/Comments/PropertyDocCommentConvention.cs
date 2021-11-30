@@ -5,9 +5,9 @@ using Namotion.Reflection;
 namespace Microsoft.EntityFrameworkCore.Comments
 {
     /// <summary>
-    /// 文档注释
+    /// 属性文档注释
     /// </summary>
-    internal class DocCommentConvention : IPropertyAddedConvention
+    internal class PropertyDocCommentConvention : IPropertyAddedConvention
     {
         public void ProcessPropertyAdded(IConventionPropertyBuilder propertyBuilder, IConventionContext<IConventionPropertyBuilder> context)
         {

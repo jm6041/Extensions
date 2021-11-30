@@ -20,8 +20,10 @@ namespace Microsoft.EntityFrameworkCore.Comments
             var extension = _options.FindExtension<DocCommentOptionsExtension>();            
             if (extension.UseDocComment)
             {
-                DocCommentConvention docComment = new DocCommentConvention();
-                conventionSet.PropertyAddedConventions.Add(docComment);
+                var prodc = new PropertyDocCommentConvention();
+                conventionSet.PropertyAddedConventions.Add(prodc);
+                var entdc = new EntityTypeDocCommentConvention();
+                conventionSet.EntityTypeAddedConventions.Add(entdc);
             }
             return conventionSet;
         }
