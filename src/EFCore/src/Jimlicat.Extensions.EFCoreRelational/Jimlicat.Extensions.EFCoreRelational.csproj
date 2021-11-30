@@ -5,7 +5,7 @@
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
     <Description>扩展 EFCore，使用实体类注释作为数据库注释 UseDocCommentConvention()</Description>
     <Product>Jimlicat EntityFrameworkCore 扩展</Product>
-    <Version>3.0.1</Version>
+    <Version>3.1.0</Version>
   </PropertyGroup>
   
   <ItemGroup>
