@@ -20,6 +20,9 @@ namespace Id32Tools
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// 默认构造函数
+        /// </summary>
         public MainWindow()
         {
             InitializeComponent();

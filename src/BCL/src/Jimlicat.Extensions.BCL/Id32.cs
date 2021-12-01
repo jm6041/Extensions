@@ -14,7 +14,7 @@ namespace System
         /// </summary>
         private const int MaxYear = 46655;
         /// <summary>
-        /// 生成全局唯一32位字符串Id
+        /// 生成全局唯一32位字符串Id，格式中年月日小时采用36进制编码，guid采用Base32，排列顺序：年号3，月号1，日号1，小时1，GUID26
         /// </summary>
         /// <returns></returns>
         public static string NewId()

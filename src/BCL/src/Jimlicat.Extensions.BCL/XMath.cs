@@ -121,7 +121,7 @@ namespace System
         {
             if (x < 2 || x > 36)
             {
-                throw new ArgumentOutOfRangeException(xrangerr);
+                throw new ArgumentOutOfRangeException(nameof(x), xrangerr);
             }
             if (n == 0)
             {
@@ -154,7 +154,7 @@ namespace System
         {
             if (x < 2 || x > 36)
             {
-                throw new ArgumentOutOfRangeException(xrangerr);
+                throw new ArgumentOutOfRangeException(nameof(x), xrangerr);
             }
             if (n == 0)
             {
@@ -188,7 +188,7 @@ namespace System
         {
             if (x < 2 || x > 36)
             {
-                throw new ArgumentOutOfRangeException(xrangerr);
+                throw new ArgumentOutOfRangeException(nameof(x), xrangerr);
             }
             if (n == 0)
             {
@@ -220,7 +220,7 @@ namespace System
         {
             if (x < 2 || x > 36)
             {
-                throw new ArgumentOutOfRangeException(xrangerr);
+                throw new ArgumentOutOfRangeException(nameof(x), xrangerr);
             }
             if (n == 0)
             {
