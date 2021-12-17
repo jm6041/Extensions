@@ -111,6 +111,7 @@ namespace FileTools
                 {
                     FilesHashComputer computer = new FilesHashComputer(hashFiles);
                     computer.FileHashComputed += Computer_FileHashComputed;
+                    computer.FileHashError += Computer_FileHashError;
                     await computer.ComputeHash();
                     filesView.FileHashComputed = true;
                 }
@@ -121,16 +122,31 @@ namespace FileTools
             }
         }
 
+        private void Computer_FileHashError(object sender, FileHashErrorEventArgs e)
+        {
+            var fInfo = e.FileHashError.FileInfo;
+            Dispatcher.Invoke(() =>
+            {
+                var f = filesView.FileItems.FirstOrDefault(x => x.FileInfo == fInfo);
+                if (f != null)
+                {
+                    f.SHA256 = e.FileHashError.Error.Message;
+                }
+                int count = filesView.Count + 1;
+                filesView.Count = count;
+            });
+        }
+
         private void Computer_FileHashComputed(object sender, FileHashInfoEventArgs e)
         {
             var fInfo = e.FileHash.FileInfo;
-            string rn = System.IO.Path.GetRelativePath(filesView.FolderName, fInfo.FullName);
-            Application.Current.Dispatcher.Invoke(() =>
+            Dispatcher.Invoke(() =>
             {
                 var f = filesView.FileItems.FirstOrDefault(x => x.FileInfo == fInfo);
                 if (f != null)
                 {
                     f.SHA256 = FilesHashComputer.ToHexString(e.FileHash.SHA256);
+                    f.IsOK = true;
                 }
                 int count = filesView.Count + 1;
                 filesView.Count = count;
@@ -146,7 +162,7 @@ namespace FileTools
         private void BtnRemoveDup_Click(object sender, RoutedEventArgs e)
         {
             List<FileItemView> removeFiles = new List<FileItemView>();
-            foreach (var files in filesView.FileItems.Where(x => false == string.IsNullOrEmpty(x.SHA256)).GroupBy(x => x.SHA256))
+            foreach (var files in filesView.FileItems.Where(x => x.IsOK && false == string.IsNullOrEmpty(x.SHA256)).GroupBy(x => x.SHA256))
             {
                 removeFiles.AddRange(files.OrderBy(x => x.CreationTime).Skip(1));
             }
@@ -214,9 +230,15 @@ namespace FileTools
                             fv.SHA256 = "Sha256正在计算中...";
                             byte[] hv = await sha256.ComputeHashAsync(fs);
                             fv.SHA256 = FilesHashComputer.ToHexString(hv);
+                            fv.IsOK = true;
                         }
                     }
                     fs.Close();
+                }
+                catch (UnauthorizedAccessException unex)
+                {
+                    fv.SHA256 = "未授权访问";
+                    ShowErrorMsg(unex.Message);
                 }
                 catch (Exception ex)
                 {

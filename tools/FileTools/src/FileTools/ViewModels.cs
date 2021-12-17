@@ -153,6 +153,16 @@ namespace FileTools
             set => SetProperty(ref sha256, value);
         }
 
+        private bool isOK = false;
+        /// <summary>
+        /// 是否正确
+        /// </summary>
+        public bool IsOK
+        {
+            get => isOK;
+            set => SetProperty(ref isOK, value);
+        }
+
         private string preBytes;
         /// <summary>
         /// PreBytes
