@@ -35,27 +35,30 @@ namespace FileTools
         public MainWindow()
         {
             InitializeComponent();
-            InitializeOther();
-
             filesView = new FilesView() { FolderName = DefaultFolder };
             DataContext = filesView;
-        }
 
-        private void InitializeOther()
-        {
             folderBrowserDialog = new WinForm.FolderBrowserDialog()
             {
-                SelectedPath = DefaultFolder,
+                SelectedPath = GetSelectedPath(DefaultFolder),
             };
         }
-
+        private static string GetSelectedPath(string path)
+        {
+            var end = System.IO.Path.DirectorySeparatorChar;
+            if (!path.EndsWith(end))
+            {
+                path += end;
+            }
+            return path;
+        }
         private void BtnBrowse_Click(object sender, RoutedEventArgs e)
         {
             filesView.FileHashComputed = false;
             WinForm.DialogResult result = folderBrowserDialog.ShowDialog();
             if (result == WinForm.DialogResult.OK)
             {
-                filesView.FolderName = folderBrowserDialog.SelectedPath;
+                filesView.FolderName = GetSelectedPath(folderBrowserDialog.SelectedPath);
             }
         }
 
