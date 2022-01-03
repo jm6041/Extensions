@@ -7,20 +7,20 @@ namespace Jimlicat.FileHash
     /// <summary>
     /// <see cref="FileHashInfo"/>事件参数
     /// </summary>
-    public class FileHashErrorEventArgs : EventArgs
+    public class FileHashInfoEventArgs : EventArgs
     {
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="fileHashError"></param>
-        public FileHashErrorEventArgs(FileHashError fileHashError)
+        /// <param name="fileHashInfo"></param>
+        public FileHashInfoEventArgs(FileHashInfo fileHashInfo)
         {
-            FileHashError = fileHashError;
+            FileHash = fileHashInfo;
         }
 
         /// <summary>
-        /// 文件Hash异常
+        /// 文件Hash
         /// </summary>
-        public FileHashError FileHashError { get; }
+        public FileHashInfo FileHash { get; }
     }
 }

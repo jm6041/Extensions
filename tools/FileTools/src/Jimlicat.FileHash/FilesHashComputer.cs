@@ -14,6 +14,12 @@ namespace Jimlicat.FileHash
     /// <param name="sender"></param>
     /// <param name="e"></param>
     public delegate void FileHashComputedEventHandler(object sender, FileHashInfoEventArgs e);
+    /// <summary>
+    /// 文件hash计算异常事件处理
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    public delegate void FileHashErrorEventHandler(object sender, FileHashErrorEventArgs e);
 
     /// <summary>
     /// 计算文件Hash
@@ -33,6 +39,10 @@ namespace Jimlicat.FileHash
         /// 文件hash计算完成事件
         /// </summary>
         public event FileHashComputedEventHandler FileHashComputed;
+        /// <summary>
+        /// 文件hash计算完成事件
+        /// </summary>
+        public event FileHashErrorEventHandler FileHashError;
         /// <summary>
         /// 计算Hash
         /// </summary>
@@ -62,13 +72,21 @@ namespace Jimlicat.FileHash
         {
             using (SHA256 sha256 = SHA256.Create())
             {
-                FileStream fileStream = file.Open(FileMode.Open);
-                fileStream.Position = 0;
-                byte[] hv = await sha256.ComputeHashAsync(fileStream);
-                FileHashInfo fi = new FileHashInfo(file, hv);
-                fileStream.Close();
-                FileHashComputed?.Invoke(this, new FileHashInfoEventArgs(fi));
-                return fi;
+                try
+                {
+                    using FileStream fileStream = file.Open(FileMode.Open);
+                    fileStream.Position = 0;
+                    byte[] hv = await sha256.ComputeHashAsync(fileStream);
+                    FileHashInfo fi = new FileHashInfo(file, hv);
+                    fileStream.Close();
+                    FileHashComputed?.Invoke(this, new FileHashInfoEventArgs(fi));
+                    return fi;
+                }
+                catch (Exception ex)
+                {
+                    FileHashError?.Invoke(this, new FileHashErrorEventArgs(new FileHashError(file, ex)));
+                    return new FileHashInfo(file, null);
+                }
             }
         }
         /// <summary>
