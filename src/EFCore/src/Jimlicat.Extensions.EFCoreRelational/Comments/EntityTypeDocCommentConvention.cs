@@ -11,10 +11,10 @@ namespace Microsoft.EntityFrameworkCore.Comments
     {
         public void ProcessEntityTypeAdded(IConventionEntityTypeBuilder entityTypeBuilder, IConventionContext<IConventionEntityTypeBuilder> context)
         {
-            string comment = entityTypeBuilder?.Metadata?.ClrType?.GetXmlDocsSummary();
+            string? comment = entityTypeBuilder?.Metadata?.ClrType?.GetXmlDocsSummary();
             if (!string.IsNullOrEmpty(comment))
             {
-                entityTypeBuilder.HasComment(comment);
+                entityTypeBuilder?.HasComment(comment);
             }
         }
     }

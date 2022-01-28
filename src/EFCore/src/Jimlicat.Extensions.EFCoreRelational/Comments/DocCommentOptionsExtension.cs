@@ -70,7 +70,7 @@ namespace Microsoft.EntityFrameworkCore
         {
         }
 
-        private DbContextOptionsExtensionInfo _info;
+        private DbContextOptionsExtensionInfo? _info;
         /// <summary>
         /// <see cref="DbContextOptionsExtensionInfo"/>
         /// </summary>
@@ -105,7 +105,11 @@ namespace Microsoft.EntityFrameworkCore
         /// </summary>
         public override bool IsDatabaseProvider => false;
         public override string LogFragment => "using DocComment ";
+#if NETSTANDARD2_0
+        public override long GetServiceProviderHashCode()
+#else
         public override int GetServiceProviderHashCode()
+#endif
         {
             var ext = (DocCommentOptionsExtension)base.Extension;
             return ext.UseDocComment.GetHashCode() ^ 7;
@@ -113,10 +117,11 @@ namespace Microsoft.EntityFrameworkCore
         public override void PopulateDebugInfo(IDictionary<string, string> debugInfo)
         {
         }
-
+#if NET6_0_OR_GREATER
         public override bool ShouldUseSameServiceProvider(DbContextOptionsExtensionInfo other)
         {
             return true;
         }
+#endif
     }
 }

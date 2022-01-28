@@ -23,6 +23,5 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <VersionSuffix>preview.1</VersionSuffix>
     <Version>1.0.0-$(VersionSuffix)</Version>
-    <MicEFCoreVersion>[6.0.0,7.0.0)</MicEFCoreVersion>
   </PropertyGroup>
 </Project>

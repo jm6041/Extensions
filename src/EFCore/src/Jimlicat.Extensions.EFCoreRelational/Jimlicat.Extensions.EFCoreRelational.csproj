@@ -1,17 +1,22 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFrameworks>net6.0;netstandard2.0</TargetFrameworks>
     <RootNamespace>Microsoft.EntityFrameworkCore</RootNamespace>
     <Description>扩展 EFCore，使用实体类注释作为数据库表和字段注释 UseDocCommentConvention()</Description>
     <Product>Jimlicat EntityFrameworkCore 扩展</Product>
     <PackageTags>Jimlicat,efcore,comment</PackageTags>
-    <Version>3.1.0</Version>
+    <Nullable>enable</Nullable>
+    <Version>3.1.1</Version>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" />
-    <PackageReference Include="Namotion.Reflection" Version="2.0.5" />
+    <PackageReference Include="Namotion.Reflection" Version="2.0.10" />
   </ItemGroup>
 
 </Project>

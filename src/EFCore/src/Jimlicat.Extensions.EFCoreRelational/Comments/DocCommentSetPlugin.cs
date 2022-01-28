@@ -17,8 +17,8 @@ namespace Microsoft.EntityFrameworkCore.Comments
 
         public ConventionSet ModifyConventions(ConventionSet conventionSet)
         {
-            var extension = _options.FindExtension<DocCommentOptionsExtension>();            
-            if (extension.UseDocComment)
+            var extension = _options.FindExtension<DocCommentOptionsExtension>();
+            if (extension != null && extension.UseDocComment)
             {
                 var prodc = new PropertyDocCommentConvention();
                 conventionSet.PropertyAddedConventions.Add(prodc);

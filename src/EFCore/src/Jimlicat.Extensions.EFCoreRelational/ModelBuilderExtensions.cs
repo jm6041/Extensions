@@ -20,7 +20,7 @@ namespace Microsoft.EntityFrameworkCore
         /// <param name="nameFunc">名字委托</param>
         /// <param name="schema">数据库 schema</param>
         /// <returns></returns>
-        public static ModelBuilder SetTableName(this ModelBuilder modelBuilder, Func<IMutableEntityType, string> nameFunc, string schema = null)
+        public static ModelBuilder SetTableName(this ModelBuilder modelBuilder, Func<IMutableEntityType, string> nameFunc, string? schema = null)
         {
             if (nameFunc == null)
             {
@@ -82,7 +82,12 @@ namespace Microsoft.EntityFrameworkCore
                     foreach (var index in entity.GetIndexes())
                     {
                         string name = nameFunc.Invoke(index);
+#if NETSTANDARD2_0
+                        index.SetName(name);
+#else
                         index.SetDatabaseName(name);
+#endif
+
                     }
                 }
             }

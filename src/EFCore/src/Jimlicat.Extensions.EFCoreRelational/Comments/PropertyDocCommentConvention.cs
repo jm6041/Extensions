@@ -11,10 +11,10 @@ namespace Microsoft.EntityFrameworkCore.Comments
     {
         public void ProcessPropertyAdded(IConventionPropertyBuilder propertyBuilder, IConventionContext<IConventionPropertyBuilder> context)
         {
-            string comment = propertyBuilder?.Metadata?.PropertyInfo?.GetXmlDocsSummary();
+            string? comment = propertyBuilder?.Metadata?.PropertyInfo?.GetXmlDocsSummary();
             if (!string.IsNullOrEmpty(comment))
             {
-                propertyBuilder.HasComment(comment);
+                propertyBuilder?.HasComment(comment);
             }
         }
     }
