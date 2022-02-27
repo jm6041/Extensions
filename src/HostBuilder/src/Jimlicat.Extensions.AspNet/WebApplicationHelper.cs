@@ -34,7 +34,7 @@ namespace Microsoft.AspNetCore.Builder
         public static WebApplicationBuilder CreateBuilder(string[] args, string startupStatusFile)
         {
             // 内容根目录
-            string contentRoot = GetContentRoot(args);
+            string contentRoot = GetContentRoot();
             // 自定义配置文件
             string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
             // 参数指定配置文件
@@ -56,13 +56,31 @@ namespace Microsoft.AspNetCore.Builder
             set => HostHelper.IsDebug = value;
         }
         /// <summary>
-        /// <see cref="HostHelper.GetContentRoot(string[])"/>
+        /// <see cref="HostHelper.InitContentRoot(string[])"/>
         /// </summary>
         /// <param name="args">启动参数</param>
         /// <returns>ContentRoot</returns>
-        public static string GetContentRoot(string[] args)
+        public static string InitContentRoot(string[] args)
         {
-            return HostHelper.GetContentRoot(args);
+            return HostHelper.InitContentRoot(null, args);
+        }
+        /// <summary>
+        /// <see cref="HostHelper.InitContentRoot(string?, string[])"/>
+        /// </summary>
+        /// <param name="cr">指定的 ContentRoot</param>
+        /// <param name="args">启动参数</param>
+        /// <returns>ContentRoot</returns>
+        public static string InitContentRoot(string? cr, string[] args)
+        {
+            return HostHelper.InitContentRoot(cr, args);
+        }
+        /// <summary>
+        /// <see cref="HostHelper.GetContentRoot()"/>
+        /// </summary>
+        /// <returns>ContentRoot</returns>
+        public static string GetContentRoot()
+        {
+            return HostHelper.GetContentRoot();
         }
         /// <summary>
         /// 默认日志目录, {contentRoot}/logs/ <see cref="HostHelper.GetDefaultLogDirectory(string)"/>

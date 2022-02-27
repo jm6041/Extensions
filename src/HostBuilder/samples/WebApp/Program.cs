@@ -2,7 +2,7 @@
 #if DEBUG
 WebApplicationHelper.IsDebug = true;
 #endif
-string contentRoot = WebApplicationHelper.GetContentRoot(args);
+string contentRoot = WebApplicationHelper.InitContentRoot(args);
 // 日志目录
 string logsDir = WebApplicationHelper.GetDefaultLogDirectory(contentRoot);
 // 状态文件
