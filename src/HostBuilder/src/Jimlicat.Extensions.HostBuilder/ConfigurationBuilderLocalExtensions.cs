@@ -27,7 +27,7 @@ namespace Microsoft.Extensions.Configuration
                 return;
             }
             var defaultFile = DirectoryHelper.GetPathOfFileAbove(dconfig, dir.Parent);
-            if (!string.IsNullOrEmpty(defaultFile))
+            if (defaultFile != null && defaultFile.Length != 0)
             {
                 configurationBuilder.AddJsonFile(defaultFile, true, true);
                 M.TEMP_CONFIG_DIC[M.DefaultConfigFileKey] = defaultFile;
@@ -35,7 +35,7 @@ namespace Microsoft.Extensions.Configuration
 
             // 运行环境的默认配置文件
             var defaultEnvFile = DirectoryHelper.GetPathOfFileAbove($"default.{environmentName}.json", dir.Parent);
-            if (!string.IsNullOrEmpty(defaultEnvFile))
+            if (defaultEnvFile != null && defaultEnvFile.Length != 0)
             {
                 configurationBuilder.AddJsonFile(defaultEnvFile, true, true);
                 M.TEMP_CONFIG_DIC[M.DefaultEnvConfigFileKey] = defaultEnvFile;

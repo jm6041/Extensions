@@ -161,9 +161,9 @@ namespace Microsoft.Extensions.Hosting
             }
             var file = DirectoryHelper.GetPathOfFileAbove("*config.json", dir.Parent);
             // 自定义配置文件不存在，用空文件代替
-            if (string.IsNullOrEmpty(file))
+            if (file == null)
             {
-                file = "";
+                file = string.Empty;
             }
             return file;
         }

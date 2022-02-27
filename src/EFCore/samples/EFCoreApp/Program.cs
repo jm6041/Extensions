@@ -23,7 +23,7 @@ namespace EFCore3App
 #if DEBUG
             HostHelper.IsDebug = true;
 #endif
-            string contentRoot = HostHelper.GetContentRoot(args);
+            string contentRoot = HostHelper.InitContentRoot(args);
             // 日志目录
             string logsDir = HostHelper.GetDefaultLogDirectory(contentRoot);
             // 状态文件
