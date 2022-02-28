@@ -74,7 +74,7 @@ namespace Microsoft.Extensions.Configuration
         /// 获得配置内容
         /// </summary>
         /// <param name="configuration"></param>
-        public static string GetContent(IConfiguration configuration)
+        public static string GetContent(this IConfiguration configuration)
         {
             StringBuilder b = new StringBuilder();
             b.Append("Time: ").Append(DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz")).AppendLine();
