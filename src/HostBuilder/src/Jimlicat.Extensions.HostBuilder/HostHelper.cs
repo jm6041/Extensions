@@ -65,7 +65,6 @@ namespace Microsoft.Extensions.Hosting
             {
                 return s_ContentRoot;
             }
-
             if (!is_initEndDir)
             {
                 s_EndDirInfo = endDir;
@@ -88,7 +87,6 @@ namespace Microsoft.Extensions.Hosting
                 }
                 else
                 {
-
                     // 当前目录，
                     string curDir = Directory.GetCurrentDirectory();
                     // 当前目录信息
