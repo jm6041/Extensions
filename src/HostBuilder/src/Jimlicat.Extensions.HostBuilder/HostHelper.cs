@@ -310,16 +310,24 @@ namespace Microsoft.Extensions.Hosting
             }
             return file;
         }
+
+        private static string? s_entryName = Assembly.GetEntryAssembly()?.GetName().Name;
         /// <summary>
-        /// 获得入口程序集名
+        /// 设置或者获取入口程序集名
         /// </summary>
         /// <returns></returns>
         public static string EntryAssemblyName
         {
             get
             {
-                var en = Assembly.GetEntryAssembly()?.GetName().Name;
-                return en ?? string.Empty;
+                return s_entryName ?? string.Empty;
+            }
+            set
+            {
+                if (value != null && value.Length != 0)
+                {
+                    s_entryName = value;
+                }
             }
         }
         /// <summary>
@@ -361,8 +369,12 @@ namespace Microsoft.Extensions.Hosting
             sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program {1} Starting", DateTimeOffset.Now, entryName);
             sb.AppendLine();
             string contentRoot = GetContentRoot();
-            sb.AppendFormat($"ContentRoot: \"{contentRoot}\"");
-            sb.AppendLine();
+            sb.AppendFormat($"ContentRoot: \"{contentRoot}\"").AppendLine();
+            var endDir = GetEndDirInfo();
+            if (endDir != null)
+            {
+                sb.AppendFormat($"EndDirInfo: \"{endDir.FullName}\"").AppendLine();
+            }
             sb.Append("------------------- 配置说明 -------------------");
             sb.AppendLine();
             string localConfigInfo = @"所有的配置都是键值对，在环境变量中使用双下划线'__'代替英文冒号':'，在参数中推荐格式为'--Key Value','-key val'
