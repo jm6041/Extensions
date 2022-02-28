@@ -1,5 +1,5 @@
 using System;
-using System.Reflection;
+using System.Text;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.Extensions.Configuration
@@ -68,6 +68,35 @@ namespace Microsoft.Extensions.Configuration
                 return null;
             }
             return new Uri(gw);
+        }
+
+        /// <summary>
+        /// 获得配置内容
+        /// </summary>
+        /// <param name="configuration"></param>
+        public static string GetContent(IConfiguration configuration)
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append("Time: ").Append(DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz")).AppendLine();
+            b.Append("MachineName: ").Append(Environment.MachineName).AppendLine();
+            b.Append("UserName: ").Append(Environment.UserName).AppendLine();
+            b.Append("UserDomainName: ").Append(Environment.UserDomainName).AppendLine();
+            b.Append("OSVersion: ").Append(Environment.OSVersion.VersionString).AppendLine();
+            b.Append("Runtime: ").Append(Environment.Version).AppendLine();
+            b.AppendLine();
+
+            b.Append("Configuration").AppendLine();
+            foreach (var c in configuration.AsEnumerable())
+            {
+                b.Append(c.Key);
+                if (!string.IsNullOrEmpty(c.Value))
+                {
+                    b.Append("=\"").Append(c.Value).Append("\"");
+                }
+                b.AppendLine();
+            }
+            b.AppendLine();
+            return b.ToString();
         }
     }
 }
