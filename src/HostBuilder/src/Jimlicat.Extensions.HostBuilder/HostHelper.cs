@@ -72,42 +72,48 @@ namespace Microsoft.Extensions.Hosting
                 is_initEndDir = true;
             }
 
+            string contentRoot;
             if (cr != null && cr.Length != 0)
             {
-                var dir = Directory.CreateDirectory(cr).FullName;
-                Interlocked.CompareExchange(ref s_ContentRoot, dir, null);
-                return s_ContentRoot;
+                contentRoot = Directory.CreateDirectory(cr).FullName;
             }
             else
             {
-
                 // 内容根目录，默认当前程序真实目录
-                string contentRoot = AppContext.BaseDirectory;
+                contentRoot = AppContext.BaseDirectory;
                 bool isws = IsWindowsService;
                 if (isws)
                 {
-                    Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
-                    return s_ContentRoot;
+                    contentRoot = AppContext.BaseDirectory;
                 }
+                else
+                {
 
-                // 当前目录，
-                string curDir = Directory.GetCurrentDirectory();
-                // 当前目录信息
-                DirectoryInfo curDirInfo = new DirectoryInfo(curDir);
-                // 当前目录包含项目文件，表示从项目启动，例如 dotnet run， 默认使用当前目录
-                if (curDirInfo.EnumerateFiles("*.csproj").Any())
-                {
-                    contentRoot = curDir;
+                    // 当前目录，
+                    string curDir = Directory.GetCurrentDirectory();
+                    // 当前目录信息
+                    DirectoryInfo curDirInfo = new DirectoryInfo(curDir);
+                    // 当前目录包含项目文件，表示从项目启动，例如 dotnet run， 默认使用当前目录
+                    if (curDirInfo.EnumerateFiles("*.csproj").Any())
+                    {
+                        contentRoot = curDir;
+                    }
+                    // 如果启动参数指定目录，使用参数
+                    var argContentRoot = GetContentRootArg(args);
+                    if (!string.IsNullOrEmpty(argContentRoot))
+                    {
+                        contentRoot = argContentRoot;
+                    }
                 }
-                // 如果启动参数指定目录，使用参数
-                var argContentRoot = GetContentRootArg(args);
-                if (!string.IsNullOrEmpty(argContentRoot))
-                {
-                    contentRoot = argContentRoot;
-                }
-                Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
-                return s_ContentRoot;
             }
+            Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
+            // 确保"appsettings.json"文件存在
+            var appsettingsJson = Path.Combine(contentRoot, "appsettings.json");
+            if (!File.Exists(appsettingsJson))
+            {
+                File.WriteAllText(appsettingsJson, "{}");
+            }
+            return s_ContentRoot;
         }
         /// <summary>
         /// 获得 ContentRoot，必须先调用 InitContentRoot
@@ -208,7 +214,7 @@ namespace Microsoft.Extensions.Hosting
             // 自定义配置文件
             string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot, endDir);
             // 参数指定配置文件
-            string argsConfigJsonFile = GetArgsConfigJsonFile(args);
+            string argsConfigJsonFile = GetArgsConfigJsonFile(args);            
             var hostBuilder = Host.CreateDefaultBuilder(args);
             return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir);
         }
