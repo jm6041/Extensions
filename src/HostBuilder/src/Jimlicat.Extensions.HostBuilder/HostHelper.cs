@@ -29,6 +29,11 @@ namespace Microsoft.Extensions.Hosting
         /// ContentRoot
         /// </summary>
         private static volatile string? s_ContentRoot;
+        /// <summary>
+        /// 递归向上查找文件的结束目录
+        /// </summary>
+        private static volatile DirectoryInfo? s_EndDirInfo;
+        private static volatile bool is_initEndDir = false;
 
         /// <summary>
         /// 是否为调试模式，在入口处设置
@@ -45,20 +50,28 @@ namespace Microsoft.Extensions.Hosting
         /// <returns>ContentRoot</returns>
         public static string InitContentRoot(string[] args)
         {
-            return InitContentRoot(null, args);
+            return InitContentRoot(null, args, null);
         }
         /// <summary>
         /// 初始化 ContentRoot，必须第一个调用，确定 ContentRoot
         /// </summary>
         /// <param name="cr">指定的 ContentRoot</param>
         /// <param name="args">启动参数</param>
+        /// <param name="endDir">递归向上查找文件的结束目录</param>
         /// <returns>ContentRoot</returns>
-        public static string InitContentRoot(string? cr, string[] args)
+        public static string InitContentRoot(string? cr, string[] args, DirectoryInfo? endDir = null)
         {
             if (s_ContentRoot != null)
             {
                 return s_ContentRoot;
             }
+
+            if (!is_initEndDir)
+            {
+                s_EndDirInfo = endDir;
+                is_initEndDir = true;
+            }
+
             if (cr != null && cr.Length != 0)
             {
                 var dir = Directory.CreateDirectory(cr).FullName;
@@ -109,6 +122,18 @@ namespace Microsoft.Extensions.Hosting
             return s_ContentRoot;
         }
         /// <summary>
+        /// 活动从ContentRoot 递归向上查找文件的结束目录， 必须先调用 InitContentRoot
+        /// </summary>
+        /// <returns>ContentRoot</returns>
+        public static DirectoryInfo? GetEndDirInfo()
+        {
+            if (is_initEndDir == false)
+            {
+                throw new InvalidOperationException("Invoke InitContentRoot");
+            }
+            return s_EndDirInfo;
+        }
+        /// <summary>
         /// 获得 ContentRoot，必须先调用 InitContentRoot
         /// </summary>
         /// <param name="args"></param>
@@ -151,15 +176,17 @@ namespace Microsoft.Extensions.Hosting
         /// <summary>
         /// 获得自定义配置文件
         /// </summary>
+        /// <param name="contentRoot"></param>
+        /// <param name="endDir"></param>
         /// <returns></returns>
-        public static string GetCustomConfigJsonFile(string contentRoot)
+        public static string GetCustomConfigJsonFile(string contentRoot, DirectoryInfo? endDir)
         {
             DirectoryInfo dir = new DirectoryInfo(contentRoot);
             if (dir.Parent == null)
             {
                 return string.Empty;
             }
-            var file = DirectoryHelper.GetPathOfFileAbove("*config.json", dir.Parent);
+            var file = DirectoryHelper.GetPathOfFileAbove("*config.json", dir.Parent, endDir);
             // 自定义配置文件不存在，用空文件代替
             if (file == null)
             {
@@ -177,12 +204,13 @@ namespace Microsoft.Extensions.Hosting
         {
             // 内容根目录
             string contentRoot = GetContentRoot();
+            DirectoryInfo? endDir = GetEndDirInfo();
             // 自定义配置文件
-            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
+            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot, endDir);
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             var hostBuilder = Host.CreateDefaultBuilder(args);
-            return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile);
+            return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir);
         }
         /// <summary>
         /// 配置<see cref="IHostBuilder"/>
@@ -193,8 +221,9 @@ namespace Microsoft.Extensions.Hosting
         /// <param name="customConfigJsonFile">自定义配置文件</param>
         /// <param name="args"></param>
         /// <param name="argsConfigJsonFile">参数指定配置文件</param>
+        /// <param name="endDir">递归向上查找文件的结束目录</param>
         /// <returns></returns>
-        public static IHostBuilder ConfigurationHostBuilder(IHostBuilder hostBuilder, string startupStatusFile, string contentRoot, string customConfigJsonFile, string[] args, string argsConfigJsonFile)
+        public static IHostBuilder ConfigurationHostBuilder(IHostBuilder hostBuilder, string startupStatusFile, string contentRoot, string customConfigJsonFile, string[] args, string argsConfigJsonFile, DirectoryInfo? endDir)
         {
             M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
             M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
@@ -212,7 +241,7 @@ namespace Microsoft.Extensions.Hosting
                 .ConfigureAppConfiguration((context, builder) =>
                 {
                     var env = context.HostingEnvironment;
-                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, customConfigJsonFile, args, argsConfigJsonFile);
+                    builder.AddLocalConfiguration(contentRoot, env.EnvironmentName, customConfigJsonFile, args, argsConfigJsonFile, endDir);
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {

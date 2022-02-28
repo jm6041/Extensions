@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Microsoft.Extensions.Hosting;
 
 namespace Microsoft.AspNetCore.Builder
@@ -9,12 +10,14 @@ namespace Microsoft.AspNetCore.Builder
     public static class WebApplicationHelper
     {
         /// <summary>
-        /// 获得自定义配置文件 <see cref="HostHelper.GetCustomConfigJsonFile(string)"/>
+        /// 获得自定义配置文件 <see cref="HostHelper.GetCustomConfigJsonFile(string, DirectoryInfo?)"/>
         /// </summary>
+        /// <param name="contentRoot"></param>
+        /// <param name="endDir"></param>
         /// <returns></returns>
-        public static string GetCustomConfigJsonFile(string contentRoot)
+        public static string GetCustomConfigJsonFile(string contentRoot, DirectoryInfo? endDir)
         {
-            return HostHelper.GetCustomConfigJsonFile(contentRoot);
+            return HostHelper.GetCustomConfigJsonFile(contentRoot, endDir);
         }
         /// <summary>
         /// 参数获得指定配置文件 <see cref="HostHelper.GetArgsConfigJsonFile(string[])"/>
@@ -35,12 +38,13 @@ namespace Microsoft.AspNetCore.Builder
         {
             // 内容根目录
             string contentRoot = GetContentRoot();
+            DirectoryInfo? endDir = GetEndDirInfo();
             // 自定义配置文件
-            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot);
+            string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot, endDir);
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             var builder = WebApplication.CreateBuilder(new WebApplicationOptions() { Args = args, ContentRootPath = contentRoot });
-            HostHelper.ConfigurationHostBuilder(builder.Host, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile);
+            HostHelper.ConfigurationHostBuilder(builder.Host, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir);
             return builder;
         }
         /// <summary>
@@ -62,17 +66,18 @@ namespace Microsoft.AspNetCore.Builder
         /// <returns>ContentRoot</returns>
         public static string InitContentRoot(string[] args)
         {
-            return HostHelper.InitContentRoot(null, args);
+            return HostHelper.InitContentRoot(args);
         }
         /// <summary>
-        /// <see cref="HostHelper.InitContentRoot(string?, string[])"/>
+        /// <see cref="HostHelper.InitContentRoot(string?, string[], DirectoryInfo?)"/>
         /// </summary>
         /// <param name="cr">指定的 ContentRoot</param>
         /// <param name="args">启动参数</param>
+        /// <param name="endDir">递归向上查找文件的结束目录</param>
         /// <returns>ContentRoot</returns>
-        public static string InitContentRoot(string? cr, string[] args)
+        public static string InitContentRoot(string? cr, string[] args, DirectoryInfo? endDir = null)
         {
-            return HostHelper.InitContentRoot(cr, args);
+            return HostHelper.InitContentRoot(cr, args, endDir);
         }
         /// <summary>
         /// <see cref="HostHelper.GetContentRoot()"/>
@@ -91,6 +96,14 @@ namespace Microsoft.AspNetCore.Builder
         public static string GetContentRoot(string[] args)
         {
             return InitContentRoot(args);
+        }
+        /// <summary>
+        /// <see cref="HostHelper.GetEndDirInfo"/>
+        /// </summary>
+        /// <returns>ContentRoot</returns>
+        public static DirectoryInfo? GetEndDirInfo()
+        {
+            return HostHelper.GetEndDirInfo();
         }
         /// <summary>
         /// 默认日志目录, {contentRoot}/logs/ <see cref="HostHelper.GetDefaultLogDirectory(string)"/>

@@ -17,7 +17,8 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="configurationBuilder"></param>
         /// <param name="contentRoot"></param>
         /// <param name="environmentName"></param>
-        public static void AddDefaultConfigFile(this IConfigurationBuilder configurationBuilder, string contentRoot, string environmentName)
+        /// <param name="endDir">递归向上查找文件的结束目录</param>
+        public static void AddDefaultConfigFile(this IConfigurationBuilder configurationBuilder, string contentRoot, string environmentName, DirectoryInfo? endDir)
         {
             // 默认配置文件
             string dconfig = $"default.json";
@@ -26,7 +27,7 @@ namespace Microsoft.Extensions.Configuration
             {
                 return;
             }
-            var defaultFile = DirectoryHelper.GetPathOfFileAbove(dconfig, dir.Parent);
+            var defaultFile = DirectoryHelper.GetPathOfFileAbove(dconfig, dir.Parent, endDir);
             if (defaultFile != null && defaultFile.Length != 0)
             {
                 configurationBuilder.AddJsonFile(defaultFile, true, true);
@@ -34,7 +35,7 @@ namespace Microsoft.Extensions.Configuration
             }
 
             // 运行环境的默认配置文件
-            var defaultEnvFile = DirectoryHelper.GetPathOfFileAbove($"default.{environmentName}.json", dir.Parent);
+            var defaultEnvFile = DirectoryHelper.GetPathOfFileAbove($"default.{environmentName}.json", dir.Parent, endDir);
             if (defaultEnvFile != null && defaultEnvFile.Length != 0)
             {
                 configurationBuilder.AddJsonFile(defaultEnvFile, true, true);
@@ -82,10 +83,11 @@ namespace Microsoft.Extensions.Configuration
         /// <param name="customConfigJsonFile">自定义配置目录</param>
         /// <param name="args">启动参数</param>
         /// <param name="argsConfigJsonFile">参数指定配置目录</param>
-        public static IConfigurationBuilder AddLocalConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile, string[] args, string argsConfigJsonFile)
+        /// <param name="endDir">递归向上查找文件的结束目录</param>
+        public static IConfigurationBuilder AddLocalConfiguration(this IConfigurationBuilder builder, string contentRoot, string environmentName, string customConfigJsonFile, string[] args, string argsConfigJsonFile, DirectoryInfo? endDir)
         {
             // 默认配置文件
-            builder.AddDefaultConfigFile(contentRoot, environmentName);
+            builder.AddDefaultConfigFile(contentRoot, environmentName, endDir);
 
             // config配置
             builder.AddJsonFile("config.json", true, true);
