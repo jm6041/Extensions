@@ -83,6 +83,16 @@ namespace Microsoft.AspNetCore.Builder
             return HostHelper.GetContentRoot();
         }
         /// <summary>
+        /// 获得 ContentRoot，必须先调用 InitContentRoot
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns>ContentRoot</returns>
+        [Obsolete("Please use InitContentRoot", false)]
+        public static string GetContentRoot(string[] args)
+        {
+            return InitContentRoot(args);
+        }
+        /// <summary>
         /// 默认日志目录, {contentRoot}/logs/ <see cref="HostHelper.GetDefaultLogDirectory(string)"/>
         /// </summary>
         /// <param name="contentRoot"></param>
