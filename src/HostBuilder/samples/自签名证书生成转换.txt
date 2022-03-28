@@ -1,5 +1,5 @@
 生成证书
-dotnet dev-certs https -p Aa1qaz2wsx -ep D:\z\certs\localdev.pfx
+dotnet dev-certs https -p **** -ep D:\z\certs\localdev.pfx
 
 导出，使用wsl中的openssl或者linux系统的openssl命令
 openssl pkcs12 -in ./localdev.pfx -clcerts -nokeys -out devandtest.crt
