@@ -12,7 +12,10 @@ namespace System.Linq
         /// <summary>
         /// 默认构造函数
         /// </summary>
-        public Ordering() { }
+        public Ordering()
+        {
+            Name = string.Empty;
+        }
 
         /// <summary>
         /// 构造函数

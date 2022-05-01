@@ -27,9 +27,9 @@ namespace System.Linq
         /// $orderby
         /// </summary>
         [DataMember(Order = 10002)]
-        public string OrderBy { get; set; }
+        public string OrderBy { get; set; } = string.Empty;
         // 排序字段字典
-        private Dictionary<string, Direction> _orderings = new Dictionary<string, Direction>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Direction> _orderings = new Dictionary<string, Direction>(StringComparer.OrdinalIgnoreCase);
         /// <summary>
         /// 添加排序属性
         /// </summary>
@@ -128,7 +128,7 @@ namespace System.Linq
         /// $filter 在数据具体查询中实现
         /// </summary>
         [DataMember(Order = 10003)]
-        public string Filter { get; set; }
+        public string Filter { get; set; } = string.Empty;
         /// <summary>
         /// $count 返回结果是否包含总数量
         /// </summary>

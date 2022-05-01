@@ -30,7 +30,7 @@ namespace System.Linq
         /// 排序清单
         /// </summary>
         [DataMember(Order = 10002)]
-        public ICollection<Ordering> Orderings { get; set; }
+        public ICollection<Ordering> Orderings { get; set; } = Enumerable.Empty<Ordering>().ToList();
         /// <summary>
         /// 排序清单是否为空
         /// </summary>

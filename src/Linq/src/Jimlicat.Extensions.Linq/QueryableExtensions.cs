@@ -21,7 +21,7 @@ namespace System.Linq
         /// <param name="propertyName">属性或者字段名</param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> query, string propertyName, IComparer<object> comparer = null)
+        public static IOrderedQueryable<T> OrderBy<T>(this IQueryable<T> query, string propertyName, IComparer<object>? comparer = null)
         {
             return CallOrderedQueryable(query, "OrderBy", propertyName, comparer);
         }
@@ -33,7 +33,7 @@ namespace System.Linq
         /// <param name="propertyName">属性或者字段名</param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> query, string propertyName, IComparer<object> comparer = null)
+        public static IOrderedQueryable<T> OrderByDescending<T>(this IQueryable<T> query, string propertyName, IComparer<object>? comparer = null)
         {
             return CallOrderedQueryable(query, "OrderByDescending", propertyName, comparer);
         }
@@ -61,7 +61,7 @@ namespace System.Linq
         /// <param name="propertyName">属性或者字段名</param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> ThenBy<T>(this IOrderedQueryable<T> query, string propertyName, IComparer<object> comparer = null)
+        public static IOrderedQueryable<T> ThenBy<T>(this IOrderedQueryable<T> query, string propertyName, IComparer<object>? comparer = null)
         {
             return CallOrderedQueryable(query, "ThenBy", propertyName, comparer);
         }
@@ -73,7 +73,7 @@ namespace System.Linq
         /// <param name="propertyName">属性或者字段名</param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public static IOrderedQueryable<T> ThenByDescending<T>(this IOrderedQueryable<T> query, string propertyName, IComparer<object> comparer = null)
+        public static IOrderedQueryable<T> ThenByDescending<T>(this IOrderedQueryable<T> query, string propertyName, IComparer<object>? comparer = null)
         {
             return CallOrderedQueryable(query, "ThenByDescending", propertyName, comparer);
         }
@@ -98,7 +98,7 @@ namespace System.Linq
         /// <summary>
         /// 调用排序查询，在(Entity Framework, Linq to Sql)中，不应该使用比较器
         /// </summary>
-        private static IOrderedQueryable<T> CallOrderedQueryable<T>(this IQueryable<T> query, string methodName, string propertyName, IComparer<object> comparer = null)
+        private static IOrderedQueryable<T> CallOrderedQueryable<T>(this IQueryable<T> query, string methodName, string propertyName, IComparer<object>? comparer = null)
         {
             var param = Expression.Parameter(typeof(T), "x");
 
@@ -161,8 +161,8 @@ namespace System.Linq
         private static ConcurrentDictionary<Type, string[]> TypeCache = new ConcurrentDictionary<Type, string[]>();
         private static string[] GetPropertiesAndFields(Type type)
         {
-            bool s = TypeCache.TryGetValue(type, out var pfs);
-            if (!s)
+            bool s = TypeCache.TryGetValue(type, out string[]? pfs);
+            if (!s || pfs == null)
             {
                 var ps = type.GetRuntimeProperties().Where(x => x.CanRead).Select(x => x.Name);
                 var fs = type.GetRuntimeFields().Where(x => x.IsPublic).Select(x => x.Name);

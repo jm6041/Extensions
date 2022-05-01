@@ -14,7 +14,7 @@ namespace System.Linq
         /// <summary>
         /// 数据结果
         /// </summary>
-        public IList<T> Result { get; set; }
+        public IList<T> Result { get; set; } = Enumerable.Empty<T>().ToList();
         /// <summary>
         /// 数据总量
         /// </summary>
