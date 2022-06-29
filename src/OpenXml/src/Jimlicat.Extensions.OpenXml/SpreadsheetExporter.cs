@@ -360,6 +360,10 @@ namespace Jimlicat.OpenXml
             {
                 CellSetString(cell, vstr);
             }
+            else if (val is double vd && double.IsNaN(vd))
+            {
+                CellSetString(cell, double.NaN.ToString());
+            }
             else if (Utils.IsNumericType(val))
             {
                 cell.DataType = new EnumValue<CellValues>(CellValues.Number);
