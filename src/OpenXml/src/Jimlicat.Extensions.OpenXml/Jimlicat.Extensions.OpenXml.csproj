@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net48</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.0;net48</TargetFrameworks>
     <RootNamespace>Jimlicat.OpenXml</RootNamespace>
     <Description>Jimlicat openxml extensions</Description>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="DocumentFormat.OpenXml" Version="2.18.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="2.19.0" />
   </ItemGroup>
 </Project>
