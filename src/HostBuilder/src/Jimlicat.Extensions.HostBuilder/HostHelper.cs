@@ -6,7 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting.WindowsServices;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
 
@@ -212,7 +214,7 @@ namespace Microsoft.Extensions.Hosting
             // 自定义配置文件
             string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot, endDir);
             // 参数指定配置文件
-            string argsConfigJsonFile = GetArgsConfigJsonFile(args);            
+            string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             var hostBuilder = Host.CreateDefaultBuilder(args);
             return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir);
         }
@@ -528,6 +530,30 @@ namespace Microsoft.Extensions.Hosting
         public static string GetConfiguration(IConfiguration configuration, IHostEnvironment env)
         {
             return GetConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath);
+        }
+        /// <summary>
+        /// Configuration EventId
+        /// </summary>
+        public static readonly EventId ConfigurationEventId = new EventId(19, "Configuration");
+        /// <summary>
+        /// 写入并且日志记录配置信息
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="logfile"></param>
+        /// <param name="logger"></param>
+        /// <param name="logLevel"></param>
+        public static void WriteAndLogConfiguration(IHost host, string logfile, Logging.ILogger logger, LogLevel logLevel = LogLevel.Information)
+        {
+            var env = host.Services.GetRequiredService<IHostEnvironment>();
+            var config = host.Services.GetRequiredService<IConfiguration>();
+            var configstr = GetConfiguration(config, env);
+            if (!string.IsNullOrEmpty(logfile))
+            {
+                using var streamWriter = File.AppendText(logfile);
+                streamWriter.WriteLine(configstr);
+            }
+            Console.WriteLine(configstr);
+            logger.Log(logLevel, ConfigurationEventId, configstr);
         }
     }
 }

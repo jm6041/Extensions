@@ -124,7 +124,7 @@ namespace System
         /// <summary>
         /// Configuration EventId
         /// </summary>
-        public static readonly EventId ConfigurationEventId = new EventId(19, "Configuration");
+        public static readonly EventId ConfigurationEventId = HostHelper.ConfigurationEventId;
         /// <summary>
         /// 日志记录配置信息
         /// </summary>
