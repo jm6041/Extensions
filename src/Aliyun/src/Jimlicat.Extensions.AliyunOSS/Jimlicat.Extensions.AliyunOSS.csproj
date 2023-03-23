@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>Aliyun.OSS</RootNamespace>
-    <Description>Wsfg Aliyun OSS extensions</Description>
+    <Description>Aliyun OSS extensions</Description>
     <SignAssembly>True</SignAssembly>
   </PropertyGroup>
 
