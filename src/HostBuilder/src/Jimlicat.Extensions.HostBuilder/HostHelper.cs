@@ -484,5 +484,50 @@ namespace Microsoft.Extensions.Hosting
             }
             Console.WriteLine(msg);
         }
+
+        /// <summary>
+        /// 获得配置信息
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="appName"></param>
+        /// <param name="environmentName"></param>
+        /// <param name="contentRootPath"></param>
+        public static string GetConfiguration(IConfiguration configuration, string appName, string environmentName, string contentRootPath)
+        {
+            StringBuilder b = new StringBuilder();
+            b.Append(appName).AppendLine();
+            b.Append("Time: ").Append(DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss zzz")).AppendLine();
+            b.Append("MachineName: ").Append(Environment.MachineName).AppendLine();
+            b.Append("UserName: ").Append(Environment.UserName).AppendLine();
+            b.Append("UserDomainName: ").Append(Environment.UserDomainName).AppendLine();
+            b.Append("OSVersion: ").Append(Environment.OSVersion.VersionString).AppendLine();
+            b.Append("WebHostEnvironment").AppendLine();
+            b.Append("Runtime: ").Append(Environment.Version).AppendLine();
+            b.Append("EnvironmentName: ").Append(environmentName).AppendLine();
+            b.Append("ContentRootPath: ").Append(contentRootPath).AppendLine();
+
+            b.AppendLine();
+            b.Append("Configuration").AppendLine();
+            foreach (var c in configuration.AsEnumerable())
+            {
+                b.Append(c.Key);
+                if (!string.IsNullOrEmpty(c.Value))
+                {
+                    b.Append("=\"").Append(c.Value).Append("\"");
+                }
+                b.AppendLine();
+            }
+            b.AppendLine();
+            return b.ToString();
+        }
+        /// <summary>
+        /// 获得配置信息
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="env"></param>
+        public static string GetConfiguration(IConfiguration configuration, IHostEnvironment env)
+        {
+            return GetConfiguration(configuration, env.ApplicationName, env.EnvironmentName, env.ContentRootPath);
+        }
     }
 }
