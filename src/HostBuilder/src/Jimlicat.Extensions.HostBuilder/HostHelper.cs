@@ -267,17 +267,23 @@ namespace Microsoft.Extensions.Hosting
             bool hasFile = configuration.GetSection("Serilog:WriteTo").GetChildren().Any(x => x.GetSection("Name").Value == "File");
             return hasFile;
         }
-
-        private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration)
+        private static LogLevel GetDefaultLogLevel(IConfiguration configuration)
         {
-            LogEventLevel logEventLevel = LogEventLevel.Warning;
+            var defaltuLevel = LogLevel.Warning;
             if (IsDebug)
             {
-                logEventLevel = LogEventLevel.Debug;
+                defaltuLevel = LogLevel.Debug;
             }
+            var logLevel = configuration.GetValue<LogLevel>("Logging:LogLevel:Default", defaltuLevel);
+            return logLevel;
+        }
+        private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration)
+        {
             var logConfig = new LoggerConfiguration();
             if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认
             {
+                var defaltuLevel = GetDefaultLogLevel(configuration);
+                var logEventLevel = defaltuLevel.ToLogEventLevel();
                 string logDir = GetDefaultLogDirectory(contentRoot);
                 string entryName = EntryAssemblyName;
                 string logPath = Path.Combine(logDir, $"{entryName}-log.log");
