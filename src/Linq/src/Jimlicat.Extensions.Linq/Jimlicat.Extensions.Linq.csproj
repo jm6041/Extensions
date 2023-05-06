@@ -8,7 +8,7 @@
     <PackageTags>Jimlicat,Linq,Page</PackageTags>
     <PackageReleaseNotes>扩展System.Linq，添加分页排序</PackageReleaseNotes>
     <Product>Jimlicat Linq 排序分页扩展</Product>
-    <Version>2.1.0</Version>
+    <Version>2.1.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">

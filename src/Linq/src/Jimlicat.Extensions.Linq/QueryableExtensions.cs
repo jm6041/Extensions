@@ -133,18 +133,22 @@ namespace System.Linq
         /// <param name="query">数据源</param>
         /// <param name="orders">排序信息</param>
         /// <returns>排序结果</returns>
-        private static IOrderedQueryable<T> OrderAndThenBy<T>(this IQueryable<T> query, IEnumerable<Ordering> orders)
+        private static IQueryable<T> OrderAndThenBy<T>(this IQueryable<T> query, IEnumerable<Ordering> orders)
         {
             Checker.NotNull(query, nameof(query));
             Checker.NotEmpty(orders, nameof(orders));
             var orderList = ClearNot(typeof(T), orders).ToList();
-            var orderedQuery = query.OrderBy(orderList[0]);
-            int count = orderList.Count;
-            for (int i = 1; i < count; i++)
+            if (orderList.Count != 0)
             {
-                orderedQuery = orderedQuery.ThenBy(orderList[i]);
+                var orderedQuery = query.OrderBy(orderList[0]);
+                int count = orderList.Count;
+                for (int i = 1; i < count; i++)
+                {
+                    orderedQuery = orderedQuery.ThenBy(orderList[i]);
+                }
+                return orderedQuery;
             }
-            return orderedQuery;
+            return query;
         }
         private static IEnumerable<Ordering> ClearNot(Type type, IEnumerable<Ordering> orders)
         {
