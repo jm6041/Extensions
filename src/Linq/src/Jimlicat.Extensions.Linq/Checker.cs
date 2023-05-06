@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Jimlicat.Utils
@@ -81,26 +80,6 @@ namespace Jimlicat.Utils
             if (data == null)
             {
                 throw new ArgumentNullException(paraName);
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Not Empty
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="data"></param>
-        /// <param name="paraName"></param>
-        /// <returns></returns>
-        public static bool NotEmpty<T>(IEnumerable<T> data, string paraName)
-        {
-            if (data == null)
-            {
-                throw new ArgumentNullException(paraName);
-            }
-            if (!data.Any())
-            {
-                throw new ArgumentException(paraName + " " + SR.IsEmpty);
             }
             return true;
         }
