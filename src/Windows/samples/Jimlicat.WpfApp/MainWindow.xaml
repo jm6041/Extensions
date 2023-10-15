@@ -3,13 +3,75 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Jimlicat.WpfApp" xmlns:c="clr-namespace:Jimlicat.Windows.Controls;assembly=Jimlicat.Windows.Controls"
+        xmlns:jc="clr-namespace:Jimlicat.Windows.Controls;assembly=Jimlicat.Windows.Controls"
+        xmlns:local="clr-namespace:Jimlicat.WpfApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <DockPanel>
+    <Window.Resources>
+        <SolidColorBrush x:Key="TextBox.Static.Border" Color="#FFABAdB3"/>
+        <SolidColorBrush x:Key="TextBox.MouseOver.Border" Color="#FF7EB4EA"/>
+        <SolidColorBrush x:Key="TextBox.Focus.Border" Color="#FF569DE5"/>
+        <Style x:Key="TextBoxStyle1" TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource TextBox.Static.Border}"/>
+            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="KeyboardNavigation.TabNavigation" Value="None"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+            <Setter Property="AllowDrop" Value="true"/>
+            <Setter Property="ScrollViewer.PanningMode" Value="VerticalFirst"/>
+            <Setter Property="Stylus.IsFlicksEnabled" Value="False"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" SnapsToDevicePixels="True">
+                            <ScrollViewer x:Name="PART_ContentHost" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsEnabled" Value="false">
+                                <Setter Property="Opacity" TargetName="border" Value="0.56"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.MouseOver.Border}"/>
+                            </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="true">
+                                <Setter Property="BorderBrush" TargetName="border" Value="{StaticResource TextBox.Focus.Border}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsInactiveSelectionHighlightEnabled" Value="true"/>
+                        <Condition Property="IsSelectionActive" Value="false"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="SelectionBrush" Value="{DynamicResource {x:Static SystemColors.InactiveSelectionHighlightBrushKey}}"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="60" />
+        </Grid.RowDefinitions>
         <StackPanel VerticalAlignment="Top" Margin="10" Orientation="Horizontal">
-            <c:KibaDateTime x:Name="dtHour"></c:KibaDateTime>
+            <jc:KibaDateTime x:Name="dtHour"></jc:KibaDateTime>
+            <Label Content="Label"></Label>
+            <TextBox Style="{DynamicResource TextBoxStyle1}" MinWidth="100" Text="TextBox"/>
+            <ContentControl Content="ContentControl"/>
+            <DatePicker/>
             <Button Content="查看时间" Click="Button_Click" Width="75"/>
         </StackPanel>
-    </DockPanel>
+        <StackPanel Grid.Row="1" Orientation="Horizontal">
+            <TextBox Height="32" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="TextBoxOK" Margin="10,0"/>
+            <jc:TextMsg BorderThickness="1" BorderBrush="Gray" VerticalAlignment="Center" Height="32" IsReadOnly="False" VerticalContentAlignment="Center" Text="TextMsgOK" Margin="10,0"/>
+            <jc:TextMsg VerticalAlignment="Center" Height="32" VerticalContentAlignment="Center" Text="TextMsgOK" Margin="10,0"/>
+            <TextBox Height="32" IsEnabled="False" VerticalAlignment="Center" VerticalContentAlignment="Center" Text="TextBoxDisable" Margin="10,0"/>
+            <jc:TextMsg VerticalAlignment="Center" Height="32" IsEnabled="False" VerticalContentAlignment="Center" Margin="10,0">TextMsgDisable</jc:TextMsg>
+        </StackPanel>
+    </Grid>
 </Window>
