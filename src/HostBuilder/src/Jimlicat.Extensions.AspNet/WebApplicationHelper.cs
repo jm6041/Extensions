@@ -33,18 +33,19 @@ namespace Microsoft.AspNetCore.Builder
         /// </summary>
         /// <param name="args"></param>
         /// <param name="startupStatusFile"></param>
+        /// <param name="loggerAction"></param>
         /// <returns></returns>
-        public static WebApplicationBuilder CreateBuilder(string[] args, string startupStatusFile)
+        public static WebApplicationBuilder CreateBuilder(string[] args, string startupStatusFile, Action<Serilog.LoggerConfiguration>? loggerAction = null)
         {
             // 内容根目录
-            string contentRoot = GetContentRoot();
-            DirectoryInfo? endDir = GetEndDirInfo();
+            string contentRoot = ContentRoot;
+            DirectoryInfo? endDir = EndDirInfo;
             // 自定义配置文件
             string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot, endDir);
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             var builder = WebApplication.CreateBuilder(new WebApplicationOptions() { Args = args, ContentRootPath = contentRoot });
-            HostHelper.ConfigurationHostBuilder(builder.Host, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir);
+            HostHelper.ConfigurationHostBuilder(builder.Host, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir, loggerAction);
             return builder;
         }
         /// <summary>
@@ -59,6 +60,12 @@ namespace Microsoft.AspNetCore.Builder
             get => HostHelper.IsDebug;
             set => HostHelper.IsDebug = value;
         }
+        /// <summary>
+        /// <see cref="HostHelper.GetContentRoot(string[])"/>
+        /// </summary>
+        /// <param name="args">启动参数</param>
+        /// <returns>ContentRoot</returns>
+        public static string GetContentRoot(string[] args) => HostHelper.GetContentRoot(args);
         /// <summary>
         /// <see cref="HostHelper.InitContentRoot(string[])"/>
         /// </summary>
@@ -80,31 +87,15 @@ namespace Microsoft.AspNetCore.Builder
             return HostHelper.InitContentRoot(cr, args, endDir);
         }
         /// <summary>
-        /// <see cref="HostHelper.GetContentRoot()"/>
+        /// <see cref="HostHelper.ContentRoot()"/>
         /// </summary>
         /// <returns>ContentRoot</returns>
-        public static string GetContentRoot()
-        {
-            return HostHelper.GetContentRoot();
-        }
+        public static string ContentRoot => HostHelper.ContentRoot;
         /// <summary>
-        /// 获得 ContentRoot，必须先调用 InitContentRoot
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns>ContentRoot</returns>
-        [Obsolete("Please use InitContentRoot", false)]
-        public static string GetContentRoot(string[] args)
-        {
-            return InitContentRoot(args);
-        }
-        /// <summary>
-        /// <see cref="HostHelper.GetEndDirInfo"/>
+        /// <see cref="HostHelper.EndDirInfo"/>
         /// </summary>
         /// <returns>ContentRoot</returns>
-        public static DirectoryInfo? GetEndDirInfo()
-        {
-            return HostHelper.GetEndDirInfo();
-        }
+        public static DirectoryInfo? EndDirInfo => HostHelper.EndDirInfo;
         /// <summary>
         /// 默认日志目录, {contentRoot}/logs/ <see cref="HostHelper.GetDefaultLogDirectory(string)"/>
         /// </summary>

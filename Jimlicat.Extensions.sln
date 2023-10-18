@@ -103,6 +103,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{8A656622-532
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jimlicat.Extensions.AliyunOSS", "src\Aliyun\src\Jimlicat.Extensions.AliyunOSS\Jimlicat.Extensions.AliyunOSS.csproj", "{86ABE07F-DD15-4002-AE2C-8DD627EE2C79}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "src\HostBuilder\samples\WpfApp\WpfApp.csproj", "{DF7222FE-72FD-4FA0-BAC0-F7F94AC3B9FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -217,6 +219,10 @@ Global
 		{86ABE07F-DD15-4002-AE2C-8DD627EE2C79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86ABE07F-DD15-4002-AE2C-8DD627EE2C79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86ABE07F-DD15-4002-AE2C-8DD627EE2C79}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF7222FE-72FD-4FA0-BAC0-F7F94AC3B9FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF7222FE-72FD-4FA0-BAC0-F7F94AC3B9FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF7222FE-72FD-4FA0-BAC0-F7F94AC3B9FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF7222FE-72FD-4FA0-BAC0-F7F94AC3B9FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -262,6 +268,7 @@ Global
 		{6D0F20EC-E751-43B5-88BB-958153B499E0} = {53C4888E-44B9-465C-9DA0-E4673FA214E3}
 		{8A656622-532E-4BC2-9D1D-687BF50B7309} = {03544BC7-B284-4B61-B5D8-9210B05E6CF0}
 		{86ABE07F-DD15-4002-AE2C-8DD627EE2C79} = {8A656622-532E-4BC2-9D1D-687BF50B7309}
+		{DF7222FE-72FD-4FA0-BAC0-F7F94AC3B9FE} = {53C4888E-44B9-465C-9DA0-E4673FA214E3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B5CA4204-8E60-43E2-A55C-A02655B2B6EA}

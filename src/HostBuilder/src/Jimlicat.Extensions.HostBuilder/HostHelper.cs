@@ -46,6 +46,40 @@ namespace Microsoft.Extensions.Hosting
         /// </summary>
         public static bool IsDebug { get; set; } = false;
         /// <summary>
+        /// 获得 ContentRoot
+        /// </summary>
+        /// <param name="args">启动参数</param>
+        /// <returns>ContentRoot</returns>
+        public static string GetContentRoot(string[] args)
+        {
+            // 内容根目录，默认当前程序真实目录
+            var contentRoot = AppContext.BaseDirectory;
+            bool isws = IsWindowsService;
+            if (isws)
+            {
+                contentRoot = AppContext.BaseDirectory;
+            }
+            else
+            {
+                // 当前目录，
+                string curDir = Directory.GetCurrentDirectory();
+                // 当前目录信息
+                DirectoryInfo curDirInfo = new DirectoryInfo(curDir);
+                // 当前目录包含项目文件，表示从项目启动，例如 dotnet run， 默认使用当前目录
+                if (curDirInfo.EnumerateFiles("*.csproj").Any())
+                {
+                    contentRoot = curDir;
+                }
+                // 如果启动参数指定目录，使用参数
+                var argContentRoot = GetContentRootArg(args);
+                if (!string.IsNullOrEmpty(argContentRoot))
+                {
+                    contentRoot = argContentRoot;
+                }
+            }
+            return contentRoot;
+        }
+        /// <summary>
         /// 初始化 ContentRoot，必须第一个调用，确定 ContentRoot
         /// </summary>
         /// <param name="args">启动参数</param>
@@ -81,30 +115,7 @@ namespace Microsoft.Extensions.Hosting
             else
             {
                 // 内容根目录，默认当前程序真实目录
-                contentRoot = AppContext.BaseDirectory;
-                bool isws = IsWindowsService;
-                if (isws)
-                {
-                    contentRoot = AppContext.BaseDirectory;
-                }
-                else
-                {
-                    // 当前目录，
-                    string curDir = Directory.GetCurrentDirectory();
-                    // 当前目录信息
-                    DirectoryInfo curDirInfo = new DirectoryInfo(curDir);
-                    // 当前目录包含项目文件，表示从项目启动，例如 dotnet run， 默认使用当前目录
-                    if (curDirInfo.EnumerateFiles("*.csproj").Any())
-                    {
-                        contentRoot = curDir;
-                    }
-                    // 如果启动参数指定目录，使用参数
-                    var argContentRoot = GetContentRootArg(args);
-                    if (!string.IsNullOrEmpty(argContentRoot))
-                    {
-                        contentRoot = argContentRoot;
-                    }
-                }
+                contentRoot = GetContentRoot(args);
             }
             Interlocked.CompareExchange(ref s_ContentRoot, contentRoot, null);
             // 确保"appsettings.json"文件存在
@@ -116,38 +127,34 @@ namespace Microsoft.Extensions.Hosting
             return s_ContentRoot;
         }
         /// <summary>
-        /// 获得 ContentRoot，必须先调用 InitContentRoot
+        /// ContentRoot，必须先调用 InitContentRoot
         /// </summary>
         /// <returns>ContentRoot</returns>
-        public static string GetContentRoot()
+        public static string ContentRoot
         {
-            if (s_ContentRoot == null)
+            get
             {
-                throw new InvalidOperationException("Invoke InitContentRoot");
+                if (s_ContentRoot == null)
+                {
+                    throw new InvalidOperationException("Invoke InitContentRoot");
+                }
+                return s_ContentRoot;
             }
-            return s_ContentRoot;
         }
         /// <summary>
         /// 活动从ContentRoot 递归向上查找文件的结束目录， 必须先调用 InitContentRoot
         /// </summary>
         /// <returns>ContentRoot</returns>
-        public static DirectoryInfo? GetEndDirInfo()
+        public static DirectoryInfo? EndDirInfo
         {
-            if (is_initEndDir == false)
+            get
             {
-                throw new InvalidOperationException("Invoke InitContentRoot");
+                if (is_initEndDir == false)
+                {
+                    throw new InvalidOperationException("Invoke InitContentRoot");
+                }
+                return s_EndDirInfo;
             }
-            return s_EndDirInfo;
-        }
-        /// <summary>
-        /// 获得 ContentRoot，必须先调用 InitContentRoot
-        /// </summary>
-        /// <param name="args"></param>
-        /// <returns>ContentRoot</returns>
-        [Obsolete("Please use InitContentRoot", false)]
-        public static string GetContentRoot(string[] args)
-        {
-            return InitContentRoot(args);
         }
         /// <summary>
         /// 默认日志目录, {contentRoot}/logs/
@@ -205,18 +212,19 @@ namespace Microsoft.Extensions.Hosting
         /// </summary>
         /// <param name="args">参数</param>
         /// <param name="startupStatusFile">启动状态保存文件</param>
+        /// <param name="loggerAction"></param>
         /// <returns></returns>
-        public static IHostBuilder CreateHostBuilder(string[] args, string startupStatusFile)
+        public static IHostBuilder CreateHostBuilder(string[] args, string startupStatusFile, Action<LoggerConfiguration>? loggerAction = null)
         {
             // 内容根目录
-            string contentRoot = GetContentRoot();
-            DirectoryInfo? endDir = GetEndDirInfo();
+            string contentRoot = ContentRoot;
+            DirectoryInfo? endDir = EndDirInfo;
             // 自定义配置文件
             string customConfigJsonFile = GetCustomConfigJsonFile(contentRoot, endDir);
             // 参数指定配置文件
             string argsConfigJsonFile = GetArgsConfigJsonFile(args);
             var hostBuilder = Host.CreateDefaultBuilder(args);
-            return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir);
+            return ConfigurationHostBuilder(hostBuilder, startupStatusFile, contentRoot, customConfigJsonFile, args, argsConfigJsonFile, endDir, loggerAction);
         }
         /// <summary>
         /// 配置<see cref="IHostBuilder"/>
@@ -228,8 +236,9 @@ namespace Microsoft.Extensions.Hosting
         /// <param name="args"></param>
         /// <param name="argsConfigJsonFile">参数指定配置文件</param>
         /// <param name="endDir">递归向上查找文件的结束目录</param>
+        /// <param name="loggerAction"></param>
         /// <returns></returns>
-        public static IHostBuilder ConfigurationHostBuilder(IHostBuilder hostBuilder, string startupStatusFile, string contentRoot, string customConfigJsonFile, string[] args, string argsConfigJsonFile, DirectoryInfo? endDir)
+        public static IHostBuilder ConfigurationHostBuilder(IHostBuilder hostBuilder, string startupStatusFile, string contentRoot, string customConfigJsonFile, string[] args, string argsConfigJsonFile, DirectoryInfo? endDir, Action<LoggerConfiguration>? loggerAction)
         {
             M.TEMP_CONFIG_DIC[M.ContentRootKey] = contentRoot;
             M.TEMP_CONFIG_DIC[M.CustomConfigFileKey] = customConfigJsonFile;
@@ -251,7 +260,7 @@ namespace Microsoft.Extensions.Hosting
                 })
                 .ConfigureLogging((hostContext, builder) =>
                 {
-                    var logger = CreateLogger(contentRoot, hostContext.Configuration);
+                    var logger = CreateLogger(contentRoot, hostContext.Configuration, loggerAction);
                     builder.AddSerilog(logger);
                 })
                 .UseContentRoot(contentRoot);
@@ -274,22 +283,26 @@ namespace Microsoft.Extensions.Hosting
             {
                 defaltuLevel = LogLevel.Debug;
             }
-            var logLevel = configuration.GetValue<LogLevel>("Logging:LogLevel:Default", defaltuLevel);
+            var logLevel = configuration.GetValue("Logging:LogLevel:Default", defaltuLevel);
             return logLevel;
         }
-        private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration)
+        private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration, Action<LoggerConfiguration>? loggerAction)
         {
             var logConfig = new LoggerConfiguration();
-            if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认
+            if (!configuration.GetSection("Serilog:MinimumLevel:Default").Exists())   // Serilog:MinimumLevel:Default 不存在
             {
                 var defaltuLevel = GetDefaultLogLevel(configuration);
                 var logEventLevel = defaltuLevel.ToLogEventLevel();
+                logConfig.MinimumLevel.Is(logEventLevel);
+            }
+            loggerAction?.Invoke(logConfig);
+            if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认
+            {
                 string logDir = GetDefaultLogDirectory(contentRoot);
                 string entryName = EntryAssemblyName;
                 string logPath = Path.Combine(logDir, $"{entryName}-log.log");
                 logConfig.WriteTo.File(
                     path: logPath,
-                    restrictedToMinimumLevel: logEventLevel,
                     outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] [{SourceContext:l}] {Message:lj}{NewLine}{Exception}",
                     fileSizeLimitBytes: 20 * 1024 * 1024,
                     flushToDiskInterval: TimeSpan.FromMinutes(1),
@@ -380,9 +393,9 @@ namespace Microsoft.Extensions.Hosting
             var entryName = EntryAssemblyName;
             sb.AppendFormat("{0:yyyy-MM-dd HH:mm:ss.ffff zzz} Program {1} Starting", DateTimeOffset.Now, entryName);
             sb.AppendLine();
-            string contentRoot = GetContentRoot();
+            string contentRoot = ContentRoot;
             sb.AppendFormat($"ContentRoot: \"{contentRoot}\"").AppendLine();
-            var endDir = GetEndDirInfo();
+            var endDir = EndDirInfo;
             if (endDir != null)
             {
                 sb.AppendFormat($"EndDirInfo: \"{endDir.FullName}\"").AppendLine();
