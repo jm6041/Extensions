@@ -2,6 +2,7 @@ using Jimlicat.OpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.IO;
 
 namespace OpenXmlConsoleApp
@@ -32,8 +33,30 @@ namespace OpenXmlConsoleApp
             var exporter2 = SpreadsheetExporterFactory.Create(source);
             using (var ms2 = new MemoryStream())
             {
-                exporter1.Export(ms2);
+                exporter2.Export(ms2);
                 ToFile(ms2);
+            }
+
+            var data = new List<ExpandoObject>();
+            var dic1 = new ExpandoObject();
+            dic1.TryAdd("Name", "T1");
+            dic1.TryAdd("P0", 11);
+            data.Add(dic1);
+            var dic2 = new ExpandoObject();
+            dic2.TryAdd("Name", "T2");
+            dic2.TryAdd("P0", 22);
+            data.Add(dic2);
+            List<ColumnInfo> dataCInfos = new List<ColumnInfo>()
+            {
+                new ColumnInfo(){ PropertyName = "Name", Show="名字"},
+                new ColumnInfo(){ PropertyName = "P0" },
+            };
+
+            var exporter3 = SpreadsheetExporterFactory.Create(data, dataCInfos);
+            using (var ms3 = new MemoryStream())
+            {
+                exporter3.Export(ms3);
+                ToFile(ms3);
             }
 
             Console.WriteLine("Hello World!");

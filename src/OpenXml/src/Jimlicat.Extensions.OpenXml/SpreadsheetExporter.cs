@@ -1,9 +1,12 @@
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.VisualBasic;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -24,6 +27,14 @@ namespace Jimlicat.OpenXml
         /// 属性名对应属性字典
         /// </summary>
         private readonly Dictionary<string, PropertyInfo> _propertyDic;
+        /// <summary>
+        /// <see cref="ExpandoObject"/> 数据
+        /// </summary>
+        private readonly ICollection<ExpandoObject> _expandoObjectData;
+        /// <summary>
+        /// 是否 <see cref="ExpandoObject"/> 数据
+        /// </summary>
+        private bool isExpandoObjectData = false;
         /// <summary>
         /// 列信息
         /// </summary>
@@ -67,6 +78,31 @@ namespace Jimlicat.OpenXml
                     {
                         c.Width = GetWidth(pv.PropertyType);
                     }
+                }
+            }
+            SheetName = typeof(T).Name;
+            InitBoolText();
+        }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="sourceDatas">要导出的数据</param>
+        /// <param name="columns">列信息</param>
+        public SpreadsheetExporter(ICollection<ExpandoObject> sourceDatas, IEnumerable<ColumnInfo> columns)
+        {
+            if (sourceDatas == null)
+            {
+                throw new ArgumentNullException(nameof(sourceDatas));
+            }
+            _expandoObjectData = sourceDatas;
+            isExpandoObjectData = true;
+            _columnInfos = new List<ColumnInfo>();
+            _columnInfos.AddRange(columns);
+            foreach (var c in _columnInfos)
+            {
+                if (c.AutoWidth)
+                {
+                    c.Width = 18;
                 }
             }
             SheetName = typeof(T).Name;
@@ -347,9 +383,8 @@ namespace Jimlicat.OpenXml
         /// </summary>
         /// <param name="val">值</param>
         /// <param name="format">格式字符串</param>
-        /// <param name="valType">值类型</param>
         /// <returns></returns>
-        private Cell ConstructCell(object val, string format, Type valType)
+        private Cell ConstructCell(object val, string format)
         {
             Cell cell = new Cell();
             if (val is null)
@@ -414,8 +449,9 @@ namespace Jimlicat.OpenXml
                 string fv = FormatBool(nvb.Value);
                 CellSetString(cell, fv);
             }
-            else if (valType.IsEnum)
+            else if (val.GetType().IsEnum)
             {
+                var valType = val.GetType();
                 string name = Enum.GetName(valType, val);
                 string text;
                 if (name == null)
@@ -554,7 +590,7 @@ namespace Jimlicat.OpenXml
                         // col
                         writer.WriteElement(column);
                     }
-                    
+
                     Cell cell = ConstructHeadCell(citem.Show);
                     cell.CellReference = CellReferenceUtil.GetCellReference(0, (uint)i);
                     headCells[i] = cell;
@@ -574,24 +610,48 @@ namespace Jimlicat.OpenXml
 
                 // 写入数据
                 uint rowIndex = 2;
-                foreach (T data in _sourceDatas)
+                if (isExpandoObjectData)
                 {
-                    Row row = new Row() { RowIndex = rowIndex, Spans = new ListValue<StringValue>() { InnerText = $"1:{columnCount}" } };
-                    // row 开始
-                    writer.WriteStartElement(row);
-                    for (int k = 0; k < columnCount; k++)
+                    foreach (IDictionary<string, object> dataDic in _expandoObjectData)
                     {
-                        ColumnInfo citem = _columnInfos[k];
-                        PropertyInfo pi = _propertyDic[citem.PropertyName];
-                        object v = pi.GetValue(data, null);
-                        Cell cell = ConstructCell(v, citem.FormatString, pi.PropertyType);
-                        cell.CellReference = CellReferenceUtil.GetCellReference(rowIndex - 1, (uint)k);
-                        // 写入 c
-                        writer.WriteElement(cell);
+                        Row row = new Row() { RowIndex = rowIndex, Spans = new ListValue<StringValue>() { InnerText = $"1:{columnCount}" } };
+                        // row 开始
+                        writer.WriteStartElement(row);
+                        for (int k = 0; k < columnCount; k++)
+                        {
+                            ColumnInfo citem = _columnInfos[k];
+                            dataDic.TryGetValue(citem.PropertyName, out object v);
+                            Cell cell = ConstructCell(v, citem.FormatString);
+                            cell.CellReference = CellReferenceUtil.GetCellReference(rowIndex - 1, (uint)k);
+                            // 写入 c
+                            writer.WriteElement(cell);
+                        }
+                        // row 结束
+                        writer.WriteEndElement();
+                        rowIndex++;
                     }
-                    // row 结束
-                    writer.WriteEndElement();
-                    rowIndex++;
+                }
+                else
+                {
+                    foreach (T data in _sourceDatas)
+                    {
+                        Row row = new Row() { RowIndex = rowIndex, Spans = new ListValue<StringValue>() { InnerText = $"1:{columnCount}" } };
+                        // row 开始
+                        writer.WriteStartElement(row);
+                        for (int k = 0; k < columnCount; k++)
+                        {
+                            ColumnInfo citem = _columnInfos[k];
+                            PropertyInfo pi = _propertyDic[citem.PropertyName];
+                            object v = pi.GetValue(data, null);
+                            Cell cell = ConstructCell(v, citem.FormatString);
+                            cell.CellReference = CellReferenceUtil.GetCellReference(rowIndex - 1, (uint)k);
+                            // 写入 c
+                            writer.WriteElement(cell);
+                        }
+                        // row 结束
+                        writer.WriteEndElement();
+                        rowIndex++;
+                    }
                 }
                 // sheetData 结束
                 writer.WriteEndElement();

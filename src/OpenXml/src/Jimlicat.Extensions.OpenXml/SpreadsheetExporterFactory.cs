@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 
@@ -27,6 +28,16 @@ namespace Jimlicat.OpenXml
         public static ISpreadsheetExporter Create<T>(IEnumerable<T> sourceDatas, IEnumerable<ColumnInfo> columns) where T : class
         {
             ISpreadsheetExporter exporter = new SpreadsheetExporter<T>(sourceDatas, columns);
+            return exporter;
+        }
+
+        /// <summary>
+        /// 创建<see cref="ISpreadsheetExporter"/>
+        /// </summary>
+        /// <returns></returns>
+        public static ISpreadsheetExporter Create(IList<ExpandoObject> sourceDatas, IEnumerable<ColumnInfo> columns)
+        {
+            ISpreadsheetExporter exporter = new SpreadsheetExporter<ExpandoObject>(sourceDatas, columns);
             return exporter;
         }
 
