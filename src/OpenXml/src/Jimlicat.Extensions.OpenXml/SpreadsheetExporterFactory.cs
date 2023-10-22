@@ -35,7 +35,7 @@ namespace Jimlicat.OpenXml
         /// 创建<see cref="ISpreadsheetExporter"/>
         /// </summary>
         /// <returns></returns>
-        public static ISpreadsheetExporter Create(IList<ExpandoObject> sourceDatas, IEnumerable<ColumnInfo> columns)
+        public static ISpreadsheetExporter Create(ICollection<ExpandoObject> sourceDatas, IEnumerable<ColumnInfo> columns)
         {
             ISpreadsheetExporter exporter = new SpreadsheetExporter<ExpandoObject>(sourceDatas, columns);
             return exporter;
