@@ -9,18 +9,6 @@ namespace Jimlicat.OpenXml
     public interface ISpreadsheetExporter
     {
         /// <summary>
-        /// Sheet名
-        /// </summary>
-        string SheetName { get; set; }
-        /// <summary>
-        /// <see cref="bool"/> true 文本
-        /// </summary>
-        string BoolTrueText { get; set; }
-        /// <summary>
-        /// <see cref="bool"/> false 文本
-        /// </summary>
-        string BoolFalseText { get; set; }
-        /// <summary>
         /// 导出
         /// </summary>
         /// <returns></returns>

@@ -1,6 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
+using System.Reflection;
 
 namespace Jimlicat.OpenXml
 {
@@ -12,42 +10,56 @@ namespace Jimlicat.OpenXml
         /// <summary>
         /// 属性字段名
         /// </summary>
-        public string PropertyName { get; set; }
+        public string PropertyName { get; set; } = "";
         /// <summary>
         /// 显示名
         /// </summary>
-        public string Show { get; set; }
+        public string Show { get; set; } = "";
         /// <summary>
         /// 格式字符串
         /// </summary>
-        public string FormatString { get; set; }
+        public string FormatString { get; set; } = "";
 
         private double? _width = null;
         /// <summary>
-        /// 长度
+        /// 长度，如果小于0，值会设置为0
         /// </summary>
         public double? Width
         {
             get
             {
-                if (_width != null && _width.Value < 1)
-                {
-                    return 1;
-                }
                 return _width;
             }
-            set => _width = value;
+            set
+            {
+                if (value is not null && value < 0)
+                {
+                    _width = 0;
+                }
+                else
+                {
+                    _width = value;
+                }
+            }
         }
         /// <summary>
-        /// 是否自动确定长度
+        /// <see cref="bool"/> true 文本
         /// </summary>
-        public bool AutoWidth { get; set; } = true;
+        public string BoolTrueText { get; set; } = "";
+        /// <summary>
+        /// <see cref="bool"/> false 文本
+        /// </summary>
+        public string BoolFalseText { get; set; } = "";
+        /// <summary>
+        /// 属性
+        /// </summary>
+        internal PropertyInfo? PropertyInfo { get; set; }
         /// <summary>
         /// 重写 Equals
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (!ReferenceEquals(this, obj))
             {
@@ -55,7 +67,7 @@ namespace Jimlicat.OpenXml
                 {
                     return false;
                 }
-                if (!(obj is ColumnInfo other))
+                if (obj is not ColumnInfo other)
                 {
                     return false;
                 }

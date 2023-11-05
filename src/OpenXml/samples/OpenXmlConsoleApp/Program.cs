@@ -1,9 +1,9 @@
-using Jimlicat.OpenXml;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Dynamic;
 using System.IO;
+using Jimlicat.OpenXml;
 
 namespace OpenXmlConsoleApp
 {
@@ -23,12 +23,10 @@ namespace OpenXmlConsoleApp
                 new ColumnInfo(){ PropertyName = nameof(Order.Season), Show="季节" },
                 new ColumnInfo(){ PropertyName = nameof(Order.Updated), Show="更新时间" },
             };
-            var exporter1 = SpreadsheetExporterFactory.Create(source, list);
-            using (var ms1 = new MemoryStream())
-            {
-                exporter1.Export(ms1);
-                ToFile(ms1);
-            }
+            SpreadsheetInfo spreadsheetInfo = new SpreadsheetInfo(list);
+            var exporter1 = SpreadsheetExporterFactory.Create(source, spreadsheetInfo);
+            string file1 = Path.Combine(AppContext.BaseDirectory, Guid.NewGuid().ToString("N") + ".xlsx");
+            exporter1.Export(file1);
 
             var exporter2 = SpreadsheetExporterFactory.Create(source);
             using (var ms2 = new MemoryStream())
@@ -52,7 +50,7 @@ namespace OpenXmlConsoleApp
                 new ColumnInfo(){ PropertyName = "P0" },
             };
 
-            var exporter3 = SpreadsheetExporterFactory.Create(data, dataCInfos);
+            var exporter3 = SpreadsheetExporterFactory.Create(data, new SpreadsheetInfo(dataCInfos));
             using (var ms3 = new MemoryStream())
             {
                 exporter3.Export(ms3);
