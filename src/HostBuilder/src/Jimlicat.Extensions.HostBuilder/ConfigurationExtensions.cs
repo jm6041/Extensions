@@ -19,7 +19,7 @@ namespace Microsoft.Extensions.Configuration
         /// <returns>证书指纹集合</returns>
         public static string[] GetTrustCertificatesThumbprints(this IConfiguration configuration)
         {
-            string vals = configuration.GetSection("TrustCertificates:Thumbprints").Value;
+            var vals = configuration.GetSection("TrustCertificates:Thumbprints").Value;
             if (vals != null)
             {
                 return vals.Split(separator, StringSplitOptions.RemoveEmptyEntries);
@@ -33,7 +33,7 @@ namespace Microsoft.Extensions.Configuration
         /// <returns>证书序列号集合</returns>
         public static string[] GetTrustCertificatesSerialNumbers(this IConfiguration configuration)
         {
-            string vals = configuration.GetSection("TrustCertificates:SerialNumbers").Value;
+            var vals = configuration.GetSection("TrustCertificates:SerialNumbers").Value;
             if (vals != null)
             {
                 return vals.Split(separator, StringSplitOptions.RemoveEmptyEntries);
@@ -45,12 +45,12 @@ namespace Microsoft.Extensions.Configuration
         /// </summary>
         /// <param name="configuration"></param>
         /// <returns></returns>
-        public static string GetConnectionString(this IConfiguration configuration)
+        public static string? GetConnectionString(this IConfiguration configuration)
         {
             // 入口程序集名
             var entryName = HostHelper.EntryAssemblyName;
             // 获得连接字符串
-            string connectionString = configuration.GetConnectionString(configuration.GetSection("db:ConnectionName").Value ?? entryName);
+            var connectionString = configuration.GetConnectionString(configuration.GetSection("db:ConnectionName").Value ?? entryName);
             return connectionString;
         }
 
@@ -62,7 +62,7 @@ namespace Microsoft.Extensions.Configuration
         public static Uri? GetGrpcGateway(this IConfiguration configuration)
         {
             // 获得 Grpc 网关
-            string gw = configuration.GetSection("Grpc:Gateway").Value;
+            var gw = configuration.GetSection("Grpc:Gateway").Value;
             if (string.IsNullOrEmpty(gw))
             {
                 return null;

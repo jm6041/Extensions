@@ -247,7 +247,7 @@ namespace Microsoft.Extensions.Hosting
             {
                 hostBuilder.ConfigureHostConfiguration((config) =>
                 {
-                    config.AddInMemoryCollection(new Dictionary<string, string>() {
+                    config.AddInMemoryCollection(new Dictionary<string, string?>() {
                         { StartupStatusFileKey, startupStatusFile }
                     });
                 });
@@ -276,24 +276,60 @@ namespace Microsoft.Extensions.Hosting
             bool hasFile = configuration.GetSection("Serilog:WriteTo").GetChildren().Any(x => x.GetSection("Name").Value == "File");
             return hasFile;
         }
-        private static LogLevel GetDefaultLogLevel(IConfiguration configuration)
+        private static DefaultLogLevels GetDefaultLogLevels(IConfiguration configuration)
         {
             var defaltuLevel = LogLevel.Warning;
             if (IsDebug)
             {
                 defaltuLevel = LogLevel.Debug;
             }
-            var logLevel = configuration.GetValue("Logging:LogLevel:Default", defaltuLevel);
-            return logLevel;
+            var logLevels = GetLoggingLogLevel(configuration).ToList();
+            if (logLevels.Count != 0)
+            {
+                var defaults = logLevels.Where(x => x.Key.Equals("Default")).ToList();
+                if (defaults.Count != 0)
+                {
+                    defaltuLevel = defaults.Last().Value;
+                    logLevels = logLevels.Except(defaults).ToList();
+                }
+            }
+            return new DefaultLogLevels(defaltuLevel, logLevels);
+        }
+        private static IEnumerable<KeyValuePair<string, LogLevel>> GetLoggingLogLevel(IConfiguration configuration)
+        {
+            var logLevelSection = configuration.GetSection("Logging:LogLevel");
+            foreach (var subSection in logLevelSection.GetChildren())
+            {
+                var key = subSection.Key.Trim();
+                if (Enum.TryParse<LogLevel>(subSection.Value, out var ll))
+                {
+                    yield return new KeyValuePair<string, LogLevel>(key, ll);
+                }
+            }
+        }
+        private class DefaultLogLevels
+        {
+            public DefaultLogLevels(LogLevel defaultLogLevel, List<KeyValuePair<string, LogLevel>> logLevels)
+            {
+                DefaultLogLevel = defaultLogLevel;
+                LogLevels = logLevels;
+            }
+            public LogLevel DefaultLogLevel { get; }
+            public List<KeyValuePair<string, LogLevel>> LogLevels { get; }
         }
         private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration, Action<LoggerConfiguration>? loggerAction)
         {
             var logConfig = new LoggerConfiguration();
             if (!configuration.GetSection("Serilog:MinimumLevel:Default").Exists())   // Serilog:MinimumLevel:Default 不存在
             {
-                var defaltuLevel = GetDefaultLogLevel(configuration);
-                var logEventLevel = defaltuLevel.ToLogEventLevel();
+                var dles = GetDefaultLogLevels(configuration);
+                var logEventLevel = dles.DefaultLogLevel.ToLogEventLevel();
                 logConfig.MinimumLevel.Is(logEventLevel);
+                logConfig.MinimumLevel.Override("System", LogEventLevel.Warning);
+                foreach (var le in dles.LogLevels)
+                {
+                    logConfig.MinimumLevel.Override(le.Key, le.Value.ToLogEventLevel());
+                }
             }
             loggerAction?.Invoke(logConfig);
             if (!HasSerilogWriteToFile(configuration))  // 如果没有配置Serilog写文件日志，添加默认

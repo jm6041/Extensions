@@ -52,7 +52,11 @@ namespace WpfApp
             string errorFileName = HostHelper.GetFileName(logsDir, "error");
             try
             {
-                IHostBuilder hostBuilder = HostHelper.CreateHostBuilder(arrEmpty, statusFileName);
+                IHostBuilder hostBuilder = HostHelper.CreateHostBuilder(arrEmpty, statusFileName, loggerConfig =>
+                {
+                    loggerConfig.MinimumLevel.Override("System", Serilog.Events.LogEventLevel.Warning);
+                    loggerConfig.MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning);
+                });
                 hostBuilder.ConfigureAppConfiguration((context, configBuilder) =>
                 {
                 }).ConfigureServices((context, services) =>

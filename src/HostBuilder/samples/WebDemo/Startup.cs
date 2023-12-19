@@ -75,7 +75,7 @@ namespace WebDemo
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseOpenApi();
             // NSwag
-            app.UseSwaggerUi3(c =>
+            app.UseSwaggerUi(c =>
             {
                 c.DocExpansion = "list";
                 c.DefaultModelExpandDepth = 3;
