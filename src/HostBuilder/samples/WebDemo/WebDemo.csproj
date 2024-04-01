@@ -15,7 +15,7 @@
     <PackageReference Include="Grpc.AspNetCore" Version="2.59.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.0.3" />
-    <PackageReference Include="NSwag.AspNetCore" Version="14.0.0-preview012" />
+    <PackageReference Include="NSwag.AspNetCore" Version="14.0.7" />
   </ItemGroup>
 
   <ItemGroup>
