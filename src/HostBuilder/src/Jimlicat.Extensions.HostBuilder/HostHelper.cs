@@ -213,17 +213,14 @@ namespace Microsoft.Extensions.Hosting
         /// <returns></returns>
         public static string GetCustomConfigJsonFile(string contentRoot, DirectoryInfo? endDir)
         {
-            DirectoryInfo dir = new DirectoryInfo(contentRoot);
+            var dir = new DirectoryInfo(contentRoot);
             if (dir.Parent == null)
             {
                 return string.Empty;
             }
             var file = DirectoryHelper.GetPathOfFileAbove("*config.json", dir.Parent, endDir);
             // 自定义配置文件不存在，用空文件代替
-            if (file == null)
-            {
-                file = string.Empty;
-            }
+            file ??= string.Empty;
             return file;
         }
         /// <summary>
@@ -336,7 +333,7 @@ namespace Microsoft.Extensions.Hosting
             public LogLevel DefaultLogLevel { get; }
             public List<KeyValuePair<string, LogLevel>> LogLevels { get; }
         }
-        private static Serilog.ILogger CreateLogger(string contentRoot, IConfiguration configuration, Action<LoggerConfiguration>? loggerAction)
+        private static Serilog.Core.Logger CreateLogger(string contentRoot, IConfiguration configuration, Action<LoggerConfiguration>? loggerAction)
         {
             var logConfig = new LoggerConfiguration();
             if (!configuration.GetSection("Serilog:MinimumLevel:Default").Exists())   // Serilog:MinimumLevel:Default 不存在
@@ -428,9 +425,7 @@ namespace Microsoft.Extensions.Hosting
             {
                 df.Delete();
             }
-            DateTimeOffset now = DateTimeOffset.Now;
-            //string n = string.Format("{0}-{1:yyyyMMdd}-{2}.log", start, now, now.Ticks);
-            string n = string.Format("{0}-{1:yyyyMMdd}.log", start, now);
+            string n = $"{start}-{DateTime.Now:yyyyMMdd}.log";
             string fn = Path.Combine(dir, n);
             return fn;
         }
@@ -589,7 +584,7 @@ namespace Microsoft.Extensions.Hosting
                 b.Append(c.Key);
                 if (!string.IsNullOrEmpty(c.Value))
                 {
-                    b.Append("=\"").Append(c.Value).Append("\"");
+                    b.Append('=').Append('"').Append(c.Value).Append('"');
                 }
                 b.AppendLine();
             }
