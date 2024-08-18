@@ -87,10 +87,14 @@ namespace Microsoft.AspNetCore.Builder
             return HostHelper.InitContentRoot(cr, args, endDir);
         }
         /// <summary>
-        /// <see cref="HostHelper.ContentRoot()"/>
+        /// <see cref="HostHelper.ContentRoot"/>
         /// </summary>
         /// <returns>ContentRoot</returns>
         public static string ContentRoot => HostHelper.ContentRoot;
+        /// <summary>
+        /// <see cref="HostHelper.AppsettingsJsonFile"/>
+        /// </summary>
+        public static string AppsettingsJsonFile => HostHelper.AppsettingsJsonFile;
         /// <summary>
         /// <see cref="HostHelper.EndDirInfo"/>
         /// </summary>

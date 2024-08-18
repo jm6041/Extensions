@@ -32,6 +32,10 @@ namespace Microsoft.Extensions.Hosting
         /// </summary>
         private static volatile string? s_ContentRoot;
         /// <summary>
+        /// appsettings.json 文件
+        /// </summary>
+        private static volatile string? s_AppsettingsJson;
+        /// <summary>
         /// 递归向上查找文件的结束目录
         /// </summary>
         private static volatile DirectoryInfo? s_EndDirInfo;
@@ -124,6 +128,7 @@ namespace Microsoft.Extensions.Hosting
             {
                 File.WriteAllText(appsettingsJson, "{}");
             }
+            Interlocked.CompareExchange(ref s_AppsettingsJson, appsettingsJson, null);
             return s_ContentRoot;
         }
         /// <summary>
@@ -139,6 +144,20 @@ namespace Microsoft.Extensions.Hosting
                     throw new InvalidOperationException("Invoke InitContentRoot");
                 }
                 return s_ContentRoot;
+            }
+        }
+        /// <summary>
+        /// appsettings.json 文件
+        /// </summary>
+        public static string AppsettingsJsonFile
+        {
+            get
+            {
+                if (s_AppsettingsJson == null)
+                {
+                    throw new InvalidOperationException("Invoke InitContentRoot");
+                }
+                return s_AppsettingsJson;
             }
         }
         /// <summary>
