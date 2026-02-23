@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;netstandard2.0;net4.8</TargetFrameworks>
+    <TargetFrameworks>net10.0;net8.0;netstandard2.0;net4.8</TargetFrameworks>
     <Nullable>enable</Nullable>
     <RootNamespace>Jimlicat.OpenXml</RootNamespace>
     <Description>Jimlicat openxml extensions</Description>
@@ -14,6 +14,6 @@
     <LangVersion>10.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DocumentFormat.OpenXml" Version="3.1.0" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="3.4.1" />
   </ItemGroup>
 </Project>
