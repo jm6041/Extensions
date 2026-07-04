@@ -69,7 +69,7 @@ namespace BCLConsoleApp
             Console.WriteLine("1字节");
             byte maxByte = byte.MaxValue;
             Console.WriteLine(maxByte);
-            string maxByte32 = Base32.ToBase32NP(BitConverter.GetBytes(maxByte));
+            string maxByte32 = Base32.ToBase32NP([maxByte]);
             Console.WriteLine(maxByte32);
             Console.WriteLine(maxByte32.Length);
 
